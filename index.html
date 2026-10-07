@@ -34,3 +34,935 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0D1211; --surface:#151B19; --sunk:#0A0E0D; --line:#27302D; --line2:#1D2523;
+  --ink:#EDF2EE; --ink2:#A9B4AE; --ink3:#78847E;
+  --accent:#58C2A8; --on-accent:#07201B; --accent-soft:#16302A;
+  --s-available:#5CC795; --s-available-bg:#12291F;
+  --s-occupied:#C4CEC8;  --s-occupied-bg:#262F2C;
+  --s-reserved:#A3A3F0;  --s-reserved-bg:#1E1F3A;
+  --s-ordering:#E3B549;  --s-ordering-bg:#33290E;
+  --s-waiting:#F0975A;   --s-waiting-bg:#3A2212;
+  --s-bill:#F0808A;      --s-bill-bg:#3B171B;
+  --s-cleaning:#78847E;  --s-cleaning-bg:#1A211F;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1211; --surface:#151B19; --sunk:#0A0E0D; --line:#27302D; --line2:#1D2523;
+  --ink:#EDF2EE; --ink2:#A9B4AE; --ink3:#78847E;
+  --accent:#58C2A8; --on-accent:#07201B; --accent-soft:#16302A;
+  --s-available:#5CC795; --s-available-bg:#12291F;
+  --s-occupied:#C4CEC8;  --s-occupied-bg:#262F2C;
+  --s-reserved:#A3A3F0;  --s-reserved-bg:#1E1F3A;
+  --s-ordering:#E3B549;  --s-ordering-bg:#33290E;
+  --s-waiting:#F0975A;   --s-waiting-bg:#3A2212;
+  --s-bill:#F0808A;      --s-bill-bg:#3B171B;
+  --s-cleaning:#78847E;  --s-cleaning-bg:#1A211F;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+
+*,*:before,*:after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.num{font-family:var(--display);font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.muted{color:var(--ink2)} .dim{color:var(--ink3)}
+
+/* shell */
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);height:100%}
+.rail{border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:22px;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px}
+.brand i{width:30px;height:30px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:600 16px var(--display);font-style:normal}
+.brand b{font:500 16px var(--display);letter-spacing:-.01em;display:block}
+.brand small{display:block;font-size:11px;color:var(--ink3);letter-spacing:.04em}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:11px;padding:10px 10px;border-radius:10px;color:var(--ink2);font-weight:500;text-align:left;white-space:nowrap}
+.nav button:hover{background:var(--sunk);color:var(--ink)}
+.nav button.on{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.nav svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nav .soon{margin-left:auto;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.rail-foot{margin-top:auto;padding:12px 10px;border-top:1px solid var(--line);font-size:12px;color:var(--ink3)}
+.main{display:flex;flex-direction:column;min-width:0;height:100%}
+.top{display:flex;align-items:center;gap:14px;padding:14px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.top h1{font-size:20px;margin-right:auto}
+.clock{font:500 13px var(--mono);color:var(--ink2);white-space:nowrap}
+.seg{display:inline-flex;background:var(--sunk);border-radius:11px;padding:3px;gap:2px}
+.seg button{padding:8px 14px;border-radius:8px;font-weight:500;color:var(--ink2);font-size:14px;white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.view{flex:1;overflow:auto;padding:26px 28px 40px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+
+/* building blocks */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.panel>header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}
+.panel h2{font-size:17px}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))} .g2{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)} .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpi{display:flex;flex-direction:column;gap:6px;padding:18px 20px;border-right:1px solid var(--line2)}
+.kpi:last-child{border-right:0}
+.kpi .num{font-size:34px;line-height:1.05;font-weight:500}
+.kpi small{font-size:12px;color:var(--ink3)} .up{color:var(--s-available)} .down{color:var(--s-bill)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:11px;border:1px solid var(--line);background:var(--surface);font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--ink3)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.big{min-height:54px;font-size:16px;width:100%}
+.btn.quiet{border-color:transparent;background:var(--sunk)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;background:var(--pb,var(--sunk));color:var(--pc,var(--ink2))}
+.pill:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.p-available{--pb:var(--s-available-bg);--pc:var(--s-available)} .p-occupied{--pb:var(--s-occupied-bg);--pc:var(--s-occupied)}
+.p-reserved{--pb:var(--s-reserved-bg);--pc:var(--s-reserved)} .p-ordering{--pb:var(--s-ordering-bg);--pc:var(--s-ordering)}
+.p-waiting{--pb:var(--s-waiting-bg);--pc:var(--s-waiting)} .p-bill{--pb:var(--s-bill-bg);--pc:var(--s-bill)} .p-cleaning{--pb:var(--s-cleaning-bg);--pc:var(--s-cleaning)}
+.p-new{--pb:var(--s-reserved-bg);--pc:var(--s-reserved)} .p-preparing{--pb:var(--s-ordering-bg);--pc:var(--s-ordering)} .p-ready{--pb:var(--s-available-bg);--pc:var(--s-available)} .p-served{--pb:var(--s-cleaning-bg);--pc:var(--s-cleaning)}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line2);min-width:0}
+.row:first-of-type{border-top:0}
+.row .grow{flex:1;min-width:0} .row b{font-weight:600} .row .t{font:500 13px var(--mono);color:var(--ink2);width:52px;flex:none}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.ava{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:600 12px var(--body);flex:none}
+.bar{height:6px;border-radius:9px;background:var(--sunk);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:9px}
+.stack{display:flex;height:10px;border-radius:9px;overflow:hidden;gap:2px;background:var(--surface)}.stack i{display:block;min-width:4px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:13px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.legend i{width:10px;height:10px;border-radius:3px;display:block}
+.tasks .row{padding:13px 0}
+.task-go{margin-left:auto}
+
+/* floor plan */
+.floor{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.floor svg{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.floor.edit svg{touch-action:none;cursor:default}
+.fscroll{overflow-x:auto}
+.zone{fill:var(--bg);stroke:var(--line);stroke-width:1}
+.zone-l{font:600 11px var(--body);letter-spacing:.09em;text-transform:uppercase;fill:var(--ink3)}
+.fx{fill:var(--sunk);stroke:var(--line);stroke-width:1}.fx-l{font:600 11px var(--body);letter-spacing:.08em;text-transform:uppercase;fill:var(--ink2)}
+.tb{cursor:pointer}.tb .sh{stroke-width:1.6;transition:fill .25s,stroke .25s}.tb .ch{fill:var(--line)}
+.tb text{pointer-events:none}.tb .n{font:600 15px var(--display);fill:var(--ink)}.tb .m{font:500 10px var(--mono);fill:var(--ink2)}
+.tb.sel .sh{stroke-width:3}.tb.dimmed{opacity:.32}
+.st-available .sh{fill:var(--s-available-bg);stroke:var(--s-available)} .st-occupied .sh{fill:var(--s-occupied-bg);stroke:var(--s-occupied)}
+.st-reserved .sh{fill:var(--s-reserved-bg);stroke:var(--s-reserved)} .st-ordering .sh{fill:var(--s-ordering-bg);stroke:var(--s-ordering)}
+.st-waiting .sh{fill:var(--s-waiting-bg);stroke:var(--s-waiting)} .st-bill .sh{fill:var(--s-bill-bg);stroke:var(--s-bill)}
+.st-cleaning .sh{fill:var(--s-cleaning-bg);stroke:var(--s-cleaning);stroke-dasharray:5 4}
+.st-bill .sh{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{stroke-width:4}}
+.floor.edit .tb{cursor:grab}.floor.edit .tb .sh{fill:var(--surface);stroke:var(--ink2)}.floor.edit .tb.sel .sh{stroke:var(--accent)}
+.floor-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line)}
+.insp{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.insp label{display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.insp input,.insp select,.fld input,.fld textarea{min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:0 12px;font:500 15px var(--body);min-width:0}
+.fld{display:flex;flex-direction:column;gap:6px}.fld textarea{padding:10px 12px;min-height:70px;resize:vertical}
+
+/* side sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,14,13,.38);z-index:30;display:flex;justify-content:flex-end}
+.sheet{width:min(440px,100%);height:100%;background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;box-shadow:var(--shadow);animation:in .22s ease}
+@keyframes in{from{transform:translateX(24px);opacity:0}}
+.sheet>header{padding:20px 22px 14px;border-bottom:1px solid var(--line2);display:flex;align-items:flex-start;gap:12px}
+.sheet>header h2{font-size:26px}.sheet .body{flex:1;overflow:auto;padding:18px 22px;display:flex;flex-direction:column;gap:18px}
+.sheet>footer{padding:14px 22px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line2);display:flex;flex-direction:column;gap:8px}
+.x{margin-left:auto;width:38px;height:38px;border-radius:10px;background:var(--sunk);display:grid;place-items:center;font-size:20px;line-height:1;flex:none}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}.facts div b{display:block;font:500 17px var(--display)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:38px;padding:0 14px;border-radius:99px;border:1px solid var(--line);font-weight:500;font-size:14px;background:var(--surface)}
+.chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.line{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line2)}.line:first-child{border-top:0}
+.line .q{font:500 14px var(--mono);width:28px;flex:none;color:var(--ink2)}.line .p{margin-left:auto;font:500 14px var(--mono);white-space:nowrap}
+.line small{display:block;color:var(--ink3);font-size:12px}
+.total{display:flex;justify-content:space-between;align-items:baseline;font:500 22px var(--display);padding-top:10px;border-top:1px solid var(--line)}
+
+/* order screen */
+.order{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+.cats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.dish{display:flex;flex-direction:column;gap:6px;text-align:left;padding:14px;border-radius:13px;border:1px solid var(--line);background:var(--surface);min-height:118px;transition:border-color .15s,transform .1s}
+.dish:hover{border-color:var(--ink3)}.dish:active{transform:scale(.985)}
+.dish b{font:500 16px/1.2 var(--display)}.dish small{color:var(--ink3);font-size:12.5px;line-height:1.35;flex:1}
+.dish .pr{font:500 14px var(--mono)}.dish.off{opacity:.45;cursor:not-allowed}
+.dish .cnt{align-self:flex-start;background:var(--accent);color:var(--on-accent);border-radius:99px;font:600 12px var(--mono);padding:1px 8px}
+.ticket{position:sticky;top:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.step button{width:46px;height:46px;font-size:20px}.step span{min-width:44px;text-align:center;font:500 18px var(--mono)}
+
+/* kitchen */
+.kds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+.kcol>header{display:flex;align-items:center;gap:10px;margin-bottom:12px}.kcol h2{font-size:15px;letter-spacing:.08em;text-transform:uppercase;font-family:var(--body);font-weight:600}
+.kcol .count{font:500 13px var(--mono);color:var(--ink3)}
+.tk{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;margin-bottom:12px;border-top:4px solid var(--kc,var(--line))}
+.tk.new{--kc:var(--s-reserved)}.tk.preparing{--kc:var(--s-ordering)}.tk.ready{--kc:var(--s-available)}.tk.late{--kc:var(--s-bill)}
+.tk header{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tk .tn{font:600 26px var(--display)}.tk .on{font:500 13px var(--mono);color:var(--ink3)}
+.tk ul{list-style:none;margin:0;padding:0;font:500 16px/1.35 var(--mono)}.tk li{padding:5px 0;border-top:1px dashed var(--line)}.tk li:first-child{border-top:0}
+.tk li small{display:block;font-size:13px;color:var(--s-waiting);font-weight:500}
+.tk .el{font:500 13px var(--mono);color:var(--ink2)}.tk.late .el{color:var(--s-bill)}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:22px;text-align:center;color:var(--ink3);font-size:14px}
+
+.userchip{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:99px;background:var(--surface);text-align:left}
+.userchip:hover{border-color:var(--ink3)}.userchip b{display:block;font-size:14px;line-height:1.2;white-space:nowrap}.userchip small{display:block;font-size:11px;color:var(--ink3);white-space:nowrap}
+.signin{grid-column:1/-1;height:100%;overflow:auto;display:flex;justify-content:center;padding:32px 16px}
+.si-card{width:min(560px,100%);display:flex;flex-direction:column;gap:22px;margin:auto 0}
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.person{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface);text-align:left;min-width:0}
+.person:hover{border-color:var(--accent)}.person b{display:block}.person small{color:var(--ink3);font-size:12.5px}.person span:last-child{min-width:0}
+.dots{display:flex;gap:14px;justify-content:center}.dots i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--ink3)}.dots i.on{background:var(--accent);border-color:var(--accent)}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:12px;justify-content:center}
+.pad button{height:68px;border-radius:18px;border:1px solid var(--line);background:var(--surface);font:500 24px var(--display)}.pad button:active{background:var(--accent-soft)}
+.perm{width:100%;border-collapse:collapse;font-size:13.5px;min-width:460px}.perm th{font:600 11px var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);padding:8px 6px;text-align:center}
+.perm td{padding:9px 6px;border-top:1px solid var(--line2);text-align:center}.perm td:first-child{text-align:left;font-weight:500}.perm .yes{color:var(--accent)}.perm .no{color:var(--ink3)}
+.toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:500;z-index:60;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.note{background:var(--accent-soft);color:var(--ink);border-radius:12px;padding:14px 16px;font-size:14px}
+.soonlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.soonlist div{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface)}.soonlist b{display:block;font:500 16px var(--display);margin-bottom:4px}
+.axis{font:500 10px var(--mono);fill:var(--ink3)}
+
+@media (max-width:1060px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi:nth-child(2){border-right:0}.kpi:nth-child(-n+2){border-bottom:1px solid var(--line2)}.g2,.g3{grid-template-columns:minmax(0,1fr)}.order{grid-template-columns:minmax(0,1fr)}.ticket{position:static}}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+  .rail{order:2;flex-direction:row;border-right:0;border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));gap:0;overflow-x:auto;scrollbar-width:none}
+  .brand,.rail-foot{display:none}.nav{flex-direction:row;gap:2px}.nav button{flex-direction:column;gap:3px;font-size:11px;padding:8px 12px}.nav .soon{display:none}
+  .top{padding:12px 16px}.top h1{font-size:18px;flex-basis:100%;margin:0}.view{padding:16px 16px 28px}
+  .kds{grid-template-columns:minmax(0,1fr)}
+  .fscroll svg{min-width:760px}
+  .scrim{align-items:flex-end}.sheet{width:100%;height:auto;max-height:92%;border-left:0;border-top:1px solid var(--line);border-radius:18px 18px 0 0;animation:up .22s ease}
+  @keyframes up{from{transform:translateY(24px);opacity:0}}
+  .kpi .num{font-size:28px}
+  .userchip small{display:none}.g3>.kpi{border-right:0;border-bottom:1px solid var(--line2)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---- two skins. "house": the owner's side, warm paper and menu type. "service": the floor, kitchen and till, dark and loud so a glance is enough. ---- */
+:root[data-skin="house"]{
+  --bg:#F4ECDF; --surface:#FFFAF2; --sunk:#EADFCD; --line:#DCCFB8; --line2:#EADFCC; --ink:#231A14; --ink2:#5E5045; --ink3:#7A6B5D;
+  --accent:#A8432A; --on-accent:#FFF6EC; --accent-soft:#F3DCCF; --brass:#96701F; --hero:#231A14; --rail:#231A14;
+  --s-available:#2F7D4F; --s-available-bg:#DFEBD9; --s-occupied:#4A3D33; --s-occupied-bg:#E3D8C8; --s-reserved:#5450A8; --s-reserved-bg:#E4E1F2;
+  --s-ordering:#96690A; --s-ordering-bg:#F5E6C2; --s-waiting:#B8561A; --s-waiting-bg:#F7DFC9; --s-bill:#AE2F3A; --s-bill-bg:#F5D9D8; --s-cleaning:#7A6B5D; --s-cleaning-bg:#EEE5D6;
+  --shadow:0 1px 2px rgba(35,26,20,.07),0 10px 28px rgba(35,26,20,.08); color-scheme:light;
+  --display:"Fraunces",Georgia,"Times New Roman",serif}
+@media (prefers-color-scheme:dark){:root[data-skin="house"]:not([data-theme="light"]){--bg:#17120E; --surface:#211A15; --sunk:#110D0A; --line:#3D3128; --line2:#2C231D; --ink:#F5EBDD; --ink2:#C6B7A6; --ink3:#9C8B78;
+  --accent:#EB8563; --on-accent:#2A0F06; --accent-soft:#40221A; --brass:#D6AE5C; --hero:#2B2019; --rail:#110D0A;
+  --s-available:#5CC795; --s-available-bg:#1A2B1F; --s-occupied:#D6CCBF; --s-occupied-bg:#33291F; --s-reserved:#B0AEF2; --s-reserved-bg:#25233F;
+  --s-ordering:#E3B549; --s-ordering-bg:#3A2D0E; --s-waiting:#F0975A; --s-waiting-bg:#40240F; --s-bill:#F0808A; --s-bill-bg:#42181C; --s-cleaning:#93826F; --s-cleaning-bg:#241C16; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-skin="house"][data-theme="dark"]{--bg:#17120E; --surface:#211A15; --sunk:#110D0A; --line:#3D3128; --line2:#2C231D; --ink:#F5EBDD; --ink2:#C6B7A6; --ink3:#9C8B78;
+  --accent:#EB8563; --on-accent:#2A0F06; --accent-soft:#40221A; --brass:#D6AE5C; --hero:#2B2019; --rail:#110D0A;
+  --s-available:#5CC795; --s-available-bg:#1A2B1F; --s-occupied:#D6CCBF; --s-occupied-bg:#33291F; --s-reserved:#B0AEF2; --s-reserved-bg:#25233F;
+  --s-ordering:#E3B549; --s-ordering-bg:#3A2D0E; --s-waiting:#F0975A; --s-waiting-bg:#40240F; --s-bill:#F0808A; --s-bill-bg:#42181C; --s-cleaning:#93826F; --s-cleaning-bg:#241C16; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+:root[data-skin="service"]{
+  --bg:#0B0A09; --surface:#1B1816; --sunk:#050505; --line:#3A342F; --line2:#27231F; --ink:#FFF8EE; --ink2:#CFC5B8; --ink3:#9A9084;
+  --accent:#FF8A3D; --on-accent:#1E0D00; --accent-soft:#3D2210; --brass:#E7B955; --hero:#1B1816; --rail:#050505;
+  --s-available:#4ADE80; --s-available-bg:#0F2E1C; --s-occupied:#EDE6DC; --s-occupied-bg:#322D28; --s-reserved:#A9ACFF; --s-reserved-bg:#1F2046;
+  --s-ordering:#FFCC33; --s-ordering-bg:#3A2E06; --s-waiting:#FF9A4D; --s-waiting-bg:#40220B; --s-bill:#FF6B78; --s-bill-bg:#45141A; --s-cleaning:#9A9084; --s-cleaning-bg:#1F1C19;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 12px 32px rgba(0,0,0,.45); color-scheme:dark}
+.rail{background:var(--rail);color:#F5EBDD;--ink:#F5EBDD;--ink2:#CDBFAE;--ink3:#A39382;--surface:rgba(255,255,255,.09);--sunk:rgba(255,255,255,.05);--line:rgba(255,255,255,.14)}
+.brand i{border-radius:50%;background:none;box-shadow:inset 0 0 0 1.5px var(--brass);color:var(--brass);font:500 17px "Fraunces",Georgia,serif;width:34px;height:34px}
+.rail .brand i{--brass:#D6AE5C}
+.brand b{font-family:"Fraunces",Georgia,serif;font-size:17px}
+[data-skin="house"] h1,[data-skin="house"] h2{letter-spacing:-.005em}
+[data-skin="house"] .panel>header h2{font-size:19px}
+[data-skin="service"] body{font-size:16px}
+[data-skin="service"] h1,[data-skin="service"] h2,[data-skin="service"] .num{font-weight:600}
+[data-skin="service"] .top h1{font-size:24px}
+[data-skin="service"] .btn{min-height:50px;font-size:16px}
+[data-skin="service"] .pill{font-size:13px;padding:4px 11px}
+[data-skin="service"] .tk{border-top-width:8px}
+[data-skin="service"] .tk .tn{font-size:32px}
+[data-skin="service"] .tk ul{font-size:18px}
+[data-skin="service"] .kpi .num{font-size:38px}
+.hero{border:1px solid var(--line)}
+/* food */
+.food{--ft:#A8432A;flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:12px;font-size:25px;line-height:1;background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--ft) 34%,var(--surface)),color-mix(in srgb,var(--ft) 14%,var(--surface)))}
+.f-Starters{--ft:#6F8F2F}.f-Mains{--ft:#C0502D}.f-Sides{--ft:#D49A1E}.f-Desserts{--ft:#C7527A}.f-Drinks{--ft:#2B8C8C}.f-Coffee{--ft:#8A5A33}.f-Specials{--ft:#B8862B}
+.dish{padding:0;overflow:hidden;gap:0}
+.dish .food{width:100%;height:92px;border-radius:0;font-size:46px}
+.dish .dt{display:flex;flex-direction:column;gap:5px;padding:12px 14px 14px;flex:1;width:100%}
+.dish.off .food{filter:grayscale(1)}
+.cats .chip{gap:6px;display:inline-flex;align-items:center}
+.hero{background:var(--hero);color:#F8EEDF;border-radius:20px;padding:28px 30px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:end}
+.hero .eyebrow{color:#D6AE5C}
+.hero h2{font-size:38px;line-height:1.05;margin-top:8px;color:#FFF8EE}
+.hero p{margin:12px 0 0;color:#D9CBB8;max-width:46ch;font-size:16px}
+.pass{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pass div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.pass span{font-size:30px;line-height:1.1}.pass b{font:500 15px/1.2 var(--display);color:#FFF8EE}.pass small{color:#D9CBB8;font-size:12.5px}
+.mcard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.mcard h2{font-size:22px}.mcard .panel>header{border-bottom:1px solid var(--brass);padding-bottom:10px;margin-bottom:4px}
+.lead{flex:1;border-bottom:1.5px dotted var(--line);min-width:12px;align-self:end;margin-bottom:9px}
+@media (max-width:1060px){.hero{grid-template-columns:minmax(0,1fr)}.mcard{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.hero{padding:22px 18px}.hero h2{font-size:30px}.lead{display:none}}
+.food{overflow:hidden}.food img{width:100%;height:100%;object-fit:cover;display:block}
+.dish .food.ph{height:124px}
+.pass .food{width:54px;height:54px;border-radius:12px;font-size:30px;background:none}.pass .food.ph{width:100%;height:84px}
+.phrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px}.phrow .food{width:96px;height:72px;font-size:34px}
+.filebtn{position:relative;overflow:hidden}.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.filebtn:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.rcwrap{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:16px;overflow:auto}
+.rc{width:min(360px,100%);display:flex;flex-direction:column;gap:12px}
+.rc-paper{background:#FFFDF7;color:#1B1714;border-radius:6px;padding:24px 20px;font:13px/1.55 var(--mono)}
+.rc-paper h2{font:600 20px/1.2 var(--display);text-align:center;color:#1B1714;margin:0 0 4px}.rc-paper p{text-align:center;margin:0;color:#5A5048}
+.rc-hr{border-top:1px dashed #B9AD9E;margin:12px 0}
+.rc-r{display:flex;justify-content:space-between;gap:12px}.rc-r span:last-child{white-space:nowrap;text-align:right}.rc-r.big{font-size:16px;font-weight:600;margin-top:4px}
+.rc-actions{display:flex;gap:10px}.rc-actions .btn{flex:1}
+@media print{html,body{height:auto;background:#fff}.rail,.main,.toast,.scrim,.rc-actions{display:none!important}.app{display:block;height:auto}.rcwrap{position:static;background:none;padding:0;display:block}.rc{width:72mm}.rc-paper{padding:0;border-radius:0;background:#fff}}
+input:disabled,button.chip:disabled{opacity:.6;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+
+<div class="app" id="app"></div>
+
+<script>
+/* =====================================================================
+   Zema Hospitality · prototype
+   One in-memory store shared by every role, so an order a waiter sends
+   really appears on the kitchen display, and "Ready" really alerts the waiter.
+   ===================================================================== */
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const gbp=n=>'£'+Number(n).toLocaleString('en-GB',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2});
+const gbp2=n=>'£'+Number(n).toFixed(2);
+const now=()=>Date.now(), minsAgo=m=>now()-m*60000;
+const hhmm=t=>new Date(t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+const since=t=>{const m=Math.max(0,Math.round((now()-t)/60000));return m<60?m+' min':Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')};
+
+const STATUS={available:'Available',occupied:'Occupied',reserved:'Reserved',ordering:'Ordering',waiting:'Waiting for food',bill:'Bill requested',cleaning:'Cleaning'};
+const OSTATE={new:'New',preparing:'Preparing',ready:'Ready',served:'Served'};
+
+const STAFF=[
+ {id:'w1',name:'Selam Tesfaye',role:'Waiter',on:true},{id:'w2',name:'Marcus Reid',role:'Waiter',on:true},{id:'w3',name:'Hana Girma',role:'Waiter',on:true},
+ {id:'w4',name:'Olivia Chen',role:'Waiter',on:true},{id:'w5',name:'Daniel Okafor',role:'Waiter',on:false},{id:'w6',name:'Priya Nair',role:'Waiter',on:false},
+ {id:'k1',name:'Chef Yonas Bekele',role:'Head chef',on:true},{id:'k2',name:'Tom Whitaker',role:'Line cook',on:true},{id:'k3',name:'Aisha Rahman',role:'Line cook',on:true},
+ {id:'m1',name:'Rebecca Lawson',role:'Manager',on:true},{id:'m2',name:'Samuel Haile',role:'Manager',on:false},
+ {id:'c1',name:'Lily Brooks',role:'Cashier',on:true},{id:'o1',name:'Abenezer Mesfin',role:'Owner',on:true},{id:'a1',name:'Zema Hospitality',role:'Admin',on:true}];
+const ROLEKEY={Owner:'owner',Manager:'manager',Waiter:'waiter','Head chef':'kitchen','Line cook':'kitchen',Cashier:'cashier',Admin:'admin'};
+const OLD=[];
+const staff=id=>STAFF.find(s=>s.id===id)||OLD.find(s=>s.id===id)||{name:'Unassigned'}, ini=n=>n.replace(/^Chef /,'').split(' ').map(x=>x[0]).slice(0,2).join('');
+let ME='w1';
+
+const CATS=['Starters','Mains','Sides','Desserts','Drinks','Coffee','Specials'];
+const MENU=[
+ ['Starters','Sambusa','Crisp pastry, spiced lentils, green chilli',6.5],['Starters','Burrata & heritage tomato','Basil oil, sourdough crisp',9.5],
+ ['Starters','Crispy calamari','Lemon aioli, pickled chilli',8.5],['Starters','Soup of the day','Ask your server, with warm bread',6],
+ ['Starters','Timatim salad','Tomato, onion, jalapeño, lemon on injera',6.5],
+ ['Mains','Chicken pasta','Rigatoni, roast chicken, parmesan cream',16.5],['Mains','Ribeye steak 280g','Chips, peppercorn sauce, watercress',28],
+ ['Mains','Lamb tibs','Sautéed lamb, rosemary, awaze, injera',19.5],['Mains','Doro wat','Slow-cooked chicken, berbere, egg, injera',18],
+ ['Mains','Sea bass','Crushed potatoes, caper butter',21],['Mains','Vegetarian beyaynetu','Six-dish sharing platter on injera',16],
+ ['Mains','Zema burger','Aged beef, smoked cheddar, brioche',15.5],['Mains','Wild mushroom risotto','Truffle oil, pecorino',15],
+ ['Sides','Skin-on fries','Sea salt',4.5],['Sides','Injera basket','Two rolls, warm',3],['Sides','Gomen','Braised collard greens, garlic',4.5],['Sides','House salad','Leaves, lemon dressing',4.5],
+ ['Desserts','Baked cheesecake','Vanilla, berry compote',7.5],['Desserts','Chocolate fondant','Ten minutes to bake, vanilla ice cream',8],['Desserts','Affogato','Espresso over vanilla ice cream',6],['Desserts','Baklava','Pistachio, honey',6.5],
+ ['Drinks','Coke','330ml',3.2],['Drinks','Sparkling water','750ml',4.5],['Drinks','House red','175ml glass',7],['Drinks','House white','175ml glass',7],['Drinks','St George lager','330ml bottle',5.5],['Drinks','Fresh mango juice','Pressed to order',4.8],
+ ['Coffee','Ethiopian coffee','Jebena-brewed, served with popcorn',4.5],['Coffee','Flat white','Double shot',3.6],
+ ['Specials','Kitfo','Minced beef, mitmita, niter kibbeh, ayib',20],['Specials','Whole grilled tilapia','Awaze, lime, salad',22]
+].map((m,i)=>({id:'i'+i,cat:m[0],name:m[1],desc:m[2],price:m[3],on:!(m[1]==='Sea bass')}));
+const FOOD={'Sambusa':'🥟','Burrata & heritage tomato':'🍅','Crispy calamari':'🦑','Soup of the day':'🍲','Timatim salad':'🥗','Chicken pasta':'🍝','Ribeye steak 280g':'🥩','Lamb tibs':'🍖','Doro wat':'🍛','Sea bass':'🐟','Vegetarian beyaynetu':'🥘','Zema burger':'🍔','Wild mushroom risotto':'🍄','Skin-on fries':'🍟','Injera basket':'🫓','Gomen':'🥬','House salad':'🥗','Baked cheesecake':'🍰','Chocolate fondant':'🍫','Affogato':'🍨','Baklava':'🍯','Coke':'🥤','Sparkling water':'💧','House red':'🍷','House white':'🥂','St George lager':'🍺','Fresh mango juice':'🥭','Ethiopian coffee':'☕','Flat white':'☕','Kitfo':'🌶️','Whole grilled tilapia':'🐟'},CATI={Starters:'🥟',Mains:'🍛',Sides:'🍟',Desserts:'🍰',Drinks:'🍷',Coffee:'☕',Specials:'⭐'};
+const okPh=p=>typeof p==='string'&&p.length<70000&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p)?p:'';
+const phOf=m=>okPh(m.photo)||okPh((MENU.find(x=>x.name===m.name)||{}).photo);
+const art=m=>{const p=phOf(m);return`<span class="food f-${m.cat}${p?' ph':''}" aria-hidden="true">${p?`<img src="${p}" alt="" loading="lazy">`:FOOD[m.name]||CATI[m.cat]||'🍽️'}</span>`};
+const DEMO_MENU=MENU.map(m=>({...m})),GONE={id:'',cat:'Mains',name:'Removed dish',desc:'',price:0,on:false};
+const item=id=>MENU.find(m=>m.id===id)||GONE, ln=x=>x.name||item(x.item).name, byName=n=>MENU.find(m=>m.name===n).id;
+const ADDONS={Mains:['Extra sauce','No onions','Gluten-free','Sauce on the side'],Starters:['No chilli','To share'],Drinks:['No ice','Slice of lemon'],Coffee:['Oat milk','Extra hot'],Desserts:['Two spoons'],Sides:['Extra crispy'],Specials:['Rare','Medium','Well done']};
+
+/* ---------- floor: logical canvas 1000 x 620 ---------- */
+const ZONES=[{id:'window',name:'Window',x:60,y:40,w:440,h:110},{id:'main',name:'Main hall',x:60,y:170,w:500,h:250},{id:'booths',name:'Booths',x:580,y:170,w:380,h:250},{id:'terrace',name:'Terrace',x:60,y:440,w:500,h:150},{id:'private',name:'Private room',x:580,y:440,w:380,h:150}];
+const DEFAULT_FIX=[{id:'f1',kind:'Bar',x:520,y:56,w:250,h:78},{id:'f2',kind:'Kitchen',x:790,y:40,w:170,h:110},{id:'f3',kind:'Entrance',x:16,y:250,w:30,h:90}];
+const T=(n,x,y,shape,seats,zone)=>({id:'T'+n,name:'T'+n,x,y,shape,seats,zone});
+const DEFAULT_TABLES=[T(1,180,100,'round',2,'window'),T(2,270,100,'round',2,'window'),T(3,360,100,'round',2,'window'),T(4,450,100,'round',2,'window'),
+ T(5,150,245,'square',4,'main'),T(6,310,245,'square',4,'main'),T(7,470,245,'square',4,'main'),T(8,150,355,'square',4,'main'),T(9,310,355,'square',4,'main'),T(10,470,355,'square',4,'main'),
+ T(11,680,245,'rect',6,'booths'),T(12,860,245,'rect',6,'booths'),T(13,680,355,'rect',6,'booths'),T(14,860,355,'rect',6,'booths'),
+ T(15,130,518,'round',2,'terrace'),T(16,240,518,'round',4,'terrace'),T(17,360,518,'round',4,'terrace'),T(18,480,518,'round',2,'terrace'),
+ T(19,680,518,'rect',8,'private'),T(20,860,518,'rect',8,'private')];
+
+const S={user:'o1',pick:null,pin:'',rr:'day',payM:'Card',tx:[],set:{name:'Zema Kitchen',address:'14 Camden Passage, London N1 8EA',phone:'020 7946 0182',email:'hello@zemakitchen.example',hours:'Tue to Sun · 12:00 to 23:00',service:12.5,methods:{Card:true,Cash:true,'Apple Pay':true,Voucher:false}},
+ role:'owner',page:'dashboard',sel:null,edit:false,range:'today',cat:'Starters',orderFor:null,draft:[],mod:null,toast:null,
+ tables:[],fix:[],live:{},orders:[],paid:[],nextOrder:105,
+ res:[{t:'19:00',name:'John & Sarah Whitmore',guests:4,table:'T12',note:'Anniversary'},{t:'19:30',name:'Michael Asante',guests:2,table:'T4',note:''},{t:'19:45',name:'Bethlehem Family',guests:8,table:'T19',note:'Birthday cake at 21:00'},{t:'20:15',name:'Dr. Patel',guests:6,table:'T13',note:'One vegetarian, one nut allergy'},{t:'20:30',name:'Leor Films',guests:4,table:'T9',note:''}]};
+
+function loadLayout(){let d=null;try{d=JSON.parse(localStorage.getItem('zh-layout')||'null')}catch(_){}
+  S.tables=(d&&d.tables)||JSON.parse(JSON.stringify(DEFAULT_TABLES));S.fix=(d&&d.fix)||JSON.parse(JSON.stringify(DEFAULT_FIX))}
+function seed(){
+  loadLayout();
+  const L=(id,status,o={})=>{S.live[id]={status,guests:0,waiter:null,seated:null,note:'',...o}};
+  S.tables.forEach(t=>L(t.id,'available'));
+  L('T2','occupied',{guests:2,waiter:'w1',seated:minsAgo(48)});L('T3','ordering',{guests:2,waiter:'w1',seated:minsAgo(4)});
+  L('T4','reserved',{note:'19:30 · Michael Asante'});L('T5','waiting',{guests:4,waiter:'w1',seated:minsAgo(21),note:'Nut allergy at seat 2'});
+  L('T6','occupied',{guests:3,waiter:'w2',seated:minsAgo(55)});L('T7','waiting',{guests:4,waiter:'w1',seated:minsAgo(26)});
+  L('T8','bill',{guests:4,waiter:'w2',seated:minsAgo(92)});L('T10','cleaning');L('T11','occupied',{guests:5,waiter:'w3',seated:minsAgo(37)});
+  L('T12','reserved',{note:'19:00 · John & Sarah Whitmore'});L('T14','waiting',{guests:6,waiter:'w3',seated:minsAgo(18)});
+  L('T16','occupied',{guests:4,waiter:'w4',seated:minsAgo(64)});L('T17','bill',{guests:3,waiter:'w1',seated:minsAgo(81)});
+  L('T19','reserved',{note:'19:45 · Bethlehem Family'});L('T20','occupied',{guests:7,waiter:'w4',seated:minsAgo(43)});
+  const O=(id,table,waiter,status,ago,lines)=>S.orders.push({id,table,waiter,status,at:minsAgo(ago),lines:lines.map(([n,q,note])=>({item:byName(n),qty:q,note:note||''}))});
+  O(96,'T8','w2','served',80,[['Lamb tibs',2],['Doro wat',1],['Zema burger',1],['St George lager',4]]);
+  O(97,'T17','w1','served',70,[['Chicken pasta',2],['Wild mushroom risotto',1],['House white',3],['Baked cheesecake',2]]);
+  O(98,'T6','w2','served',44,[['Ribeye steak 280g',1,'Medium rare'],['Chicken pasta',2],['Coke',3]]);
+  O(99,'T2','w1','served',40,[['Burrata & heritage tomato',1],['Lamb tibs',1],['Vegetarian beyaynetu',1],['Fresh mango juice',2]]);
+  O(100,'T16','w4','served',52,[['Kitfo',2],['Injera basket',2],['St George lager',4]]);
+  O(101,'T11','w3','ready',16,[['Sambusa',3],['Timatim salad',2],['Sparkling water',2]]);
+  O(102,'T20','w4','preparing',14,[['Doro wat',3],['Lamb tibs',2],['Vegetarian beyaynetu',2],['Gomen',3]]);
+  O(103,'T7','w1','ready',19,[['Chicken pasta',2,'No onions'],['Ribeye steak 280g',1,'Medium'],['Coke',2]]);
+  O(104,'T5','w1','preparing',9,[['Lamb tibs',2],['Whole grilled tilapia',1,'Nut allergy at seat 2'],['Skin-on fries',2],['Ethiopian coffee',1]]);
+  [[88,'T9',64.5,'Card','w1',190],[89,'T15',38,'Cash','w4',160],[90,'T1',52.25,'Apple Pay','w1',140],[91,'T13',121,'Card','w3',115]].forEach(([id,table,total,method,by,ago])=>S.tx.push({id,table,total,method,by,at:minsAgo(ago),refunded:false}));
+  O(92,'T14','w3','new',2,[['Zema burger',3],['Chicken pasta',2,'Extra sauce'],['Skin-on fries',3],['Coke',6]]);
+}
+const tb=id=>S.tables.find(t=>t.id===id), lv=id=>S.live[id]||(S.live[id]={status:'available',guests:0,waiter:null,seated:null,note:''});
+const openOrders=id=>S.orders.filter(o=>o.table===id&&!o.closed);
+const lineTotal=l=>(l.price!=null?l.price:item(l.item).price)*l.qty, orderTotal=o=>o.lines.reduce((a,l)=>a+lineTotal(l),0), tableTotal=id=>openOrders(id).reduce((a,o)=>a+orderTotal(o),0);
+const due=t=>Math.round(t*(1+(S.set.service||0)/100)*100)/100;
+function toast(m){S.toast=m;clearTimeout(toast.t);toast.t=setTimeout(()=>{S.toast=null;const e=$('.toast');if(e)e.remove()},2600);const e=$('.toast');if(e)e.textContent=m;else document.body.insertAdjacentHTML('beforeend',`<div class="toast" role="status">${esc(m)}</div>`)}
+
+/* ---------- icons ---------- */
+const I={dashboard:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 7h6V4h-6z"/>',floor:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><circle cx="17" cy="6.5" r="3.5"/><rect x="3" y="14" width="18" height="7" rx="1.5"/>',
+ res:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',menu:'<path d="M5 4h14v17H5zM9 9h6M9 13h6M9 17h3"/>',staff:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 20a6.5 6.5 0 0 0-2-4.6"/>',
+ reports:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2l.4 2.6h4l.4-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/>',
+ tables:'<path d="M3 9h18M6 9v10M18 9v10M3 9l2-4h14l2 4"/>',bills:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',tx:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>',orders:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',kitchen:'<path d="M6 14a4 4 0 1 1 1.5-7.7 5 5 0 0 1 9 0A4 4 0 1 1 18 14zM6 14v6h12v-6"/>'};
+const ic=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${I[k]}</svg>`;
+const OWNERNAV=[['dashboard','Dashboard'],['floor','Floor plan'],['res','Reservations'],['menu','Menu'],['staff','Staff'],['tx','Payments'],['reports','Reports'],['settings','Settings']];
+const NAV={admin:[['menu','Menu'],['floor','Floor plan'],['staff','Staff'],['settings','Settings']],owner:OWNERNAV,manager:OWNERNAV,cashier:[['bills','Bills'],['floor','Floor plan'],['tx','Payments']],
+ waiter:[['dashboard','My shift'],['floor','Floor plan'],['orders','Orders'],['res','Reservations']],kitchen:[['kitchen','Kitchen display']]};
+const TITLE={bills:'Bills',tx:'Payments',dashboard:{owner:'Dashboard',manager:'Dashboard',waiter:'My shift'},floor:'Floor plan',res:'Reservations',menu:'Menu',staff:'Staff',reports:'Reports',settings:'Settings',orders:'Orders',kitchen:'Kitchen display',order:'New order'};
+const SOON={};
+
+/* ---------- shell ---------- */
+function render(){DIRTY=0;draw();queueSync()}
+function draw(){
+  document.documentElement.dataset.skin='service';
+  if(GATES[S.page]){$('#app').innerHTML=GATES[S.page]();return}
+  if(S.page==='signin'){$('#app').innerHTML=signIn();return}
+  const u=LIVE&&S.role==='admin'?{name:'Zema Hospitality',role:'Admin'}:staff(S.user);
+  const nav=NAV[S.role],title=S.page==='order'?`Order · ${esc(tb(S.orderFor).name)}`:(typeof TITLE[S.page]==='object'?TITLE[S.page][S.role]:TITLE[S.page]);
+  $('#app').innerHTML=`<aside class="rail"><div class="brand"><i>Z</i><div><b>${esc(S.set.name)}</b><small>Zema Hospitality</small></div></div>
+<nav class="nav" aria-label="Sections">${nav.map(([k,l])=>`<button class="${S.page===k||(S.page==='order'&&k==='floor')?'on':''}" data-go="${k}">${ic(k)}<span>${l}</span>${SOON[k]?'<span class="soon">Next</span>':''}</button>`).join('')}</nav>
+<div class="rail-foot">${LIVE?(S.offline?'Offline · changes are waiting':'Live · every device in sync'):'Prototype · sample data<br>Thursday dinner service'}</div></aside>
+<div class="main"><div class="top"><h1>${title}</h1>${LIVE?`<span class="pill ${S.offline?'p-bill':'p-available'}">${S.offline?'Offline':'Live'}</span>`:''}<span class="clock" id="clock">${hhmm(now())}</span>
+<button class="userchip" data-a="switch" aria-label="Switch user"><span class="ava">${ini(u.name)}</span><span><b>${esc(u.name.replace(/^Chef /,''))}</b><small>${LIVE&&S.role==='admin'?'Admin · all restaurants':u.role+' · switch'}</small></span></button></div>
+<div class="view" id="view"><div class="wrap">${page()}</div></div></div>${sheet()}`;
+  if(S.page==='floor'||(S.role==='waiter'&&S.page==='dashboard'))bindFloor();
+}
+function page(){
+  if(S.page==='order')return orderPage();
+  if(S.page==='kitchen')return kitchenPage();
+  if(S.page==='floor')return floorPage();
+  if(S.page==='res')return resPage();
+  if(S.page==='menu')return menuPage();
+  if(S.page==='orders')return ordersPage();
+  if(S.page==='staff')return staffPage();
+  if(S.page==='reports')return reportsPage();
+  if(S.page==='settings')return settingsPage();
+  if(S.page==='bills')return billsPage();
+  if(S.page==='tx')return txPage();
+  return S.role==='waiter'?waiterHome():ownerHome();
+}
+
+/* ---------- owner dashboard ---------- */
+const BASE={rev:3186,orders:91,covers:58};
+function kpis(){if(LIVE)return kpisLive();const paid=S.paid.reduce((a,p)=>a+p.total,0),open=S.orders.filter(o=>!o.closed).reduce((a,o)=>a+orderTotal(o),0),rev=BASE.rev+paid+open,ord=BASE.orders+S.orders.length,cov=BASE.covers+Object.values(S.live).reduce((a,l)=>a+(l.guests||0),0)+S.paid.reduce((a,p)=>a+p.guests,0);return{rev,ord,avg:rev/ord,cov}}
+const SALES={today:{l:['12','13','14','15','16','17','18','19'],v:[310,640,520,180,140,360,890,0],p:[280,590,560,210,160,330,760,980]},
+ week:{l:['Fri','Sat','Sun','Mon','Tue','Wed','Thu'],v:[5240,6810,4930,2180,2640,3320,0],p:[4980,6420,5110,2350,2410,3050,3640]},
+ month:{l:['Wk 1','Wk 2','Wk 3','Wk 4'],v:[24800,26950,25300,0],p:[23100,24600,26200,25900]},
+ year:{l:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'],v:[68200,71400,83900,88100,96300,104800,109200,101500,97400,0],p:[61800,64900,74200,80300,86100,93700,98800,95200,90600,93900]}};
+function chart(rg){
+  rg=rg||S.range;const d=LIVE?liveSales(rg):SALES[rg],k=kpis(),v=d.v.slice();if(!LIVE)v[v.length-1]=rg==='today'?Math.max(0,Math.round(k.rev-d.v.slice(0,-1).reduce((a,b)=>a+b,0))):rg==='week'?Math.round(k.rev):rg==='month'?Math.round(d.p[3]*.62+k.rev):Math.round(21400+k.rev);
+  const W=720,H=230,L=46,R=14,Tp=14,B=28,max=Math.max(1,...v,...d.p),step=max>60000?30000:max>20000?10000:max>4000?2000:max>900?300:200,top=Math.ceil(max/step)*step;
+  const x=i=>L+(W-L-R)*i/(v.length-1),y=n=>Tp+(H-Tp-B)*(1-n/top),path=a=>a.map((n,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(n).toFixed(1)).join(' ');
+  const ticks=[];for(let t=0;t<=top;t+=step)ticks.push(t);
+  return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Sales, this period against the last" style="width:100%;height:auto;display:block">
+${ticks.map(t=>`<line x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line2)" stroke-width="1"/><text class="axis" x="${L-8}" y="${y(t)+3}" text-anchor="end">${t>=1000?'£'+(t/1000)+'k':'£'+t}</text>`).join('')}
+<path d="${path(d.p)}" fill="none" stroke="var(--ink3)" stroke-width="1.5" stroke-dasharray="4 5"/>
+<path d="${path(v)} L${x(v.length-1)} ${y(0)} L${x(0)} ${y(0)} Z" fill="var(--accent-soft)"/>
+<path d="${path(v)}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="${x(v.length-1)}" cy="${y(v[v.length-1])}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
+${d.l.map((l,i)=>`<text class="axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${l}${rg==='today'?':00':''}</text>`).join('')}</svg>`}
+function popular(){if(LIVE){const c={},ds=dayStart();S.orders.filter(o=>o.at>=ds).forEach(o=>o.lines.forEach(l=>{if(item(l.item)!==GONE)c[l.item]=(c[l.item]||0)+l.qty}));return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,5)}const c={};S.orders.forEach(o=>o.lines.forEach(l=>{c[l.item]=(c[l.item]||0)+l.qty}));const seedC={'Chicken pasta':21,'Ribeye steak 280g':17,'Ethiopian coffee':16,'Lamb tibs':14,'Baked cheesecake':11};Object.entries(seedC).forEach(([n,q])=>{const id=byName(n);c[id]=(c[id]||0)+q});return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,5)}
+function ownerHome(){
+  const k=kpis(),cnt=s=>S.tables.filter(t=>lv(t.id).status===s).length,busy=S.tables.length-cnt('available')-cnt('reserved')-cnt('cleaning'),oc=s=>S.orders.filter(o=>o.status===s&&!o.closed).length,pop=popular(),h=new Date().getHours();
+  return`<section class="hero"><div><div class="eyebrow">${esc(S.set.name)} · ${LIVE?new Date().toLocaleDateString('en-GB',{weekday:'long'})+' service':'Thursday dinner service'}</div><h2>Good ${h<12?'morning':h<18?'afternoon':'evening'}, ${esc(staff(S.user).name.split(' ')[0])}</h2><p>${busy} tables seated, ${oc('new')+oc('preparing')} tickets in the kitchen${S.res[0]?`, next arrival ${S.res[0].t} for ${S.res[0].guests}`:''}.</p></div>
+<div><div class="eyebrow" style="margin-bottom:10px">Flying out of the kitchen</div><div class="pass">${pop.slice(0,3).map(([id,q])=>`<div>${art(item(id))}<b class="ell">${esc(item(id).name)}</b><small>${q} sold tonight</small></div>`).join('')||'<div style="grid-column:1/-1"><small>Your best sellers appear here once orders come in.</small></div>'}</div></div></section>
+<div class="panel grid g4" style="padding:0;gap:0">
+ <div class="kpi"><span class="eyebrow">Revenue today</span><span class="num">${gbp(Math.round(k.rev))}</span><small>${LIVE?'payments and open tables':'<span class="up">▲ 8%</span> on last Thursday'}</small></div>
+ <div class="kpi"><span class="eyebrow">Orders</span><span class="num">${k.ord}</span><small>${oc('new')+oc('preparing')+oc('ready')} in progress</small></div>
+ <div class="kpi"><span class="eyebrow">Average order</span><span class="num">${gbp2(k.avg)}</span><small>${LIVE?'per order today':'<span class="up">▲ £1.20</span> on last week'}</small></div>
+ <div class="kpi"><span class="eyebrow">Covers</span><span class="num">${k.cov}</span><small>${S.res.reduce((a,r)=>a+r.guests,0)} more booked tonight</small></div></div>
+<div class="grid g2">
+ <section class="panel"><header><h2>Sales</h2><div class="seg">${[['today','Today'],['week','Week'],['month','Month']].map(([a,b])=>`<button class="${S.range===a?'on':''}" data-range="${a}">${b}</button>`).join('')}</div></header>
+ ${chart()}<div class="legend" style="margin-top:8px"><span><i style="background:var(--accent)"></i>${S.range==='today'?'Today':S.range==='week'?'This week':'This month'}</span><span><i style="background:var(--ink3)"></i>${S.range==='today'?'Last Thursday':S.range==='week'?'Last week':'Last month'}</span></div></section>
+ <section class="panel"><header><h2>Tables</h2><button class="btn quiet" data-go="floor">Open floor plan</button></header>
+ <div style="display:flex;align-items:baseline;gap:10px"><span class="num" style="font-size:40px;font-weight:500">${busy}</span><span class="muted">of ${S.tables.length} tables seated</span></div>
+ <div class="stack" style="margin:14px 0">${Object.keys(STATUS).map(s=>cnt(s)?`<i style="flex:${cnt(s)};background:var(--s-${s})" title="${STATUS[s]}"></i>`:'').join('')}</div>
+ <div class="legend">${Object.keys(STATUS).filter(cnt).map(s=>`<span><i style="background:var(--s-${s})"></i>${cnt(s)} ${STATUS[s].toLowerCase()}</span>`).join('')}</div>
+ <div style="border-top:1px solid var(--line2);margin-top:16px;padding-top:14px"><div class="eyebrow" style="margin-bottom:10px">Kitchen right now</div>
+ <div class="grid g3" style="gap:10px">${['new','preparing','ready'].map(s=>`<div><div class="num" style="font-size:26px">${oc(s)}</div><span class="pill p-${s}">${OSTATE[s]}</span></div>`).join('')}</div></div></section></div>
+<div class="grid g3">
+ <section class="panel"><header><h2>Popular today</h2></header>${pop.map(([id,q],i)=>`<div class="row">${art(item(id))}<div class="grow"><b class="ell">${esc(item(id).name)}</b><div class="bar" style="margin-top:6px"><i style="width:${Math.round(q/pop[0][1]*100)}%"></i></div></div><span class="mono muted">${q}</span></div>`).join('')||'<div class="empty">No orders yet today.</div>'}</section>
+ <section class="panel"><header><h2>On shift</h2><span class="dim">${STAFF.filter(s=>s.on).length} of ${STAFF.length}</span></header>${STAFF.filter(s=>s.on).map(s=>{const n=S.tables.filter(t=>lv(t.id).waiter===s.id).length,sales=S.orders.filter(o=>o.waiter===s.id).reduce((a,o)=>a+orderTotal(o),0);return`<div class="row"><span class="ava">${ini(s.name)}</span><div class="grow"><b class="ell">${esc(s.name)}</b><span class="dim" style="font-size:13px">${s.role}${n?' · '+n+' table'+(n>1?'s':''):''}</span></div>${sales?`<span class="mono muted">${gbp(Math.round(sales))}</span>`:''}</div>`}).join('')}</section>
+ <section class="panel"><header><h2>Arriving tonight</h2><button class="btn quiet" data-go="res">All</button></header>${S.res.slice(0,5).map(r=>`<div class="row"><span class="t">${r.t}</span><div class="grow"><b class="ell">${esc(r.name)}</b><span class="dim" style="font-size:13px">${r.guests} guests · ${esc(tb(r.table)?tb(r.table).name:r.table)}</span></div></div>`).join('')}</section></div>`}
+
+/* ---------- floor plan ---------- */
+function shapeOf(t){const s=t.seats;if(t.shape==='round'){const r=s<=2?26:s<=4?34:42;return{w:r*2,h:r*2,r}}if(t.shape==='square'){const w=s<=2?52:s<=4?66:80;return{w,h:w}}return{w:s<=4?92:s<=6?118:150,h:62}}
+function chairs(t){const g=shapeOf(t),o=[],n=t.seats;
+  if(t.shape==='round'){for(let i=0;i<n;i++){const a=i/n*Math.PI*2-Math.PI/2,d=g.r+9;o.push(`<rect class="ch" x="${(Math.cos(a)*d-7).toFixed(1)}" y="${(Math.sin(a)*d-7).toFixed(1)}" width="14" height="14" rx="4"/>`)}}
+  else{const top=Math.ceil(n/2),bot=n-top,put=(k,y)=>{for(let i=0;i<k;i++){const x=-g.w/2+g.w*(i+.5)/k;o.push(`<rect class="ch" x="${(x-8).toFixed(1)}" y="${y}" width="16" height="11" rx="3.5"/>`)}};put(top,-g.h/2-15);put(bot,g.h/2+4)}
+  return o.join('')}
+function tableSvg(t){const g=shapeOf(t),l=lv(t.id),mine=l.waiter===ME,dim=S.role==='waiter'&&!S.edit&&l.waiter&&!mine;
+  const sub=S.edit?t.seats+' seats':l.status==='reserved'?(l.note||'').split(' · ')[0]:l.seated?since(l.seated):l.status==='cleaning'?'clean':'';
+  return`<g class="tb st-${l.status} ${S.sel===t.id?'sel':''} ${dim?'dimmed':''}" data-t="${t.id}" transform="translate(${t.x} ${t.y})" tabindex="0" role="button" aria-label="${esc(t.name)}, ${STATUS[l.status]}">${chairs(t)}
+${t.shape==='round'?`<circle class="sh" r="${g.r}"/>`:`<rect class="sh" x="${-g.w/2}" y="${-g.h/2}" width="${g.w}" height="${g.h}" rx="${t.shape==='square'?12:14}"/>`}
+<text class="n" text-anchor="middle" y="${sub?1:5}">${esc(t.name)}</text>${sub?`<text class="m" text-anchor="middle" y="15">${esc(sub)}</text>`:''}</g>`}
+function floorSvg(){return`<div class="fscroll"><svg viewBox="0 0 1000 620" id="fsvg" aria-label="Restaurant floor plan">
+${ZONES.map(z=>`<rect class="zone" x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="16"/><text class="zone-l" x="${z.x+14}" y="${z.y+22}">${z.name}</text>`).join('')}
+${S.fix.map(f=>`<g data-f="${f.id}"><rect class="fx" x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx="10"/><text class="fx-l" text-anchor="middle" ${f.w<50?`transform="translate(${f.x+f.w/2+4} ${f.y+f.h/2}) rotate(-90)"`:`x="${f.x+f.w/2}" y="${f.y+f.h/2+4}"`}>${f.kind}</text></g>`).join('')}
+${S.tables.map(tableSvg).join('')}</svg></div>`}
+function floorLegend(){const cnt=s=>S.tables.filter(t=>lv(t.id).status===s).length;return`<div class="legend">${Object.keys(STATUS).map(s=>`<span><i style="background:var(--s-${s})"></i>${STATUS[s]} <b class="mono">${cnt(s)}</b></span>`).join('')}</div>`}
+function floorPage(){
+  const t=S.edit&&S.sel?tb(S.sel):null,can=S.role==='admin';
+  return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0;margin-right:auto">${S.edit?'Drag a table to move it. Tap one to rename it or change its size and shape.':S.role==='waiter'?'Your tables are in full colour. Tap any table to open it.':'Live view of the room. Tap a table to see who is there and what they ordered.'}</p>
+${can?(S.edit?`<button class="btn" data-a="addTable">+ Add table</button><button class="btn" data-a="resetLayout">Reset</button><button class="btn pri" data-a="saveLayout">Save layout</button>`:`<button class="btn" data-a="editOn">Edit layout</button>`):''}</div>
+<div class="floor ${S.edit?'edit':''}">${floorSvg()}<div class="floor-bar">${S.edit?(t?`<div class="insp"><label>Name<input id="tn" value="${esc(t.name)}" maxlength="6" style="width:96px"></label>
+<label>Seats<select id="ts">${[2,4,6,8,10].map(n=>`<option ${t.seats===n?'selected':''}>${n}</option>`).join('')}</select></label>
+<label>Shape<select id="tsh">${[['round','Round'],['square','Square'],['rect','Rectangle']].map(([a,b])=>`<option value="${a}" ${t.shape===a?'selected':''}>${b}</option>`).join('')}</select></label>
+<label>Section<select id="tz">${ZONES.map(z=>`<option value="${z.id}" ${t.zone===z.id?'selected':''}>${z.name}</option>`).join('')}</select></label>
+<button class="btn" data-a="delTable">Delete table</button></div>`:'<span class="muted">Select a table to edit it, or add a new one.</span>'):floorLegend()}</div></div>`}
+function bindFloor(){
+  const svg=$('#fsvg');if(!svg)return;
+  const pt=e=>{const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*1000,y:(e.clientY-r.top)/r.height*620}};
+  let drag=null;
+  svg.addEventListener('pointerdown',e=>{const g=e.target.closest('.tb');if(!g)return;const t=tb(g.dataset.t);
+    if(!S.edit){return}
+    const p=pt(e);drag={t,g,dx:p.x-t.x,dy:p.y-t.y,moved:false};g.setPointerCapture(e.pointerId);e.preventDefault()});
+  svg.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e),g=shapeOf(drag.t);
+    const x=Math.round(Math.min(1000-g.w/2-8,Math.max(g.w/2+8,p.x-drag.dx))/10)*10,y=Math.round(Math.min(620-g.h/2-16,Math.max(g.h/2+16,p.y-drag.dy))/10)*10;
+    if(x!==drag.t.x||y!==drag.t.y){drag.moved=true;drag.t.x=x;drag.t.y=y;drag.g.setAttribute('transform',`translate(${x} ${y})`)}});
+  const end=()=>{if(!drag)return;const d=drag;drag=null;const z=ZONES.find(z=>d.t.x>=z.x&&d.t.x<=z.x+z.w&&d.t.y>=z.y&&d.t.y<=z.y+z.h);if(z)d.t.zone=z.id;S.sel=d.t.id;S.dirty=S.dirty||d.moved;render()};
+  svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+  svg.addEventListener('click',e=>{if(S.edit)return;const g=e.target.closest('.tb');if(g){S.sel=g.dataset.t;render()}});
+  svg.addEventListener('keydown',e=>{const g=e.target.closest('.tb');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();S.sel=g.dataset.t;render()}});
+}
+
+/* ---------- table sheet ---------- */
+function sheet(){
+  if(S.rcpt)return receipt();
+  if(S.mod)return modSheet();
+  if(!S.sel||S.edit||S.page==='order'||S.role==='admin')return'';
+  const t=tb(S.sel),l=lv(t.id),os=openOrders(t.id),tot=tableTotal(t.id),ready=os.filter(o=>o.status==='ready'),zone=ZONES.find(z=>z.id===t.zone);
+  const facts=l.guests?`<div class="facts"><div><span class="eyebrow">Guests</span><b>${l.guests}</b></div><div><span class="eyebrow">Seated</span><b>${hhmm(l.seated)} · ${since(l.seated)}</b></div><div><span class="eyebrow">Waiter</span><b>${esc(staff(l.waiter).name)}</b></div><div><span class="eyebrow">Running total</span><b>${gbp2(tot)}</b></div></div>`:'';
+  let foot='';
+  if(l.status==='available'||l.status==='reserved')foot=`<div style="display:flex;align-items:center;gap:14px;justify-content:space-between"><span class="muted">Guests</span><div class="step"><button data-a="gMinus" aria-label="Fewer guests">−</button><span id="gN">${S.gN||Math.min(t.seats,2)}</span><button data-a="gPlus" aria-label="More guests">+</button></div></div><button class="btn pri big" data-a="seat">Seat guests and start order</button>`;
+  else if(l.status==='cleaning')foot=`<button class="btn pri big" data-a="cleaned">Table is clean and ready</button>`;
+  else if(l.status==='bill'){const sp=splitOf(t.id);foot=`<div class="chips">${Object.keys(S.set.methods).filter(m=>S.set.methods[m]).map(m=>`<button class="chip ${S.payM===m?'on':''}" data-pm="${m}">${m}</button>`).join('')}</div>
+<div style="display:flex;align-items:center;gap:14px;justify-content:space-between"><span class="muted">Split between</span><div class="step"><button data-a="spMinus" aria-label="Fewer people">−</button><span>${sp.n}</span><button data-a="spPlus" aria-label="More people">+</button></div></div>
+${S.set.service?`<div class="muted" style="display:flex;justify-content:space-between"><span>Service ${S.set.service}%</span><span class="mono">${gbp2(tot*S.set.service/100)}</span></div>`:''}
+${sp.paid?`<div style="display:flex;justify-content:space-between;color:var(--s-available)"><span>Paid so far · ${sp.done} of ${sp.n}</span><span class="mono">${gbp2(sp.paid)}</span></div>`:''}
+<button class="btn pri big" data-a="pay">${sp.n>1?`Take ${gbp2(sp.amt)} · ${sp.done+1} of ${sp.n}`:`Take payment · ${gbp2(sp.amt)}`}</button><div style="display:flex;gap:10px"><button class="btn" data-a="showBill" style="flex:1">Show bill</button><button class="btn" data-a="startOrder" style="flex:1">Add items</button></div>`}
+  else foot=`${ready.length?`<button class="btn pri big" data-a="served">Mark ${ready.length>1?ready.length+' orders':'order #'+ready[0].id} served</button>`:''}<button class="btn ${ready.length?'':'pri'} big" data-a="startOrder">${os.length?'Add more items':'Start order'}</button>${os.length?`<button class="btn" data-a="bill">Request bill</button>`:''}`;
+  return`<div class="scrim" data-a="closeSheet"><aside class="sheet" role="dialog" aria-label="${esc(t.name)}"><header><div><div class="eyebrow">${zone?zone.name:''} · ${t.seats} seats</div><h2>${esc(t.name)}</h2><span class="pill p-${l.status}" style="margin-top:8px">${STATUS[l.status]}</span></div><button class="x" data-a="closeSheet" aria-label="Close">×</button></header>
+<div class="body">${facts}${l.note?`<div class="note"><b>Note</b> · ${esc(l.note)}</div>`:''}
+${os.length?`<div><div class="eyebrow" style="margin-bottom:8px">Order</div>${os.map(o=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px"><span class="mono dim">#${o.id} · ${hhmm(o.at)}</span><span class="pill p-${o.status}">${OSTATE[o.status]}</span></div>${o.lines.map(x=>`<div class="line"><span class="q">${x.qty}×</span><div>${esc(ln(x))}${x.note?`<small>${esc(x.note)}</small>`:''}</div><span class="p">${gbp2(lineTotal(x))}</span></div>`).join('')}</div>`).join('')}<div class="total"><span>Total</span><span class="mono">${gbp2(tot)}</span></div></div>`:l.guests?'<div class="empty">Nothing ordered yet.</div>':`<div class="empty">${l.status==='reserved'?'Held for a reservation.':l.status==='cleaning'?'Being cleared and reset.':'Free to seat.'}</div>`}
+${S.role==='owner'||S.role==='manager'?`<div><div class="eyebrow" style="margin-bottom:8px">Set status</div><div class="chips">${Object.keys(STATUS).map(s=>`<button class="chip ${l.status===s?'on':''}" data-a="setStatus" data-s="${s}">${STATUS[s]}</button>`).join('')}</div></div>`:''}</div>
+<footer>${foot}</footer></aside></div>`}
+
+/* ---------- waiter ---------- */
+function myTasks(){const o=[];S.orders.filter(x=>x.waiter===ME&&x.status==='ready'&&!x.closed).forEach(x=>o.push({k:'ready',t:x.table,txt:`Order #${x.id} is ready`,sub:'Run it to the table'}));
+  S.tables.filter(t=>lv(t.id).waiter===ME&&lv(t.id).status==='bill').forEach(t=>o.push({k:'bill',t:t.id,txt:'Asked for the bill',sub:gbp2(tableTotal(t.id))+' to take'}));
+  S.tables.filter(t=>lv(t.id).waiter===ME&&lv(t.id).status==='ordering').forEach(t=>o.push({k:'ordering',t:t.id,txt:'Seated, no order yet',sub:'Seated '+since(lv(t.id).seated)+' ago'}));
+  S.tables.filter(t=>lv(t.id).status==='cleaning').forEach(t=>o.push({k:'cleaning',t:t.id,txt:'Needs clearing',sub:'Reset for the next guests'}));return o}
+function waiterHome(){
+  const mine=S.tables.filter(t=>lv(t.id).waiter===ME),act=S.orders.filter(o=>o.waiter===ME&&!o.closed&&o.status!=='served'),tasks=myTasks(),h=new Date().getHours();
+  const tile=(n,l,alert)=>`<div class="kpi"><span class="eyebrow">${l}</span><span class="num" ${alert&&n?'style="color:var(--s-bill)"':''}>${n}</span></div>`;
+  return`<div><div class="eyebrow">Signed in as waiter</div><h2 style="font-size:30px;margin-top:6px">Good ${h<12?'morning':h<18?'afternoon':'evening'}, ${esc(staff(ME).name.split(' ')[0])}</h2></div>
+<div class="panel grid g4" style="padding:0;gap:0">${tile(mine.length,'My tables')}${tile(act.length,'Active orders')}${tile(tasks.filter(t=>t.k==='ready').length,'Ready to serve',1)}${tile(tasks.filter(t=>t.k==='bill').length,'Bills requested',1)}</div>
+<div class="grid g2"><div class="floor">${floorSvg()}<div class="floor-bar">${floorLegend()}</div></div>
+<section class="panel tasks"><header><h2>Do next</h2><span class="dim">${tasks.length}</span></header>${tasks.length?tasks.map(t=>`<div class="row"><span class="pill p-${t.k==='ready'?'ready':t.k}">${esc(tb(t.t).name)}</span><div class="grow"><b class="ell">${t.txt}</b><span class="dim" style="font-size:13px">${t.sub}</span></div><button class="btn quiet task-go" data-open="${t.t}">Open</button></div>`).join(''):'<div class="empty">All caught up.</div>'}
+<div class="eyebrow" style="margin:18px 0 4px">Arriving in my section</div>${S.res.filter(r=>ME==='w1'?['T4','T9'].includes(r.table):lv(r.table).waiter===ME).map(r=>`<div class="row"><span class="t">${r.t}</span><div class="grow"><b class="ell">${esc(r.name)}</b><span class="dim" style="font-size:13px">${r.guests} guests · ${r.table}</span></div></div>`).join('')}</section></div>`}
+function ordersPage(){const l=S.orders.filter(o=>o.waiter===ME&&!o.closed).sort((a,b)=>b.at-a.at);return`<section class="panel"><header><h2>My open orders</h2><span class="dim">${l.length}</span></header>${l.map(o=>`<div class="row"><span class="t">#${o.id}</span><div class="grow"><b>${esc(tb(o.table).name)} · ${o.lines.reduce((a,x)=>a+x.qty,0)} items</b><span class="dim ell" style="font-size:13px">${o.lines.map(x=>x.qty+'× '+item(x.item).name).join(', ')}</span></div><span class="pill p-${o.status}">${OSTATE[o.status]}</span><button class="btn quiet" data-open="${o.table}">Open</button></div>`).join('')||'<div class="empty">No open orders.</div>'}</section>`}
+
+/* ---------- order screen ---------- */
+function orderPage(){
+  const t=tb(S.orderFor),dq=id=>S.draft.filter(l=>l.item===id).reduce((a,l)=>a+l.qty,0),tot=S.draft.reduce((a,l)=>a+lineTotal(l),0);
+  return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><button class="btn" data-a="backFloor">← Back to floor</button><span class="muted">${lv(t.id).guests} guests · ${esc(staff(lv(t.id).waiter).name)}</span></div>
+<div class="order"><div style="display:flex;flex-direction:column;gap:14px;min-width:0"><div class="cats">${CATS.map(c=>`<button class="chip ${S.cat===c?'on':''}" data-cat="${c}"><span aria-hidden="true">${CATI[c]}</span>${c}</button>`).join('')}</div>
+<div class="menu">${MENU.filter(m=>m.cat===S.cat&&!m.hidden).map(m=>`<button class="dish ${m.on?'':'off'}" data-dish="${m.id}" ${m.on?'':'aria-disabled="true"'}>${art(m)}<span class="dt"><b>${esc(m.name)}</b><small>${esc(m.desc)}</small><span style="display:flex;justify-content:space-between;align-items:center;width:100%"><span class="pr">${m.on?gbp2(m.price):'Sold out'}</span>${dq(m.id)?`<span class="cnt">${dq(m.id)}</span>`:''}</span></span></button>`).join('')||'<div class="empty" style="grid-column:1/-1">No dishes in this category yet.</div>'}</div></div>
+<aside class="ticket"><div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="font-size:20px">${esc(t.name)}</h2><span class="mono dim">New round</span></div>
+${S.draft.length?S.draft.map((l,i)=>`<div class="line"><span class="q">${l.qty}×</span><div>${esc(item(l.item).name)}${l.note?`<small>${esc(l.note)}</small>`:''}</div><span class="p">${gbp2(lineTotal(l))}</span><button class="x" style="width:30px;height:30px;font-size:16px" data-a="rmLine" data-i="${i}" aria-label="Remove">×</button></div>`).join(''):'<div class="empty">Tap a dish to add it.</div>'}
+<div class="total"><span>This round</span><span class="mono">${gbp2(tot)}</span></div><button class="btn pri big" data-a="send" ${S.draft.length?'':'disabled'}>Send to kitchen</button></aside></div>`}
+function modSheet(){const m=item(S.mod.item),a=ADDONS[m.cat]||[];return`<div class="scrim" data-a="modClose"><aside class="sheet" role="dialog" aria-label="${esc(m.name)}"><header><div><div class="eyebrow">${m.cat}</div><h2>${esc(m.name)}</h2><span class="muted">${esc(m.desc)}</span></div><button class="x" data-a="modClose" aria-label="Close">×</button></header>
+<div class="body"><div style="display:flex;justify-content:space-between;align-items:center"><span class="eyebrow">Quantity</span><div class="step"><button data-a="qMinus" aria-label="Less">−</button><span>${S.mod.qty}</span><button data-a="qPlus" aria-label="More">+</button></div></div>
+${a.length?`<div><div class="eyebrow" style="margin-bottom:8px">Preferences</div><div class="chips">${a.map(x=>`<button class="chip ${S.mod.mods.includes(x)?'on':''}" data-a="modTog" data-m="${esc(x)}">${x}</button>`).join('')}</div></div>`:''}
+<div class="fld"><label class="eyebrow" for="mnote">Note for the kitchen</label><textarea id="mnote" maxlength="120" placeholder="e.g. allergy, no onions">${esc(S.mod.note)}</textarea></div></div>
+<footer><button class="btn pri big" data-a="modAdd">Add ${S.mod.qty} · ${gbp2(m.price*S.mod.qty)}</button></footer></aside></div>`}
+
+/* ---------- kitchen ---------- */
+function kitchenPage(){const col=(s,next,label)=>{const l=S.orders.filter(o=>o.status===s&&!o.closed).sort((a,b)=>a.at-b.at);return`<div class="kcol"><header><h2>${OSTATE[s]}</h2><span class="count">${l.length}</span></header>${l.map(o=>{const m=Math.round((now()-o.at)/60000),late=m>=15&&s!=='ready';return`<article class="tk ${s} ${late?'late':''}"><header><span class="tn">${esc(tb(o.table).name)}</span><span class="on">#${o.id} · ${hhmm(o.at)}</span></header><ul>${o.lines.filter(x=>!['Drinks'].includes(item(x.item).cat)||true).map(x=>`<li>${x.qty} × ${esc(ln(x))}${x.note?`<small>${esc(x.note)}</small>`:''}</li>`).join('')}</ul><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="el">${m} min${late?' · running late':''}</span><button class="btn ${s==='ready'?'':'pri'}" data-bump="${o.id}" data-next="${next}">${label}</button></div></article>`}).join('')||'<div class="empty">Nothing here.</div>'}</div>`};
+  return`<div class="kds">${col('new','preparing','Start')}${col('preparing','ready','Ready')}${col('ready','served','Served')}</div>`}
+
+/* ---------- reservations, menu, next phase ---------- */
+function resPage(){return`<section class="panel"><header><h2>Tonight</h2><span class="dim">${S.res.length} bookings · ${S.res.reduce((a,r)=>a+r.guests,0)} guests</span></header>${S.res.map((r,i)=>{const l=lv(r.table);return`<div class="row"><span class="t">${r.t}</span><div class="grow"><b class="ell">${esc(r.name)}</b><span class="dim" style="font-size:13px">${r.guests} guests${r.note?' · '+esc(r.note):''}</span></div><span class="pill p-${l.status}">${esc(tb(r.table)?tb(r.table).name:r.table)} · ${STATUS[l.status]}</span>${l.status==='available'?`<button class="btn quiet" data-hold="${i}">Hold table</button>`:`<button class="btn quiet" data-open="${r.table}">Open</button>`}<button class="x" data-resrm="${i}" aria-label="Remove booking for ${esc(r.name)}" style="flex:none">×</button></div>`}).join('')||'<div class="empty">No bookings yet.</div>'}</section>${resForm()}
+<div class="note">Holding a booking marks its table as Reserved on the floor plan, for everyone, straight away.</div>`}
+function menuPage(){const adm=S.role==='admin',e=S.dEdit&&MENU.find(m=>m.id===S.dEdit),IN='min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body);width:100%';
+  return(adm?`<section class="panel"><header><h2>${e?'Edit dish':'Add a dish'}</h2><span class="dim">Tap a dish name below to edit it</span></header><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;align-items:end"><div class="fld"><label class="eyebrow" for="dn">Name</label><input id="dn" maxlength="60" value="${e?esc(e.name):''}" placeholder="e.g. Shiro"></div><div class="fld"><label class="eyebrow" for="dd">Description</label><input id="dd" maxlength="90" value="${e?esc(e.desc):''}" placeholder="Short line for the waiter"></div><div class="fld"><label class="eyebrow" for="dc">Category</label><select id="dc" style="${IN}">${CATS.map(c=>`<option ${e&&e.cat===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="fld"><label class="eyebrow" for="dp">Price £</label><input id="dp" type="number" inputmode="decimal" min="0" step="0.1" value="${e?e.price:''}" placeholder="0.00"></div></div><div class="phrow"><span id="dprev">${art(e||{cat:'Mains',name:''})}</span><label class="btn filebtn">${e&&phOf(e)?'Change photo':'Add a photo'}<input type="file" id="dph" accept="image/*" aria-label="Dish photo"></label><button class="btn quiet" data-a="dishNoPhoto">Remove photo</button><span class="dim" style="font-size:13px;flex-basis:100%">A landscape photo works best. It is shrunk automatically, so any phone photo is fine.</span></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn pri" data-a="dishSave">${e?'Save dish':'Add to the menu'}</button>${e?'<button class="btn" data-a="dishDel">Remove dish</button><button class="btn quiet" data-a="dishNew">Cancel</button>':''}</div></section>`:e?`<section class="panel"><header><h2>${esc(e.name)}</h2><span class="dim">Change the price</span></header><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end"><div class="fld" style="max-width:160px"><label class="eyebrow" for="dp">Price £</label><input id="dp" type="number" inputmode="decimal" min="0" step="0.1" value="${e.price}"></div><button class="btn pri" data-a="priceSave">Save price</button><button class="btn quiet" data-a="dishNew">Cancel</button></div></section>`:`<div class="note">Zema Hospitality looks after your menu and photos. You can change a price by tapping a dish name, and switch any dish between Available, Sold out and Hidden.</div>`)+`<div class="mcard">`+CATS.map(c=>`<section class="panel"><header><h2>${c}</h2><span class="dim">${MENU.filter(m=>m.cat===c).length} items</span></header>${MENU.filter(m=>m.cat===c).map(m=>`<div class="row">${art(m)}<button data-dedit="${m.id}" aria-label="Edit ${esc(m.name)}" style="min-width:0;flex:0 1 auto;text-align:left"><b class="ell" style="font:500 16.5px var(--display)">${esc(m.name)}</b><span class="dim ell" style="font-size:13px">${esc(m.desc)}</span></button><span class="lead"></span><span class="mono">${gbp2(m.price)}</span><button class="chip ${m.hidden?'':m.on?'on':''}" data-avail="${m.id}" aria-label="${esc(m.name)}: ${m.hidden?'Hidden':m.on?'Available':'Sold out'}. Tap to change">${m.hidden?'Hidden':m.on?'Available':'Sold out'}</button></div>`).join('')}</section>`).join('')+`</div>`}
+const PLAN={staff:['Staff','Add managers, waiters, kitchen staff and cashiers. Each person signs in with their own PIN and only sees what their role allows.',[['Roles','Owner, manager, waiter, kitchen, cashier'],['Shifts','Who is on tonight, and their section'],['Performance','Orders handled and sales per person']]],
+ reports:['Reports','Sales by day, week, month and year, best and lowest sellers, staff performance and returning customers.',[['Sales','Daily to yearly, compared with the last period'],['Products','Best sellers, slow sellers, revenue by item'],['Customers','Covers, returning guests, average spend']]],
+ settings:['Settings','Restaurant details, opening hours, sections, payment methods and permissions.',[['Restaurant','Name, logo, address, hours'],['Payments','Methods, transactions, refunds'],['Locations','Run more than one restaurant from one account']]]};
+function soonPage(){const p=PLAN[S.page];return`<section class="panel"><div class="eyebrow">Next phase</div><h2 style="font-size:26px;margin:6px 0 8px">${p[0]}</h2><p class="muted" style="max-width:60ch;margin:0 0 18px">${p[1]}</p><div class="soonlist">${p[2].map(([a,b])=>`<div><b>${a}</b><span class="muted">${b}</span></div>`).join('')}</div></section>`}
+
+/* ---------- sign-in ---------- */
+function signIn(){
+  const groups=[['Owner',['Owner']],['Managers',['Manager']],['Waiters',['Waiter']],['Kitchen',['Head chef','Line cook']],['Cashier',['Cashier']],['Zema Hospitality · admin',['Admin']]],u=S.pick&&staff(S.pick);
+  return`<div class="signin"><div class="si-card"><div class="brand" style="padding:0"><i>Z</i><div><b>${esc(S.set.name)}</b><small>Zema Hospitality</small></div></div>
+${u?`<div style="text-align:center"><span class="ava" style="width:64px;height:64px;font-size:20px;margin:0 auto 12px">${ini(u.name)}</span><h2 style="font-size:24px">${esc(u.name.replace(/^Chef /,''))}</h2><span class="muted">${u.role} · enter your PIN</span></div>
+<div class="dots" aria-label="${S.pin.length} of 4 digits entered">${[0,1,2,3].map(i=>`<i class="${i<S.pin.length?'on':''}"></i>`).join('')}</div>
+<div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-pin="${n}">${n}</button>`).join('')}<button data-a="signBack" style="font-size:14px">Back</button><button data-pin="0">0</button><button data-pin="x" aria-label="Delete">⌫</button></div>
+<p class="dim" style="text-align:center;margin:0;font-size:13px">${LIVE?esc(S.pinMsg||'Enter your 4-digit PIN.'):'Prototype: any four digits sign you in.'}</p>`
+:`<div><h2 style="font-size:28px">Who is signing in?</h2><p class="muted" style="margin:6px 0 0">Each person sees only what their role needs.</p></div>
+${groups.filter(([g,rs])=>STAFF.some(x=>rs.includes(x.role))).map(([g,rs])=>`<div><div class="eyebrow" style="margin-bottom:8px">${g}</div><div class="people">${STAFF.filter(x=>rs.includes(x.role)).map(x=>`<button class="person" data-who="${x.id}"><span class="ava">${ini(x.name)}</span><span><b class="ell">${esc(x.name.replace(/^Chef /,''))}</b><small>${x.role}${x.on?'':' · off today'}</small></span></button>`).join('')}</div></div>`).join('')}
+${LIVE&&!TOKEN?'':'<button class="btn quiet" data-a="signBack">Cancel</button>'}`}</div></div>`}
+
+/* ---------- staff ---------- */
+const PERMS=[['Dashboard and sales',1,1,0,0,0],['Floor plan · view',1,1,1,0,1],['Floor plan · edit layout',0,0,0,0,0],['Take and send orders',1,1,1,0,0],['Kitchen display',1,1,0,1,0],['Take payments',1,1,1,0,1],['Refunds',1,1,0,0,0],['Prices, sold out and hidden dishes',1,1,0,0,0],['Menu, dish names and photos',0,0,0,0,0],['Staff and shifts',1,1,0,0,0],['Reports',1,1,0,0,0],['Restaurant details',0,0,0,0,0],['Ownership, billing, locations',1,0,0,0,0]];
+const mayEdit=x=>x.role!=='Admin'&&(S.role==='admin'||x.id===S.user)||(S.role==='owner'&&x.role!=='Owner')||(S.role==='manager'&&!['Owner','Manager'].includes(x.role)),PINBTN=x=>`<button class="btn quiet" data-sedit="${x.id}" style="min-height:38px;padding:0 12px">PIN</button>`;
+function staffPage(){
+  const perf=id=>{const o=S.orders.filter(x=>x.waiter===id);return{n:o.length,v:o.reduce((a,x)=>a+orderTotal(x),0)}},canEdit=S.role==='owner'||S.role==='admin';
+  const grp=(title,roles)=>`<section class="panel"><header><h2>${title}</h2><span class="dim">${STAFF.filter(x=>roles.includes(x.role)&&x.on).length} on shift</span></header>${STAFF.filter(x=>roles.includes(x.role)).map(x=>{const p=perf(x.id),n=S.tables.filter(t=>lv(t.id).waiter===x.id).length;return`<div class="row"><span class="ava">${ini(x.name)}</span><div class="grow"><b class="ell">${esc(x.name)}</b><span class="dim" style="font-size:13px">${x.role}${n?' · '+n+' tables':''}${p.n?' · '+p.n+' orders · '+gbp(Math.round(p.v)):''}</span></div>${x.role==='Owner'?'<span class="pill">Account owner</span>'+(x.id===S.user||S.role==='admin'?PINBTN(x):''):`<button class="chip ${x.on?'on':''}" data-shift="${x.id}" aria-pressed="${x.on}">${x.on?'On shift':'Off'}</button>${mayEdit(x)?PINBTN(x):''}`}</div>${S.sEdit===x.id?`<div class="row" style="border-top:0;padding-top:0;flex-wrap:wrap"><input id="spin" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="New 4-digit PIN" aria-label="New PIN for ${esc(x.name)}" style="flex:1;min-width:140px;min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="pinSave">Save PIN</button>${x.role==='Owner'||x.id===S.user?'':'<button class="btn" data-a="staffRm">Remove</button>'}</div>`:''}`}).join('')}</section>`;
+  return`<div class="grid g2" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px">${grp('Front of house',['Waiter','Cashier'])}${grp('Kitchen',['Head chef','Line cook'])}${grp('Management',['Owner','Manager'])}</div>
+<div style="display:flex;flex-direction:column;gap:16px"><section class="panel"><header><h2>Add someone</h2></header><div style="display:flex;flex-direction:column;gap:12px"><div class="fld"><label class="eyebrow" for="sn">Full name</label><input id="sn" maxlength="60" placeholder="e.g. Sara Tadesse"></div>
+<div class="fld"><label class="eyebrow" for="sr">Role</label><select id="sr" style="min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:0 12px;font:500 15px var(--body)">${['Waiter','Line cook','Head chef','Cashier'].concat(canEdit?['Manager']:[]).map(r=>`<option>${r}</option>`).join('')}</select></div>
+<div class="fld"><label class="eyebrow" for="sp">Their PIN (4 digits)</label><input id="sp" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="e.g. 4821" style="max-width:160px"></div><button class="btn pri" data-a="addStaff">Add to the team</button>${canEdit?'':'<span class="dim" style="font-size:13px">Only the owner can add managers.</span>'}</div></section>
+<section class="panel"><header><h2>What each role can do</h2></header><div style="overflow-x:auto"><table class="perm"><thead><tr><th></th><th>Owner</th><th>Manager</th><th>Waiter</th><th>Kitchen</th><th>Cashier</th></tr></thead><tbody>${PERMS.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map(v=>`<td>${v?'<span class="yes" aria-label="Yes">●</span>':'<span class="no" aria-label="No">–</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="dim" style="margin:12px 0 0;font-size:13px">The menu, photos, floor plan and restaurant details are set up by Zema Hospitality.</p></section></div></div>`}
+
+/* ---------- reports ---------- */
+const RSCALE={day:1,week:6.4,month:27,year:318},RNAME={day:'Today',week:'This week',month:'This month',year:'This year'},RPREV={day:'last Thursday',week:'last week',month:'last month',year:'last year'};
+function itemStats(){const c={};MENU.forEach((m,i)=>{c[m.id]=3+(i*7)%19});S.orders.forEach(o=>o.lines.forEach(l=>{c[l.item]+=l.qty}));const k=RSCALE[S.rr];return MENU.map(m=>({m,q:Math.round(c[m.id]*k),v:Math.round(c[m.id]*k*m.price)}))}
+function reportsPage(){
+  if(LIVE)return reportsLive();
+  const k=kpis(),sc=RSCALE[S.rr],rev=S.rr==='day'?k.rev:S.rr==='week'?SALES.week.v.slice(0,-1).reduce((a,b)=>a+b,0)+k.rev:S.rr==='month'?SALES.month.v.slice(0,-1).reduce((a,b)=>a+b,0)+SALES.month.p[3]*.62+k.rev:SALES.year.v.slice(0,-1).reduce((a,b)=>a+b,0)+21400+k.rev;
+  const cov=Math.round(k.cov*sc),st=itemStats(),byQ=st.slice().sort((a,b)=>b.q-a.q),byV=st.slice().sort((a,b)=>b.v-a.v),best=byQ.slice(0,5),low=byQ.slice(-5).reverse(),topV=byV.slice(0,6);
+  const waiters=STAFF.filter(x=>x.role==='Waiter').map((x,i)=>{const o=S.orders.filter(q=>q.waiter===x.id),n=Math.round((o.length+14-i*2)*sc),v=Math.round((o.reduce((a,q)=>a+orderTotal(q),0)+520-i*60)*sc);return{x,n,v}}).sort((a,b)=>b.v-a.v);
+  const list=(rows,max,fmt)=>rows.map(r=>`<div class="row">${art(r.m)}<div class="grow"><b class="ell">${esc(r.m.name)}</b><div class="bar" style="margin-top:6px"><i style="width:${Math.max(4,Math.round(fmt(r,1)/max*100))}%"></i></div></div><span class="mono muted">${fmt(r)}</span></div>`).join('');
+  return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0;margin-right:auto">How the restaurant is doing, compared with ${RPREV[S.rr]}.</p><div class="seg">${[['day','Daily'],['week','Weekly'],['month','Monthly'],['year','Yearly']].map(([a,b])=>`<button class="${S.rr===a?'on':''}" data-rr="${a}">${b}</button>`).join('')}</div></div>
+<div class="panel grid g4" style="padding:0;gap:0"><div class="kpi"><span class="eyebrow">Sales · ${RNAME[S.rr].toLowerCase()}</span><span class="num">${gbp(Math.round(rev))}</span><small><span class="up">▲ ${S.rr==='year'?'9':'8'}%</span> on ${RPREV[S.rr]}</small></div>
+<div class="kpi"><span class="eyebrow">Customers</span><span class="num">${cov.toLocaleString('en-GB')}</span><small>covers served</small></div>
+<div class="kpi"><span class="eyebrow">Returning</span><span class="num">34%</span><small>came back within 60 days</small></div>
+<div class="kpi"><span class="eyebrow">Average spend</span><span class="num">${gbp2(rev/cov)}</span><small>per customer</small></div></div>
+<section class="panel"><header><h2>Sales</h2><div class="legend"><span><i style="background:var(--accent)"></i>${RNAME[S.rr]}</span><span><i style="background:var(--ink3)"></i>${RPREV[S.rr].replace(/^l/,'L')}</span></div></header>${chart(S.rr==='day'?'today':S.rr)}</section>
+<div class="grid g3"><section class="panel"><header><h2>Best sellers</h2><span class="dim">sold</span></header>${list(best,best[0].q,(r,n)=>n?r.q:r.q.toLocaleString('en-GB'))}</section>
+<section class="panel"><header><h2>Lowest sellers</h2><span class="dim">sold</span></header>${list(low,best[0].q,(r,n)=>n?r.q:r.q.toLocaleString('en-GB'))}</section>
+<section class="panel"><header><h2>Revenue by item</h2></header>${list(topV,topV[0].v,(r,n)=>n?r.v:gbp(r.v))}</section></div>
+<section class="panel"><header><h2>Staff performance</h2><span class="dim">waiters</span></header>${waiters.map(w=>`<div class="row"><span class="ava">${ini(w.x.name)}</span><div class="grow"><b class="ell">${esc(w.x.name)}</b><div class="bar" style="margin-top:6px"><i style="width:${Math.round(w.v/waiters[0].v*100)}%"></i></div></div><span class="mono muted" style="width:90px;text-align:right">${w.n.toLocaleString('en-GB')} orders</span><span class="mono" style="width:84px;text-align:right">${gbp(w.v)}</span></div>`).join('')}</section>
+<div class="note">Figures before today are sample data. Once the database is connected, every number here comes from real orders and payments.</div>`}
+
+/* ---------- settings ---------- */
+function settingsPage(){
+  const adm=S.role==='admin';
+  const f=(k,l,ph)=>`<div class="fld"><label class="eyebrow" for="set-${k}">${l}</label><input id="set-${k}" value="${esc(S.set[k])}" maxlength="120" placeholder="${ph||''}" ${adm?'':'disabled'}></div>`,own=S.role==='owner';
+  return`<div class="grid g2" style="align-items:start"><section class="panel"><header><h2>Restaurant</h2></header><div style="display:flex;flex-direction:column;gap:12px">${f('name','Restaurant name')}${f('address','Address')}<div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">${f('phone','Phone')}${f('email','Email')}</div>${f('hours','Opening hours')}
+<div class="fld"><label class="eyebrow" for="set-service">Service charge %</label><input id="set-service" type="number" inputmode="decimal" min="0" max="30" step="0.5" value="${S.set.service}" style="max-width:140px" ${adm?'':'disabled'}></div>
+${adm?'<button class="btn pri" data-a="saveSet" style="align-self:flex-start">Save changes</button>':'<span class="dim" style="font-size:13px">These details are managed by Zema Hospitality. Ask us if something needs changing.</span>'}</div></section>
+<div style="display:flex;flex-direction:column;gap:16px"><section class="panel"><header><h2>Payment methods</h2></header>${Object.keys(S.set.methods).map(m=>`<div class="row"><div class="grow"><b>${m}</b></div><button class="chip ${S.set.methods[m]?'on':''}" data-method="${m}" ${adm?'':'disabled'} aria-pressed="${S.set.methods[m]}">${S.set.methods[m]?'Accepted':'Off'}</button></div>`).join('')}</section>
+<section class="panel"><header><h2>Sections and tables</h2><button class="btn quiet" data-go="floor">Open floor plan</button></header>${ZONES.map(z=>{const l=S.tables.filter(t=>t.zone===z.id);return`<div class="row"><div class="grow"><b>${z.name}</b></div><span class="mono muted">${l.length} tables · ${l.reduce((a,t)=>a+t.seats,0)} seats</span></div>`}).join('')}</section>
+${LIVE?linkPanel():''}<section class="panel"><header><h2>Account</h2>${own?'':'<span class="pill">Owner only</span>'}</header>${own?`<div class="row"><div class="grow"><b>Plan</b><span class="dim" style="display:block;font-size:13px">One restaurant · ${STAFF.length} staff</span></div><span class="pill p-available">Active</span></div><div class="row"><div class="grow"><b>Locations</b><span class="dim" style="display:block;font-size:13px">${esc(S.set.name)}</span></div><button class="btn quiet" disabled>Add a restaurant</button></div><div class="row"><div class="grow"><b>Ownership</b><span class="dim" style="display:block;font-size:13px">${esc((STAFF.find(x=>x.role==='Owner')||{name:''}).name)}</span></div><button class="btn quiet" disabled>Transfer</button></div>`:'<p class="muted" style="margin:0">Billing, extra locations and ownership can only be changed by the owner.</p>'}</section></div></div>`}
+
+/* ---------- cashier: bills and payments ---------- */
+function billsPage(){
+  const open=S.tables.filter(t=>openOrders(t.id).length).sort((a,b)=>(lv(b.id).status==='bill')-(lv(a.id).status==='bill')||lv(a.id).seated-lv(b.id).seated),ask=open.filter(t=>lv(t.id).status==='bill'),took=S.tx.filter(x=>x.by===S.user&&!x.refunded&&(!LIVE||x.at>=dayStart())).reduce((a,x)=>a+x.total,0);
+  return`<div class="panel grid g3" style="padding:0;gap:0"><div class="kpi"><span class="eyebrow">Waiting to pay</span><span class="num" ${ask.length?'style="color:var(--s-bill)"':''}>${ask.length}</span></div><div class="kpi"><span class="eyebrow">Open tables</span><span class="num">${open.length}</span></div><div class="kpi"><span class="eyebrow">Taken by me today</span><span class="num">${gbp2(took)}</span></div></div>
+<section class="panel"><header><h2>Open bills</h2><span class="dim">${gbp2(open.reduce((a,t)=>a+tableTotal(t.id),0))} on the floor</span></header>${open.map(t=>{const l=lv(t.id);return`<div class="row"><span class="pill p-${l.status}">${esc(t.name)}</span><div class="grow"><b>${l.guests} guests · ${esc(staff(l.waiter).name)}</b><span class="dim" style="font-size:13px;display:block">Seated ${since(l.seated)} · ${STATUS[l.status]}</span></div><span class="mono" style="font-weight:500">${gbp2(due(tableTotal(t.id)))}</span><button class="btn ${l.status==='bill'?'pri':'quiet'}" data-open="${t.id}">${l.status==='bill'?'Take payment':'Open'}</button></div>`}).join('')||'<div class="empty">No open bills.</div>'}</section>`}
+function txPage(){
+  const l=S.tx.filter(x=>!LIVE||x.at>=dayStart()).sort((a,b)=>b.at-a.at),net=l.filter(x=>!x.refunded).reduce((a,x)=>a+x.total,0),canRefund=S.role==='owner'||S.role==='manager',by={};l.filter(x=>!x.refunded).forEach(x=>{by[x.method]=(by[x.method]||0)+x.total});
+  return`<div class="panel grid g3" style="padding:0;gap:0"><div class="kpi"><span class="eyebrow">Payments tonight</span><span class="num">${l.length}</span></div><div class="kpi"><span class="eyebrow">Taken</span><span class="num">${gbp2(net)}</span></div><div class="kpi"><span class="eyebrow">By method</span><span style="font-size:14px;line-height:1.6">${Object.entries(by).map(([m,v])=>`${m} <span class="mono">${gbp2(v)}</span>`).join('<br>')||'None yet'}</span></div></div>
+<section class="panel"><header><h2>Transactions</h2>${canRefund?'':'<span class="dim">Refunds need a manager</span>'}</header>${l.map(x=>`<div class="row"><span class="t">${hhmm(x.at)}</span><button class="grow" data-rc="${x.id}" style="text-align:left" aria-label="Receipt for payment ${x.id}"><b>${esc(tb(x.table)?tb(x.table).name:x.table)} · ${x.method}${x.part?' · '+x.part:''}</b><span class="dim" style="font-size:13px;display:block">#${x.id} · ${esc(staff(x.by).name)} · tap for receipt</span></button><span class="mono" style="font-weight:500;${x.refunded?'text-decoration:line-through;color:var(--ink3)':''}">${gbp2(x.total)}</span>${x.refunded?'<span class="pill p-bill">Refunded</span>':canRefund?`<button class="btn quiet" data-refund="${x.id}">Refund</button>`:''}</div>`).join('')}</section>`}
+
+/* ---------- actions ---------- */
+function go(page){S.page=page;S.rcpt=null;S.sel=null;S.edit=false;S.mod=null;render();const v=$('#view');if(v)v.scrollTop=0}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin]');if(!el)return;const d=el.dataset;
+  if(d.go)return go(d.go);
+  if(d.who){S.pick=d.who;S.pin='';return render()}
+  if(d.pin!=null){if(d.pin==='x')S.pin=S.pin.slice(0,-1);else if(S.pin.length<4)S.pin+=d.pin;if(S.pin.length===4){if(LIVE){liveSignin();return draw()}const u=staff(S.pick);S.user=u.id;S.role=ROLEKEY[u.role];if(S.role==='waiter')ME=u.id;S.pick=null;S.pin='';toast('Signed in as '+u.name.replace(/^Chef /,''));return go(NAV[S.role][0][0])}return render()}
+  if(d.rr){S.rr=d.rr;return render()}
+  if(d.pm){S.payM=d.pm;return render()}
+  if(d.shift){const u=staff(d.shift);if(LIVE)rpc('h_staff_update',{p_token:TOKEN,p_id:u.id,p_patch:{on:!u.on}}).then(setStaff).catch(netFail);u.on=!u.on;toast(u.name+(u.on?' is on shift':' is off shift'));return render()}
+  if(d.refund){const x=S.tx.find(q=>q.id==d.refund);x.refunded=true;if(!LIVE)BASE.rev-=x.total;repStale();toast(gbp2(x.total)+' refunded to '+x.method.toLowerCase());return render()}
+  if(d.method){if(S.role!=='admin')return;S.set.methods[d.method]=!S.set.methods[d.method];if(!S.set.methods[S.payM])S.payM=Object.keys(S.set.methods).find(m=>S.set.methods[m])||'Card';return render()}
+  if(d.range){S.range=d.range;return render()}
+  if(d.open){if(S.page!=='floor'&&!(S.role==='waiter'&&S.page==='dashboard'))S.page='floor';S.sel=d.open;S.edit=false;return render()}
+  if(d.cat){S.cat=d.cat;return render()}
+  if(d.dish){const m=item(d.dish);if(!m.on)return toast(m.name+' is sold out tonight');S.mod={item:m.id,qty:1,mods:[],note:''};return render()}
+  if(d.bump){const o=S.orders.find(x=>x.id==d.bump);o.status=d.next;syncTable(o.table);toast(d.next==='ready'?`${tb(o.table).name} is ready · ${staff(o.waiter).name.split(' ')[0]} notified`:`#${o.id} ${OSTATE[d.next].toLowerCase()}`);return render()}
+  if(d.avail){const m=item(d.avail);if(m.hidden){m.hidden=false;m.on=true}else if(m.on)m.on=false;else m.hidden=true;toast(m.name+(m.hidden?' is hidden from the order screen':m.on?' is available':' marked sold out'));return render()}
+  if(d.hold!=null){const r=S.res[+d.hold];Object.assign(lv(r.table),{status:'reserved',note:r.t+' · '+r.name});toast(`${r.table} held for ${r.name}`);return render()}
+  if(d.aopen)return adminOpen(d.aopen);
+  if(d.alink){const u=location.origin+location.pathname+'?r='+d.alink;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Device link copied')).catch(()=>window.prompt('Copy this device link',u));return}
+  if(d.apin){S.aPin=S.aPin===d.apin?null:d.apin;return draw()}
+  if(d.rc){S.rcpt={tx:d.rc};return render()}
+  if(d.sedit){S.sEdit=S.sEdit===d.sedit?null:d.sedit;return render()}
+  if(d.dedit){S.dPhoto=undefined;S.dEdit=d.dedit;render();const v=$('#view');if(v)v.scrollTop=0;return}
+  if(d.resrm!=null){const r=S.res[+d.resrm];S.res.splice(+d.resrm,1);toast('Booking for '+r.name+' removed');return render()}
+  const a=d.a,t=S.sel&&tb(S.sel),l=t&&lv(t.id);
+  if(GACT[a])return GACT[a]();
+  if(a==='spPlus'||a==='spMinus'){l.split=Math.max((l.parts||0)+1,Math.min(12,(l.split||1)+(a==='spPlus'?1:-1)));return render()}
+  if(a==='showBill'){S.rcpt={table:t.id};return render()}
+  if(a==='rcClose'){if(e.target!==el&&el.classList.contains('rcwrap'))return;S.rcpt=null;return render()}
+  if(a==='rcPrint'){window.print();return}
+  if(a==='dishNoPhoto'){S.dPhoto=null;$('#dprev').innerHTML=art({cat:$('#dc').value,name:'\u0000'});return}
+  if(a==='priceSave'){const pr=parseFloat($('#dp').value),m=MENU.find(x=>x.id===S.dEdit);if(!(pr>=0)){$('#dp').focus();return toast('Add a price')}if(m){m.price=Math.round(pr*100)/100;toast(m.name+' is now '+gbp2(m.price))}S.dEdit=null;return render()}
+  if((a==='dishSave'||a==='dishDel'||a==='dishNoPhoto')&&S.role!=='admin')return;
+  if(a==='dishNew'){S.dPhoto=undefined;S.dEdit=null;return render()}
+  if(a==='dishDel'){const i=MENU.findIndex(m=>m.id===S.dEdit);if(i>=0){toast(MENU[i].name+' removed from the menu');MENU.splice(i,1)}S.dEdit=null;return render()}
+  if(a==='dishSave'){const nm=$('#dn').value.trim(),pr=parseFloat($('#dp').value);if(!nm){$('#dn').focus();return toast('Give the dish a name')}if(!(pr>=0)){$('#dp').focus();return toast('Add a price')}
+    const o={cat:$('#dc').value,name:nm,desc:$('#dd').value.trim(),price:Math.round(pr*100)/100},e=S.dEdit&&MENU.find(m=>m.id===S.dEdit);if(S.dPhoto)o.photo=S.dPhoto;else if(S.dPhoto===null&&e)delete e.photo;S.dPhoto=undefined;if(e)Object.assign(e,o);else MENU.push({id:'m'+now().toString(36),...o,on:true});S.dEdit=null;toast(nm+(e?' updated':' added to '+o.cat.toLowerCase()));return render()}
+  if(a==='resAdd'){const nm=$('#rn').value.trim(),tm=$('#rt').value,g=parseInt($('#rg').value,10);if(!nm||!tm||!(g>0)){return toast('Add a time, a name and the number of guests')}
+    S.res.push({id:'r'+now().toString(36),t:tm,name:nm,guests:g,table:$('#rtb').value,note:$('#rno').value.trim()});S.res.sort((x,y)=>x.t.localeCompare(y.t));toast('Booked '+nm+' for '+tm);return render()}
+  if(a==='pinSave'){const pn=$('#spin').value,u=staff(S.sEdit);if(!/^\d{4}$/.test(pn)){$('#spin').focus();return toast('PINs are 4 digits')}
+    if(LIVE){rpc('h_staff_update',{p_token:TOKEN,p_id:u.id,p_patch:{pin:pn}}).then(()=>{toast('New PIN saved for '+u.name)}).catch(e=>toast(errMsg(e)))}else toast('New PIN saved for '+u.name);S.sEdit=null;return render()}
+  if(a==='staffRm'){const u=staff(S.sEdit);if(LIVE){rpc('h_staff_update',{p_token:TOKEN,p_id:u.id,p_patch:{remove:true}}).then(x=>{setStaff(x);toast(u.name+' removed');draw()}).catch(e=>toast(errMsg(e)))}else{STAFF.splice(STAFF.indexOf(u),1);toast(u.name+' removed')}S.sEdit=null;return render()}
+  if(a==='copyLink'){const u=deviceLink();(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Link copied')).catch(()=>toast('Press and hold the link to copy it'));return}
+  if(a==='switch'){if(LIVE)return liveOut();S.page='signin';S.pick=null;S.pin='';S.sel=null;S.mod=null;S.edit=false;return render()}
+  if(a==='signBack'){if(S.pick){S.pick=null;S.pin='';S.pinMsg='';return render()}if(LIVE&&!TOKEN)return;return go(NAV[S.role][0][0])}
+  if(a==='addStaff'){const n=$('#sn').value.trim(),r=$('#sr').value;if(!n){$('#sn').focus();return toast('Add their name first')}const pn=($('#sp')||{}).value||'';if(!/^\d{4}$/.test(pn)){$('#sp').focus();return toast('Give them a 4-digit PIN')}if(LIVE){rpc('h_staff_add',{p_token:TOKEN,p_name:n,p_role:r,p_pin:pn}).then(x=>{setStaff(x);toast(n+' added as '+r.toLowerCase());draw()}).catch(e=>toast(errMsg(e)));return}STAFF.push({id:'n'+now(),name:n,role:r,on:false});toast(n+' added as '+r.toLowerCase());return render()}
+  if(a==='saveSet'){if(S.role!=='admin')return;['name','address','phone','email','hours'].forEach(k=>{const v=$('#set-'+k).value.trim();if(v)S.set[k]=v});const sv=parseFloat($('#set-service').value);S.set.service=sv>=0&&sv<=30?sv:0;toast('Settings saved');return render()}
+  if(a==='closeSheet'){if(e.target!==el&&el.classList.contains('scrim'))return;S.sel=null;S.gN=null;return render()}
+  if(a==='editOn'){if(S.role!=='admin')return;S.edit=true;S.sel=null;return render()}
+  if(a==='saveLayout'){if(!LIVE)try{localStorage.setItem('zh-layout',JSON.stringify({tables:S.tables,fix:S.fix}))}catch(_){}S.edit=false;S.sel=null;toast('Layout saved');return render()}
+  if(a==='resetLayout'){if(!LIVE)try{localStorage.removeItem('zh-layout')}catch(_){}S.tables=JSON.parse(JSON.stringify(DEFAULT_TABLES));S.sel=null;toast('Back to the original layout');return render()}
+  if(a==='addTable'){let n=S.tables.length+1;while(tb('T'+n))n++;const nt={id:'T'+n,name:'T'+n,x:310,y:300,shape:'square',seats:4,zone:'main'};S.tables.push(nt);lv(nt.id);S.sel=nt.id;toast(nt.name+' added. Drag it into place.');return render()}
+  if(a==='delTable'&&t){S.tables=S.tables.filter(x=>x.id!==t.id);S.sel=null;toast(t.name+' removed');return render()}
+  if(a==='gPlus'||a==='gMinus'){S.gN=Math.max(1,Math.min(12,(S.gN||Math.min(t.seats,2))+(a==='gPlus'?1:-1)));$('#gN').textContent=S.gN;return}
+  if(a==='seat'){Object.assign(l,{paid:0,parts:0,split:1,status:'ordering',guests:S.gN||Math.min(t.seats,2),waiter:S.role==='waiter'?ME:(l.waiter||ME),seated:now(),note:''});S.gN=null;return startOrder(t.id)}
+  if(a==='startOrder')return startOrder(t.id);
+  if(a==='backFloor'){S.page=S.role==='waiter'?'dashboard':'floor';S.sel=S.orderFor;S.draft=[];return render()}
+  if(a==='served'){openOrders(t.id).filter(o=>o.status==='ready').forEach(o=>o.status='served');syncTable(t.id);toast('Served at '+t.name);return render()}
+  if(a==='bill'){l.status='bill';toast('Bill requested for '+t.name);return render()}
+  if(a==='pay'){if(LIVE&&S.no==null){const keep=t.id;withNo(n=>{S.no=n;S.sel=keep;act('pay')});return}const txid=LIVE?S.no:S.nextOrder+200+S.tx.length;S.no=null;
+    const tot=tableTotal(t.id),sp=splitOf(t.id),f=sp.full?sp.amt/sp.full:1;S.paid.push({total:0,guests:0});
+    S.tx.push({id:txid,net:Math.round(tot*f*100)/100,guests:sp.last?l.guests:0,table:t.id,total:sp.amt,method:S.payM,by:S.user,at:now(),refunded:false,svc:S.set.service||0,part:sp.n>1?(sp.done+1)+' of '+sp.n:'',lines:billLines(t.id),waiter:l.waiter});
+    if(!LIVE){BASE.rev+=tot*f;if(sp.last)BASE.covers+=l.guests}repStale();
+    if(!sp.last){l.paid=Math.round((sp.paid+sp.amt)*100)/100;l.parts=sp.done+1;toast(`${gbp2(sp.amt)} taken by ${S.payM.toLowerCase()} · ${sp.n-sp.done-1} more to pay`);return render()}
+    openOrders(t.id).forEach(o=>{o.closed=true;o.status='served'});Object.assign(l,{status:'cleaning',guests:0,waiter:null,seated:null,note:'',paid:0,parts:0,split:1});S.rcpt={tx:txid};toast(`${gbp2(sp.amt)} taken by ${S.payM.toLowerCase()} · ${t.name} closed`);return render()}
+  if(a==='cleaned'){l.status='available';toast(t.name+' is available');return render()}
+  if(a==='setStatus'){l.status=d.s;if(d.s==='available'||d.s==='cleaning')Object.assign(l,{guests:0,waiter:null,seated:null});return render()}
+  if(a==='rmLine'){S.draft.splice(+d.i,1);return render()}
+  if(a==='send'){if(!S.draft.length)return;if(LIVE&&S.no==null){withNo(n=>{S.no=n;act('send')});return}const id=LIVE?S.no:S.nextOrder++,tid=S.orderFor;S.no=null;S.orders.push({id,table:tid,waiter:lv(tid).waiter||ME,status:'new',at:now(),lines:S.draft.map(x=>({...x,name:item(x.item).name,cat:item(x.item).cat,price:item(x.item).price}))});S.draft=[];lv(tid).status='waiting';S.page=S.role==='waiter'?'dashboard':'floor';S.sel=tid;toast(`Order #${id} sent to the kitchen`);return render()}
+  if(a==='modClose'){if(e.target!==el&&el.classList.contains('scrim'))return;S.mod=null;return render()}
+  if(a==='qPlus'||a==='qMinus'){S.mod.note=$('#mnote').value;S.mod.qty=Math.max(1,Math.min(20,S.mod.qty+(a==='qPlus'?1:-1)));return render()}
+  if(a==='modTog'){S.mod.note=$('#mnote').value;const i=S.mod.mods.indexOf(d.m);if(i<0)S.mod.mods.push(d.m);else S.mod.mods.splice(i,1);return render()}
+  if(a==='modAdd'){const note=[...S.mod.mods,$('#mnote').value.trim()].filter(Boolean).join(' · ');S.draft.push({item:S.mod.item,qty:S.mod.qty,note});S.mod=null;return render()}
+});
+document.addEventListener('change',e=>{const t=S.edit&&S.sel&&tb(S.sel);if(!t)return;const id=e.target.id;
+  if(id==='tn'){const v=e.target.value.trim();if(v)t.name=v}else if(id==='ts')t.seats=+e.target.value;else if(id==='tsh')t.shape=e.target.value;else if(id==='tz')t.zone=e.target.value;else return;render()});
+/* a dish photo is cropped to 4:3 and shrunk in the browser, so it stays small enough to sync quickly */
+document.addEventListener('change',e=>{if(e.target.id!=='dph')return;const f=e.target.files&&e.target.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);
+  img.onload=()=>{const W=400,H=300,c=document.createElement('canvas'),k=Math.max(W/img.width,H/img.height),w=img.width*k,h=img.height*k;c.width=W;c.height=H;c.getContext('2d').drawImage(img,(W-w)/2,(H-h)/2,w,h);URL.revokeObjectURL(u);
+    let q=.78,out=c.toDataURL('image/jpeg',q);while(out.length>46000&&q>.3){q-=.08;out=c.toDataURL('image/jpeg',q)}
+    if(!okPh(out))return toast('That photo could not be used. Try another one.');S.dPhoto=out;$('#dprev').innerHTML=art({cat:'Mains',name:'',photo:out});toast('Photo ready. Press save to keep it.')};
+  img.onerror=()=>{URL.revokeObjectURL(u);toast('That file is not a photo this device can read. Try a JPG or PNG.')};img.src=u});
+/* ---------- bills, splitting, receipts ---------- */
+function billLines(tid){const m=new Map();openOrders(tid).forEach(o=>o.lines.forEach(x=>{const nm=ln(x),pr=x.price!=null?x.price:item(x.item).price,k=nm+'|'+pr,c=m.get(k)||{name:nm,qty:0,price:pr};c.qty+=x.qty;m.set(k,c)}));return[...m.values()]}
+function splitOf(tid){const l=lv(tid),full=due(tableTotal(tid)),paid=l.paid||0,done=l.parts||0,n=Math.max(done+1,l.split||1),rem=Math.max(0,Math.round((full-paid)*100)/100),last=n-done<=1,amt=last?rem:Math.round(rem/(n-done)*100)/100;return{full,paid,done,n,rem,last,amt}}
+function receipt(){const r=S.rcpt,x=r.tx!=null&&S.tx.find(q=>q.id==r.tx),tid=x?x.table:r.table,t=tb(tid),lines=x?(x.lines||[]):billLines(tid),svc=x?(x.svc||0):(S.set.service||0),sub=lines.reduce((a,q)=>a+q.qty*q.price,0),sv=Math.round(sub*svc)/100,total=Math.round((sub+sv)*100)/100,l=!x&&lv(tid),w=staff(x?x.waiter:l.waiter),at=x?x.at:now();
+  const row=(a,b,c)=>`<div class="rc-r ${c||''}"><span>${a}</span><span>${b}</span></div>`;
+  return`<div class="rcwrap" data-a="rcClose"><div class="rc" role="dialog" aria-label="${x?'Receipt':'Bill'}"><div class="rc-paper"><h2>${esc(S.set.name)}</h2>${S.set.address?`<p>${esc(S.set.address)}</p>`:''}${S.set.phone?`<p>${esc(S.set.phone)}</p>`:''}
+<div class="rc-hr"></div>${row(x?'Receipt #'+x.id:'Bill',new Date(at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' '+hhmm(at))}${row('Table',esc(t?t.name:tid))}${w.id?row('Served by',esc(w.name.split(' ')[0])):''}
+<div class="rc-hr"></div>${lines.length?lines.map(q=>row(q.qty+' × '+esc(q.name),gbp2(q.qty*q.price))).join(''):row('Items','not itemised')}
+<div class="rc-hr"></div>${lines.length?row('Subtotal',gbp2(sub))+(svc?row('Service '+svc+'%',gbp2(sv)):'')+row('Total',gbp2(total),'big'):''}
+${x?row((x.refunded?'Refunded · ':'Paid · ')+esc(x.method)+(x.part?' · '+x.part:''),gbp2(x.total),lines.length?'':'big'):(l.paid?row('Paid so far',gbp2(l.paid))+row('Still to pay',gbp2(Math.max(0,total-l.paid)),'big'):'')+((l.split||1)>1?row('Split between '+l.split,gbp2(splitOf(tid).amt)+' each'):'')}
+<div class="rc-hr"></div><p>${x?'Thank you for dining with us':'Service is '+(svc?'included as shown':'not included')}</p></div>
+<div class="rc-actions"><button class="btn pri" data-a="rcPrint">Print</button><button class="btn" data-a="rcClose">Close</button></div></div></div>`}
+function startOrder(tid){S.orderFor=tid;S.sel=null;S.draft=[];S.cat='Starters';S.page='order';render();const v=$('#view');if(v)v.scrollTop=0}
+/* a table's state follows its tickets: food on the way is "waiting", everything served is "occupied" */
+function syncTable(tid){const l=lv(tid),os=openOrders(tid);if(!os.length||l.status==='bill')return;l.status=os.some(o=>o.status!=='served')?'waiting':'occupied'}
+
+/* =====================================================================
+   Live mode. With a database configured, the same screens run on real
+   data: PIN sign-in is checked by the server, every change is saved as a
+   small document, and every device picks up the others' changes within
+   a few seconds. Without one, the page is the self-contained demo.
+   ===================================================================== */
+const SB_URL='https://ciaiadyarwumtkjwuddv.supabase.co',SB_KEY='sb_publishable_5Znf_3VzbHiy_ojoMREBAw_RbEvbzJ9';
+let LIVE=false,CODE=null,TOKEN=null,SYNCED=new Map(),SINCE=null,REP={},pushT=0,pushing=false,pushAgain=false,polling=false,staffJ='';
+const DEMO_STAFF=STAFF.map(x=>({...x})),DEFAULT_SET={name:'',address:'',phone:'',email:'',hours:'',service:12.5,methods:{Card:true,Cash:true,'Apple Pay':true,Voucher:false}};
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(_){return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(_){}},lsDel=k=>{try{localStorage.removeItem(k)}catch(_){}};
+const clone=o=>JSON.parse(JSON.stringify(o));
+const sortK=o=>Array.isArray(o)?o.map(sortK):o&&typeof o==='object'?Object.keys(o).sort().reduce((a,k)=>(a[k]=sortK(o[k]),a),{}):o, J=o=>JSON.stringify(sortK(o));
+const LIVE0=J({status:'available',guests:0,waiter:null,seated:null,note:''});
+async function rpc(fn,args){const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
+  const j=await r.json().catch(()=>null);if(!r.ok){const e=new Error((j&&j.message)||'ERR');e.code=(j&&j.message)||'ERR';throw e}return j}
+const errMsg=e=>({DENIED:'You are not allowed to do that',PIN:'PINs are 4 digits',NAME:'Add a name first',BUSY:'Too many at once. Try again later.'}[e&&e.code]||'No connection. Try again.');
+let DIRTY=0;document.addEventListener('input',()=>{DIRTY=Date.now()});
+const safe=()=>{const a=document.activeElement;return!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))&&!S.edit&&Date.now()-DIRTY>120000&&!GATES[S.page]};
+function softRender(){if(safe())draw()}
+function act(a){const b=document.createElement('button');b.dataset.a=a;b.hidden=true;document.body.appendChild(b);b.click();b.remove()}
+function withNo(fn){if(S.busy)return;S.busy=true;rpc('h_next_no',{p_token:TOKEN}).then(n=>{S.busy=false;netOk();fn(n)}).catch(e=>{S.busy=false;netFail(e);toast('No connection. Nothing was sent, try again.')})}
+function netOk(){if(S.offline){S.offline=false;softRender()}}
+function netFail(e){if(e&&/SESSION/.test(e.code||'')&&S.role==='admin'){adminBack();return}
+  if(e&&/SESSION/.test(e.code||'')){TOKEN=null;lsDel('zh-tok');S.sel=null;S.mod=null;S.edit=false;S.pick=null;S.pin='';S.page='signin';S.pinMsg='';draw();toast('Signed out. Please sign in again.');return}
+  if(!S.offline){S.offline=true;softRender()}}
+function setStaff(l){if(!Array.isArray(l))return;const j=J(l);if(j===staffJ)return false;staffJ=j;STAFF.length=0;OLD.length=0;l.forEach(x=>(x.gone?OLD:STAFF).push(x));return true}
+function resetData(){S.tables=clone(DEFAULT_TABLES);S.fix=clone(DEFAULT_FIX);S.live={};S.orders=[];S.tx=[];S.res=[];S.paid=[];MENU.length=0;SYNCED=new Map();SINCE=null;REP={};
+  S.set={...clone(DEFAULT_SET),name:S.lobbyName||''};BASE.rev=BASE.orders=BASE.covers=0}
+
+/* ---- documents ---- */
+function snapshot(){const m=new Map(),mg=S.role==='owner'||S.role==='manager',rk=S.role;
+  m.set('set',J(S.set));m.set('layout',S.edit&&SYNCED.has('layout')?SYNCED.get('layout'):J({tables:S.tables,fix:S.fix}));
+  MENU.forEach(x=>m.set('menu:'+x.id,J(x)));
+  Object.keys(S.live).forEach(id=>{const k='live:'+id,v=J(S.live[id]);if(SYNCED.has(k)||v!==LIVE0)m.set(k,v)});
+  S.orders.forEach(o=>m.set('order:'+o.id,J(o)));S.tx.forEach(x=>m.set('tx:'+x.id,J(x)));S.res.forEach(r=>{if(r.id)m.set('res:'+r.id,J(r))});
+  /* what this role may not change is treated as already in step, so it is never sent */
+  const adm=rk==='admin',no=k=>{const kd=k.split(':')[0];return(!adm&&(kd==='set'||kd==='layout'))||(kd==='menu'&&!adm&&!mg)||(kd==='res'&&(rk==='kitchen'||rk==='cashier'||adm))||(kd==='tx'&&(rk==='kitchen'||adm))||(kd==='order'&&adm)};
+  [...m.keys()].forEach(k=>{if(no(k)){if(SYNCED.has(k))m.set(k,SYNCED.get(k));else m.delete(k)}});
+  SYNCED.forEach((v,k)=>{if(!m.has(k)&&no(k))m.set(k,v)});
+  return m}
+function applyDoc(key,data,del){const i=key.indexOf(':'),kd=i<0?key:key.slice(0,i),id=i<0?'':key.slice(i+1),up=(arr,same)=>{const n=arr.findIndex(same);if(del){if(n>=0)arr.splice(n,1)}else if(n>=0)arr[n]=data;else arr.push(data)};
+  if(kd==='set'){if(!del)S.set={...clone(DEFAULT_SET),...data,methods:{...DEFAULT_SET.methods,...(data.methods||{})}}}
+  else if(kd==='layout'){if(!del&&Array.isArray(data.tables)){S.tables=data.tables;S.fix=data.fix||[];if(S.sel&&!tb(S.sel))S.sel=null}}
+  else if(kd==='live'){if(del)delete S.live[id];else S.live[id]=data}
+  else if(kd==='menu'){up(MENU,x=>x.id===id);const od=m=>m.id[0]==='i'?+m.id.slice(1):parseInt(m.id.slice(1),36)||0;MENU.sort((x,y)=>od(x)-od(y))}
+  else if(kd==='order'){const o=S.orders.find(x=>String(x.id)===id);
+    if(!del&&TOKEN&&data.status==='ready'&&(!o||o.status!=='ready')&&data.waiter===S.user&&tb(data.table))toast(tb(data.table).name+' is ready to serve');
+    if(!del&&TOKEN&&!o&&S.role==='kitchen'&&data.status==='new'&&SINCE)toast('New order'+(tb(data.table)?' · '+tb(data.table).name:''));
+    up(S.orders,x=>String(x.id)===id)}
+  else if(kd==='tx')up(S.tx,x=>String(x.id)===id);
+  else if(kd==='res'){up(S.res,x=>x.id===id);S.res.sort((a,b)=>String(a.t).localeCompare(String(b.t)))}}
+async function pull(first){const r=await rpc('h_pull',{p_token:TOKEN,p_since:first?null:SINCE});let ch=false;const loc=first?null:snapshot();
+  for(const d of r.docs){const v=J(d.data);
+    if(!first){const a=loc.get(d.key),b=SYNCED.get(d.key);if(a!==b)continue;if(d.deleted?b===undefined:b===v)continue}
+    else if(d.deleted)continue;
+    applyDoc(d.key,d.data,d.deleted);if(d.deleted)SYNCED.delete(d.key);else SYNCED.set(d.key,v);ch=true}
+  SINCE=new Date(new Date(r.now)-4000).toISOString();if(r.name)S.lobbyName=r.name;if(setStaff(r.staff))ch=true;return ch}
+function queueSync(){if(!LIVE||!TOKEN)return;clearTimeout(pushT);pushT=setTimeout(doPush,120)}
+async function doPush(){if(!LIVE||!TOKEN)return;if(pushing){pushAgain=true;return}
+  const snap=snapshot(),out=[],mg=S.role==='owner'||S.role==='manager';
+  snap.forEach((v,k)=>{if(SYNCED.get(k)!==v)out.push({key:k,data:JSON.parse(v)})});
+  SYNCED.forEach((v,k)=>{const kd=k.split(':')[0];if(!snap.has(k)&&((S.role==='admin'&&(kd==='menu'||kd==='live'))||(mg&&(kd==='res'||kd==='live'))||(kd==='res'&&S.role==='waiter')))out.push({key:k,deleted:true})});
+  if(!out.length)return;pushing=true;
+  try{const r=await rpc('h_push',{p_token:TOKEN,p_docs:out});out.forEach(d=>d.deleted?SYNCED.delete(d.key):SYNCED.set(d.key,J(d.data)));netOk();
+    if(r.rejected&&r.rejected.length){toast('Some changes were not allowed and have been undone');reloadAll()}}
+  catch(e){netFail(e);if(TOKEN)setTimeout(queueSync,3000)}
+  finally{pushing=false;if(pushAgain){pushAgain=false;queueSync()}}}
+async function reloadAll(){try{resetData();await pull(true);softRender()}catch(e){netFail(e)}}
+setInterval(async()=>{if(!LIVE||!TOKEN||polling||document.hidden||S.page==='signin')return;polling=true;
+  try{const ch=await pull(false);netOk();if(ch)softRender()}catch(e){netFail(e)}finally{polling=false}},2500);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&LIVE&&TOKEN)queueSync()});
+
+/* ---- figures ---- */
+function dayStart(){const d=new Date();if(d.getHours()<4)d.setDate(d.getDate()-1);d.setHours(4,0,0,0);return+d}
+function kpisLive(){const ds=dayStart(),tx=S.tx.filter(x=>x.at>=ds&&!x.refunded),open=S.orders.filter(o=>!o.closed).reduce((a,o)=>a+orderTotal(o),0),rev=tx.reduce((a,x)=>a+(x.net!=null?x.net:x.total),0)+open,
+  ord=S.orders.filter(o=>o.at>=ds||!o.closed).length,cov=Object.values(S.live).reduce((a,l)=>a+(l.guests||0),0)+tx.reduce((a,x)=>a+(x.guests||0),0);return{rev,ord,avg:ord?rev/ord:0,cov}}
+function needRep(key){const c=REP[key];if((!c||c.stale||now()-c.t>60000)&&!(c&&c.loading)&&TOKEN){REP[key]={...(c||{}),loading:true};
+    rpc('h_report',{p_token:TOKEN,p_range:key}).then(r=>{REP[key]={t:now(),r};softRender()}).catch(()=>{REP[key]={...(c||{}),t:now()-50000,loading:false}})}
+  return c&&c.r}
+function repStale(){Object.values(REP).forEach(c=>{c.stale=true})}
+function liveSales(rg){const key=rg==='today'?'day':rg,r=needRep(key);if(!r)return{l:['',''],v:[0,0],p:[0,0]};let v=r.v.map(Number),p=r.p.map(Number),l;
+  if(key==='day'){let a=12,b=Math.max(new Date().getHours(),13);v.forEach((n,i)=>{if(n||p[i]){a=Math.min(a,i);b=Math.max(b,i)}});l=[];for(let i=a;i<=b;i++)l.push(String(i));v=v.slice(a,b+1);p=p.slice(a,b+1)}
+  else if(key==='week'){const f=new Date(r.from);l=v.map((_,i)=>new Date(+f+i*864e5+432e5).toLocaleDateString('en-GB',{weekday:'short'}))}
+  else if(key==='month')l=v.map((_,i)=>(i%5===0?String(i+1):''));
+  else l=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return{l,v,p}}
+function reportsLive(){
+  const head=`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0;margin-right:auto">Real figures from your orders and payments, compared with ${RPREV[S.rr].replace('last Thursday','the same day last week')}.</p><div class="seg">${[['day','Daily'],['week','Weekly'],['month','Monthly'],['year','Yearly']].map(([a,b])=>`<button class="${S.rr===a?'on':''}" data-rr="${a}">${b}</button>`).join('')}</div></div>`,r=needRep(S.rr);
+  if(!r)return head+`<section class="panel"><div class="empty">Loading the figures…</div></section>`;
+  const sum=a=>a.reduce((x,y)=>x+Number(y),0),rev=sum(r.v),prev=sum(r.p),dl=prev?Math.round((rev-prev)/prev*100):null,cov=Number(r.covers)||0;
+  const items=r.items.map(i=>({m:{name:i.name,cat:i.cat||'Mains'},q:Number(i.q),v:Number(i.v)})),best=items.slice(0,5),low=items.length>5?items.slice(-5).reverse():[],topV=items.slice().sort((a,b)=>b.v-a.v).slice(0,6);
+  const waiters=r.waiters.map(w=>({x:staff(w.id),n:w.n,v:Number(w.v)})),none='<div class="empty">Nothing yet for this period.</div>';
+  const list=(rows,max,fmt)=>rows.map(q=>`<div class="row">${art(q.m)}<div class="grow"><b class="ell">${esc(q.m.name)}</b><div class="bar" style="margin-top:6px"><i style="width:${Math.max(4,Math.round(fmt(q,1)/(max||1)*100))}%"></i></div></div><span class="mono muted">${fmt(q)}</span></div>`).join('')||none;
+  return head+`<div class="panel grid g4" style="padding:0;gap:0"><div class="kpi"><span class="eyebrow">Sales · ${RNAME[S.rr].toLowerCase()}</span><span class="num">${gbp(Math.round(rev))}</span><small>${dl==null?'no earlier figures to compare yet':`<span class="${dl<0?'down':'up'}">${dl<0?'▼':'▲'} ${Math.abs(dl)}%</span> on the period before`}</small></div>
+<div class="kpi"><span class="eyebrow">Customers</span><span class="num">${cov.toLocaleString('en-GB')}</span><small>covers served</small></div>
+<div class="kpi"><span class="eyebrow">Orders</span><span class="num">${Number(r.orders).toLocaleString('en-GB')}</span><small>${r.payments} payments taken</small></div>
+<div class="kpi"><span class="eyebrow">Average spend</span><span class="num">${gbp2(cov?rev/cov:0)}</span><small>per customer</small></div></div>
+<section class="panel"><header><h2>Sales</h2><div class="legend"><span><i style="background:var(--accent)"></i>${RNAME[S.rr]}</span><span><i style="background:var(--ink3)"></i>Period before</span></div></header>${chart(S.rr==='day'?'today':S.rr)}</section>
+<div class="grid g3"><section class="panel"><header><h2>Best sellers</h2><span class="dim">sold</span></header>${list(best,best[0]&&best[0].q,(q,n)=>n?q.q:q.q.toLocaleString('en-GB'))}</section>
+<section class="panel"><header><h2>Lowest sellers</h2><span class="dim">sold</span></header>${list(low,best[0]&&best[0].q,(q,n)=>n?q.q:q.q.toLocaleString('en-GB'))}</section>
+<section class="panel"><header><h2>Revenue by item</h2></header>${list(topV,topV[0]&&topV[0].v,(q,n)=>n?q.v:gbp(q.v))}</section></div>
+<section class="panel"><header><h2>Staff performance</h2><span class="dim">orders taken</span></header>${waiters.map(w=>`<div class="row"><span class="ava">${ini(w.x.name)}</span><div class="grow"><b class="ell">${esc(w.x.name)}</b><div class="bar" style="margin-top:6px"><i style="width:${Math.max(4,Math.round(w.v/(waiters[0].v||1)*100))}%"></i></div></div><span class="mono muted" style="width:90px;text-align:right">${w.n} orders</span><span class="mono" style="width:84px;text-align:right">${gbp(w.v)}</span></div>`).join('')||none}</section>`}
+
+/* ---- small forms ---- */
+function resForm(){if(!(S.role==='owner'||S.role==='manager'||S.role==='waiter'))return'';const IN='min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body);width:100%';
+  return`<section class="panel"><header><h2>Add a booking</h2></header><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end"><div class="fld"><label class="eyebrow" for="rt">Time</label><input id="rt" type="time" value="19:00"></div><div class="fld"><label class="eyebrow" for="rn">Name</label><input id="rn" maxlength="60" placeholder="Guest name"></div><div class="fld"><label class="eyebrow" for="rg">Guests</label><input id="rg" type="number" inputmode="numeric" min="1" max="40" value="2"></div><div class="fld"><label class="eyebrow" for="rtb">Table</label><select id="rtb" style="${IN}">${S.tables.map(t=>`<option value="${esc(t.id)}">${esc(t.name)} · ${t.seats} seats</option>`).join('')}</select></div><div class="fld"><label class="eyebrow" for="rno">Note</label><input id="rno" maxlength="100" placeholder="Allergy, occasion"></div></div><button class="btn pri" data-a="resAdd" style="margin-top:14px">Add booking</button></section>`}
+const deviceLink=()=>location.origin+location.pathname+'?r='+CODE;
+function linkPanel(){return`<section class="panel"><header><h2>Device link</h2><button class="btn quiet" data-a="copyLink">Copy</button></header><p class="mono" style="margin:0;word-break:break-all;font-size:13px;user-select:all">${esc(deviceLink())}</p><p class="muted" style="margin:10px 0 0;font-size:14px">Open this link once on every till, tablet and phone used in the restaurant, then add it to the Home Screen. Keep it private: it shows who works here, and each person still needs their own PIN.</p></section>`}
+
+/* ---- opening screens ---- */
+const gate=inner=>`<div class="signin"><div class="si-card"><div class="brand" style="padding:0"><i>Z</i><div><b>Zema Hospitality</b><small>Restaurant management</small></div></div>${inner}</div></div>`;
+const GATES={
+  welcome:()=>gate(`<div><h2 style="font-size:28px">Welcome</h2><p class="muted" style="margin:6px 0 0">${esc(S.gMsg||'Restaurants are set up by Zema Hospitality. Paste the device link you were given to open yours.')}</p></div>
+<div class="fld"><label class="eyebrow" for="gcode">Already set up? Paste your device link</label><input id="gcode" placeholder="https://…?r=…" autocomplete="off"></div><button class="btn big" data-a="gOpen">Open my restaurant</button>
+<button class="btn quiet" data-a="gDemo">Look around the demo first</button>`),
+  create:()=>gate(`<div><h2 style="font-size:28px">Create your restaurant</h2><p class="muted" style="margin:6px 0 0">You become the owner. You can add your team afterwards.</p></div>
+<div class="fld"><label class="eyebrow" for="cn">Restaurant name</label><input id="cn" maxlength="80" placeholder="e.g. Zema Kitchen"></div>
+<div class="fld"><label class="eyebrow" for="co">Your name</label><input id="co" maxlength="60" placeholder="First and last name"></div>
+<div class="fld"><label class="eyebrow" for="cp">Choose your PIN (4 digits)</label><input id="cp" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="Only you should know it" style="max-width:220px"></div>
+<label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="checkbox" id="cd" checked style="width:20px;height:20px;margin-top:2px;accent-color:var(--accent)"><span>Start with the sample menu of 31 dishes<br><span class="dim" style="font-size:13px">You can edit or remove every dish later.</span></span></label>
+<button class="btn pri big" data-a="gMake">${S.busy?'Creating…':'Create restaurant'}</button><button class="btn quiet" data-a="gBack">Back</button>`),
+  loading:()=>gate(`<div class="empty">${esc(S.gMsg||'Opening your restaurant…')}</div>${S.gRetry?'<button class="btn pri big" data-a="gRetry">Try again</button><button class="btn quiet" data-a="gForget">Use a different restaurant</button>':''}`)};
+const GACT={
+  gCreate(){S.page='create';draw()},gBack(){S.page='welcome';S.gMsg='';draw()},
+  gDemo(){LIVE=false;S.page='dashboard';seed();render()},
+  gOpen(){const m=($('#gcode').value||'').match(/[0-9a-f]{24}/);if(!m){$('#gcode').focus();return toast('Paste the full device link')}startLive(m[0])},
+  gRetry(){startLive(CODE)},gForget(){lsDel('zh-code');lsDel('zh-tok');CODE=null;LIVE=false;S.gMsg='';S.gRetry=false;history.replaceState(null,'',location.pathname);S.page='welcome';draw()},
+  async gMake(){if(S.busy)return;const nm=$('#cn').value.trim(),ow=$('#co').value.trim(),pn=$('#cp').value,dm=$('#cd').checked;
+    if(nm.length<2){$('#cn').focus();return toast('Add the restaurant name')}if(ow.length<2){$('#co').focus();return toast('Add your name')}if(!/^\d{4}$/.test(pn)){$('#cp').focus();return toast('Choose a 4-digit PIN')}
+    S.busy=true;try{const r=await rpc('h_create',{p_name:nm,p_owner:ow,p_pin:pn});CODE=r.code;LIVE=true;lsSet('zh-code',CODE);if(dm)lsSet('zh-demo',CODE);history.replaceState(null,'','?r='+CODE);S.lobbyName=nm;
+      const q=await rpc('h_signin',{p_code:CODE,p_staff:r.staff_id,p_pin:pn});TOKEN=q.token;lsSet('zh-tok',JSON.stringify({c:CODE,t:TOKEN,u:r.staff_id}));S.busy=false;await enter(r.staff_id);S.page='settings';render();toast('Restaurant created. Save your device link below.')}
+    catch(e){S.busy=false;toast(errMsg(e))}}};
+async function startLive(code){CODE=code;LIVE=true;lsSet('zh-code',code);STAFF.length=0;staffJ='';S.gMsg='';S.gRetry=false;S.page='loading';draw();
+  try{const r=await rpc('h_lobby',{p_code:CODE});S.lobbyName=r.name;resetData();setStaff(r.staff);history.replaceState(null,'','?r='+CODE);
+    let st=null;try{st=JSON.parse(lsGet('zh-tok')||'null')}catch(_){}
+    if(st&&st.c===CODE&&st.t){TOKEN=st.t;try{await enter(st.u);return render()}catch(e){TOKEN=null;lsDel('zh-tok')}}
+    S.pick=null;S.pin='';S.pinMsg='';S.page='signin';draw()}
+  catch(e){if(e.code==='NOCODE'){lsDel('zh-code');CODE=null;LIVE=false;STAFF.push(...DEMO_STAFF.map(x=>({...x})));S.gMsg='That link was not recognised. Check it and try again.';S.page='welcome'}else{S.gMsg='Could not reach the restaurant. Check the internet connection.';S.gRetry=true;S.page='loading'}draw()}}
+async function enter(id){resetData();await pull(true);const u=staff(id);if(!u.id)throw new Error('gone');S.user=u.id;ME=u.id;S.role=ROLEKEY[u.role];S.pick=null;S.pin='';S.sel=null;S.mod=null;S.edit=false;S.page=NAV[S.role][0][0];
+  if(!SYNCED.has('layout')&&S.role==='owner'&&lsGet('zh-demo')===CODE){MENU.push(...DEMO_MENU.map(m=>({...m,on:true})));lsDel('zh-demo')}}
+async function liveSignin(){const id=S.pick,pin=S.pin;S.pinMsg='Checking…';
+  try{const r=await rpc('h_signin',{p_code:CODE,p_staff:id,p_pin:pin});S.pin='';
+    if(r.error){S.pinMsg=r.error==='LOCKED'?'Too many wrong tries. Wait 5 minutes.':'Wrong PIN. Try again.';return draw()}
+    S.pinMsg='';TOKEN=r.token;lsSet('zh-tok',JSON.stringify({c:CODE,t:TOKEN,u:id}));await enter(id);render();toast('Signed in as '+staff(id).name.replace(/^Chef /,''))}
+  catch(e){S.pin='';TOKEN=null;S.pinMsg='No connection. Try again.';S.page='signin';draw()}}
+function liveOut(){if(S.role==='admin')return adminBack();const t=TOKEN;TOKEN=null;lsDel('zh-tok');rpc('h_signout',{p_token:t}).catch(()=>{});S.pick=null;S.pin='';S.pinMsg='';S.sel=null;S.mod=null;S.edit=false;S.page='signin';draw();
+  rpc('h_lobby',{p_code:CODE}).then(r=>{if(setStaff(r.staff)&&S.page==='signin'&&!S.pick)draw()}).catch(()=>{})}
+function boot(){const q=new URLSearchParams(location.search);
+  if(!SB_URL||q.has('demo')){seed();return render()}
+  if(q.has('admin'))return adminStart();
+  const c=((q.get('r')||lsGet('zh-code')||'').match(/[0-9a-f]{24}/)||[])[0];
+  if(!c){S.page='welcome';return draw()}
+  startLive(c)}
+
+/* ---- Zema Hospitality admin: creates restaurants and looks after their menu, photos, floor plan and details ---- */
+let ADM=null;
+const admList=async()=>{S.aList=await rpc('h_admin_list',{p_token:ADM})};
+GATES.adminLogin=()=>gate(`<div><h2 style="font-size:28px">${S.aSetup?'Admin sign-in':'Set your admin password'}</h2><p class="muted" style="margin:6px 0 0">${esc(S.gMsg||(S.aSetup?'Zema Hospitality only.':'This is asked once. Choose a long password only you know: it controls every restaurant.'))}</p></div>
+<div class="fld"><label class="eyebrow" for="apw">Password</label><input id="apw" type="password" autocomplete="${S.aSetup?'current-password':'new-password'}" maxlength="80"></div>
+${S.aSetup?'':'<div class="fld"><label class="eyebrow" for="apw2">Repeat the password</label><input id="apw2" type="password" autocomplete="new-password" maxlength="80"></div>'}
+<button class="btn pri big" data-a="aIn">${S.aSetup?'Sign in':'Save password and continue'}</button>`);
+GATES.adminHome=()=>{const l=S.aList||[];return`<div class="signin" style="align-items:flex-start"><div class="si-card" style="max-width:760px;width:100%"><div style="display:flex;align-items:center;gap:12px"><div class="brand" style="padding:0;margin-right:auto"><i>Z</i><div><b>Zema Hospitality</b><small>Admin · ${l.length} restaurant${l.length===1?'':'s'}</small></div></div><button class="btn quiet" data-a="aOut">Sign out</button></div>
+${l.map(r=>`<section class="panel"><header><h2>${esc(r.name)}</h2><span class="dim">since ${new Date(r.created).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></header>
+<p class="muted" style="margin:0 0 14px">Owner ${esc(r.owner||'not set')} · ${r.staff} staff · ${r.dishes} dishes</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" data-aopen="${r.id}">Open and set up</button><button class="btn" data-alink="${r.code}">Copy device link</button><button class="btn quiet" data-apin="${r.id}">Reset owner PIN</button></div>
+${S.aPin===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="apin" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="New 4-digit PIN" aria-label="New PIN for ${esc(r.owner||'the owner')}" style="flex:1;min-width:150px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aPinSave">Save PIN</button></div>`:''}</section>`).join('')||'<div class="empty">No restaurants yet. Create the first one below.</div>'}
+<section class="panel"><header><h2>Create a restaurant</h2><span class="dim">or a second location</span></header><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px"><div class="fld"><label class="eyebrow" for="an">Restaurant name</label><input id="an" maxlength="80" placeholder="e.g. Zema Kitchen Soho"></div><div class="fld"><label class="eyebrow" for="ao">Owner's name</label><input id="ao" maxlength="60" placeholder="First and last name"></div><div class="fld"><label class="eyebrow" for="ap">Owner's PIN (4 digits)</label><input id="ap" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="They can change it later"></div></div>
+<label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;margin-top:14px"><input type="checkbox" id="ad" style="width:20px;height:20px;margin-top:2px;accent-color:var(--accent)"><span>Start from the sample menu of 31 dishes</span></label>
+<button class="btn pri" data-a="aMake" style="margin-top:14px">${S.busy?'Creating…':'Create restaurant'}</button></section></div></div>`};
+async function adminStart(){S.page='loading';S.gMsg='Opening admin…';S.gRetry=false;draw();
+  try{const st=await rpc('h_admin_state');S.aSetup=st.setup;S.gMsg='';ADM=lsGet('zh-adm');
+    if(ADM&&st.setup){try{await admList();S.page='adminHome';return draw()}catch(e){ADM=null;lsDel('zh-adm')}}
+    S.page='adminLogin';draw()}
+  catch(e){S.gMsg='Could not reach the server. Check the internet connection and reload.';S.page='loading';draw()}}
+async function adminOpen(rid,then){try{const r=await rpc('h_admin_open',{p_token:ADM,p_rid:rid});CODE=r.code;LIVE=true;TOKEN=r.token;S.lobbyName=r.name;resetData();await pull(true);
+    S.role='admin';S.user='admin';ME='admin';S.sel=null;S.mod=null;S.edit=false;S.rcpt=null;S.dEdit=null;if(!SYNCED.has('set'))S.set.name=r.name;
+    if(S.aSeed===rid&&!MENU.length)MENU.push(...DEMO_MENU.map(m=>({...m,on:true})));S.aSeed=null;S.page=then||'menu';render()}
+  catch(e){admErr(e)}}
+async function adminBack(){clearTimeout(pushT);try{await doPush()}catch(_){}const t=TOKEN;TOKEN=null;LIVE=false;CODE=null;if(t)rpc('h_signout',{p_token:t}).catch(()=>{});
+  S.sel=null;S.mod=null;S.edit=false;S.role='owner';S.aPin=null;S.page='adminHome';try{await admList()}catch(e){return admErr(e)}draw()}
+function admErr(e){if(e&&e.code==='ADMIN'){ADM=null;lsDel('zh-adm');TOKEN=null;LIVE=false;S.gMsg='Please sign in again.';S.page='adminLogin';return draw()}toast(errMsg(e))}
+Object.assign(GACT,{
+  async aIn(){const pw=$('#apw').value;if(S.busy)return;
+    if(!S.aSetup){if(pw.length<8){$('#apw').focus();return toast('Use at least 8 characters')}if(pw!==$('#apw2').value){$('#apw2').focus();return toast('The two passwords do not match')}}
+    S.busy=true;try{const r=await rpc(S.aSetup?'h_admin_signin':'h_admin_setup',{p_pass:pw});S.busy=false;
+      if(r.error){S.gMsg=r.error==='LOCKED'?'Too many wrong tries. Wait 10 minutes.':'Wrong password. Try again.';return draw()}
+      ADM=r.token;lsSet('zh-adm',ADM);S.aSetup=true;S.gMsg='';await admList();S.page='adminHome';draw()}
+    catch(e){S.busy=false;toast(e.code==='SHORT'?'Use at least 8 characters':e.code==='DENIED'?'An admin password already exists. Reload and sign in.':errMsg(e))}},
+  aOut(){rpc('h_admin_signout',{p_token:ADM}).catch(()=>{});ADM=null;lsDel('zh-adm');S.gMsg='';S.page='adminLogin';draw()},
+  async aMake(){if(S.busy)return;const nm=$('#an').value.trim(),ow=$('#ao').value.trim(),pn=$('#ap').value,dm=$('#ad').checked;
+    if(nm.length<2){$('#an').focus();return toast('Add the restaurant name')}if(ow.length<2){$('#ao').focus();return toast("Add the owner's name")}if(!/^\d{4}$/.test(pn)){$('#ap').focus();return toast('Give the owner a 4-digit PIN')}
+    S.busy=true;try{const r=await rpc('h_admin_create',{p_token:ADM,p_name:nm,p_owner:ow,p_pin:pn});S.busy=false;S.aSeed=dm?r.id:null;await adminOpen(r.id,'settings');toast(nm+' created. Add its details, then copy the device link.')}
+    catch(e){S.busy=false;admErr(e)}},
+  async aPinSave(){const pn=$('#apin').value,r=(S.aList||[]).find(x=>x.id===S.aPin);if(!/^\d{4}$/.test(pn)){$('#apin').focus();return toast('PINs are 4 digits')}if(!r||!r.owner_id)return toast('This restaurant has no owner yet');
+    try{const o=await rpc('h_admin_open',{p_token:ADM,p_rid:r.id});await rpc('h_staff_update',{p_token:o.token,p_id:r.owner_id,p_patch:{pin:pn}});rpc('h_signout',{p_token:o.token}).catch(()=>{});S.aPin=null;draw();toast('New PIN saved for '+r.owner)}
+    catch(e){admErr(e)}}});
+
+boot();
+setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())render()},30000);
+</script>
+
+</body>
+</html>

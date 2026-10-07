@@ -300,6 +300,10 @@ h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance;l
 .rc-actions{display:flex;gap:10px}.rc-actions .btn{flex:1}
 @media print{html,body{height:auto;background:#fff}.rail,.main,.toast,.scrim,.rc-actions{display:none!important}.app{display:block;height:auto}.rcwrap{position:static;background:none;padding:0;display:block}.rc{width:72mm}.rc-paper{padding:0;border-radius:0;background:#fff}}
 input:disabled,button.chip:disabled{opacity:.6;cursor:not-allowed}
+.ftabs{display:flex;gap:8px;flex-wrap:wrap;padding:12px 12px 0}.ftabs .chip{display:inline-flex;align-items:center}
+.fdot{width:8px;height:8px;border-radius:50%;background:var(--s-bill);margin-left:8px}
+.hdl{fill:var(--accent);cursor:nwse-resize}.selz{stroke:var(--accent)!important;stroke-width:2!important;stroke-dasharray:7 5}
+.floor.edit .zg,.floor.edit .fg{cursor:move}.floor.edit .zone{fill-opacity:.6}
 </style>
 </head>
 <body>
@@ -359,6 +363,7 @@ const ADDONS={Mains:['Extra sauce','No onions','Gluten-free','Sauce on the side'
 
 /* ---------- floor: logical canvas 1000 x 620 ---------- */
 const ZONES=[{id:'window',name:'Window',x:60,y:40,w:440,h:110},{id:'main',name:'Main hall',x:60,y:170,w:500,h:250},{id:'booths',name:'Booths',x:580,y:170,w:380,h:250},{id:'terrace',name:'Terrace',x:60,y:440,w:500,h:150},{id:'private',name:'Private room',x:580,y:440,w:380,h:150}];
+const DEFAULT_ZONES=JSON.parse(JSON.stringify(ZONES)),DEFAULT_FLOORS=[{id:'g',name:'Ground floor'}];
 const DEFAULT_FIX=[{id:'f1',kind:'Bar',x:520,y:56,w:250,h:78},{id:'f2',kind:'Kitchen',x:790,y:40,w:170,h:110},{id:'f3',kind:'Entrance',x:16,y:250,w:30,h:90}];
 const T=(n,x,y,shape,seats,zone)=>({id:'T'+n,name:'T'+n,x,y,shape,seats,zone});
 const DEFAULT_TABLES=[T(1,180,100,'round',2,'window'),T(2,270,100,'round',2,'window'),T(3,360,100,'round',2,'window'),T(4,450,100,'round',2,'window'),
@@ -369,11 +374,13 @@ const DEFAULT_TABLES=[T(1,180,100,'round',2,'window'),T(2,270,100,'round',2,'win
 
 const S={user:'o1',pick:null,pin:'',rr:'day',payM:'Card',tx:[],set:{name:'Zema Kitchen',address:'14 Camden Passage, London N1 8EA',phone:'020 7946 0182',email:'hello@zemakitchen.example',hours:'Tue to Sun · 12:00 to 23:00',service:12.5,methods:{Card:true,Cash:true,'Apple Pay':true,Voucher:false}},
  role:'owner',page:'dashboard',sel:null,edit:false,range:'today',cat:'Starters',orderFor:null,draft:[],mod:null,toast:null,
- tables:[],fix:[],live:{},orders:[],paid:[],nextOrder:105,
+ tables:[],fix:[],floors:[{id:'g',name:'Ground floor'}],floor:'g',selZ:null,live:{},orders:[],paid:[],nextOrder:105,
  res:[{t:'19:00',name:'John & Sarah Whitmore',guests:4,table:'T12',note:'Anniversary'},{t:'19:30',name:'Michael Asante',guests:2,table:'T4',note:''},{t:'19:45',name:'Bethlehem Family',guests:8,table:'T19',note:'Birthday cake at 21:00'},{t:'20:15',name:'Dr. Patel',guests:6,table:'T13',note:'One vegetarian, one nut allergy'},{t:'20:30',name:'Leor Films',guests:4,table:'T9',note:''}]};
 
 function loadLayout(){let d=null;try{d=JSON.parse(localStorage.getItem('zh-layout')||'null')}catch(_){}
-  S.tables=(d&&d.tables)||JSON.parse(JSON.stringify(DEFAULT_TABLES));S.fix=(d&&d.fix)||JSON.parse(JSON.stringify(DEFAULT_FIX))}
+  S.tables=(d&&d.tables)||JSON.parse(JSON.stringify(DEFAULT_TABLES));S.fix=(d&&d.fix)||JSON.parse(JSON.stringify(DEFAULT_FIX));setZones(d&&d.zones,d&&d.floors)}
+function setZones(z,f){ZONES.length=0;ZONES.push(...JSON.parse(JSON.stringify(Array.isArray(z)?z:DEFAULT_ZONES)));S.floors=JSON.parse(JSON.stringify(Array.isArray(f)&&f.length?f:DEFAULT_FLOORS));if(!S.floors.some(x=>x.id===S.floor))S.floor=S.floors[0].id}
+const fl=o=>o.floor&&S.floors.some(x=>x.id===o.floor)?o.floor:S.floors[0].id,layoutDoc=()=>({tables:S.tables,fix:S.fix,zones:ZONES,floors:S.floors});
 function seed(){
   loadLayout();
   const L=(id,status,o={})=>{S.live[id]={status,guests:0,waiter:null,seated:null,note:'',...o}};
@@ -501,35 +508,53 @@ function tableSvg(t){const g=shapeOf(t),l=lv(t.id),mine=l.waiter===ME,dim=S.role
   return`<g class="tb st-${l.status} ${S.sel===t.id?'sel':''} ${dim?'dimmed':''}" data-t="${t.id}" transform="translate(${t.x} ${t.y})" tabindex="0" role="button" aria-label="${esc(t.name)}, ${STATUS[l.status]}">${chairs(t)}
 ${t.shape==='round'?`<circle class="sh" r="${g.r}"/>`:`<rect class="sh" x="${-g.w/2}" y="${-g.h/2}" width="${g.w}" height="${g.h}" rx="${t.shape==='square'?12:14}"/>`}
 <text class="n" text-anchor="middle" y="${sub?1:5}">${esc(t.name)}</text>${sub?`<text class="m" text-anchor="middle" y="15">${esc(sub)}</text>`:''}</g>`}
-function floorSvg(){return`<div class="fscroll"><svg viewBox="0 0 1000 620" id="fsvg" aria-label="Restaurant floor plan">
-${ZONES.map(z=>`<rect class="zone" x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="16"/><text class="zone-l" x="${z.x+14}" y="${z.y+22}">${z.name}</text>`).join('')}
-${S.fix.map(f=>`<g data-f="${f.id}"><rect class="fx" x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx="10"/><text class="fx-l" text-anchor="middle" ${f.w<50?`transform="translate(${f.x+f.w/2+4} ${f.y+f.h/2}) rotate(-90)"`:`x="${f.x+f.w/2}" y="${f.y+f.h/2+4}"`}>${f.kind}</text></g>`).join('')}
-${S.tables.map(tableSvg).join('')}</svg></div>`}
+function floorSvg(){
+  if(!S.floors.some(f=>f.id===S.floor))S.floor=S.floors[0].id;
+  const on=o=>fl(o)===S.floor,sz=S.edit&&S.selZ,so=sz&&(sz.k==='z'?ZONES:S.fix).find(x=>x.id===sz.id),hd=()=>'',se=(o,k)=>sz&&sz.k===k&&sz.id===o.id?' selz':'';
+  const tabs=S.floors.length>1||S.edit?`<div class="ftabs" role="tablist" aria-label="Floors">${S.floors.map(f=>{const n=S.tables.filter(t=>fl(t)===f.id),b=n.filter(t=>['bill'].includes(lv(t.id).status)).length;return`<button class="chip ${f.id===S.floor?'on':''}" role="tab" aria-selected="${f.id===S.floor}" data-floor="${f.id}">${esc(f.name)}<span class="mono" style="opacity:.7;margin-left:6px">${n.length}</span>${b&&!S.edit?`<span class="fdot" title="${b} bill requested"></span>`:''}</button>`}).join('')}${S.edit?'<button class="chip" data-a="addFloor">+ Add floor</button>':''}</div>`:'';
+  return`${tabs}<div class="fscroll"><svg viewBox="0 0 1000 620" id="fsvg" aria-label="Restaurant floor plan">
+${ZONES.filter(on).map(z=>`<g class="zg" data-z="${z.id}" transform="translate(${z.x} ${z.y})"><rect class="zone${se(z,'z')}" width="${z.w}" height="${z.h}" rx="16"/><text class="zone-l" x="14" y="22">${esc(z.name)}</text>${hd(z,'z')}</g>`).join('')}
+${S.fix.filter(on).map(f=>`<g class="fg" data-f="${f.id}" transform="translate(${f.x} ${f.y})"><rect class="fx${se(f,'f')}" width="${f.w}" height="${f.h}" rx="10"/><text class="fx-l" text-anchor="middle" ${f.w<50?`transform="translate(${f.w/2+4} ${f.h/2}) rotate(-90)"`:`x="${f.w/2}" y="${f.h/2+4}"`}>${esc(f.kind)}</text>${hd(f,'f')}</g>`).join('')}
+${S.tables.filter(on).map(tableSvg).join('')}${so&&on(so)?`<rect class="hdl" x="${so.x+so.w-20}" y="${so.y+so.h-20}" width="22" height="22" rx="5"/>`:''}</svg></div>`}
 function floorLegend(){const cnt=s=>S.tables.filter(t=>lv(t.id).status===s).length;return`<div class="legend">${Object.keys(STATUS).map(s=>`<span><i style="background:var(--s-${s})"></i>${STATUS[s]} <b class="mono">${cnt(s)}</b></span>`).join('')}</div>`}
 function floorPage(){
   const t=S.edit&&S.sel?tb(S.sel):null,can=S.role==='admin';
-  return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0;margin-right:auto">${S.edit?'Drag a table to move it. Tap one to rename it or change its size and shape.':S.role==='waiter'?'Your tables are in full colour. Tap any table to open it.':'Live view of the room. Tap a table to see who is there and what they ordered.'}</p>
-${can?(S.edit?`<button class="btn" data-a="addTable">+ Add table</button><button class="btn" data-a="resetLayout">Reset</button><button class="btn pri" data-a="saveLayout">Save layout</button>`:`<button class="btn" data-a="editOn">Edit layout</button>`):''}</div>
+  return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0;margin-right:auto">${S.edit?'Drag tables, sections and features into place. Tap one to rename it; drag the orange corner to resize a section or feature.':S.role==='waiter'?'Your tables are in full colour. Tap any table to open it.':'Live view of the room. Tap a table to see who is there and what they ordered.'}</p>
+${can?(S.edit?`<button class="btn" data-a="addTable">+ Table</button><button class="btn" data-a="addZone">+ Section</button><button class="btn" data-a="addFix">+ Feature</button><button class="btn quiet" data-a="clearFloor">Clear floor</button><button class="btn quiet" data-a="resetLayout">Sample layout</button><button class="btn pri" data-a="saveLayout">Save layout</button>`:`<button class="btn" data-a="editOn">Edit layout</button>`):''}</div>
 <div class="floor ${S.edit?'edit':''}">${floorSvg()}<div class="floor-bar">${S.edit?(t?`<div class="insp"><label>Name<input id="tn" value="${esc(t.name)}" maxlength="6" style="width:96px"></label>
 <label>Seats<select id="ts">${[2,4,6,8,10].map(n=>`<option ${t.seats===n?'selected':''}>${n}</option>`).join('')}</select></label>
 <label>Shape<select id="tsh">${[['round','Round'],['square','Square'],['rect','Rectangle']].map(([a,b])=>`<option value="${a}" ${t.shape===a?'selected':''}>${b}</option>`).join('')}</select></label>
-<label>Section<select id="tz">${ZONES.map(z=>`<option value="${z.id}" ${t.zone===z.id?'selected':''}>${z.name}</option>`).join('')}</select></label>
-<button class="btn" data-a="delTable">Delete table</button></div>`:'<span class="muted">Select a table to edit it, or add a new one.</span>'):floorLegend()}</div></div>`}
+<label>Section<select id="tz"><option value="">None</option>${ZONES.filter(z=>fl(z)===fl(t)).map(z=>`<option value="${z.id}" ${t.zone===z.id?'selected':''}>${esc(z.name)}</option>`).join('')}</select></label>
+<button class="btn" data-a="delTable">Delete table</button></div>`:inspZ()):floorLegend()}</div></div>`}
+function inspZ(){const z=S.selZ,o=z&&(z.k==='z'?ZONES:S.fix).find(x=>x.id===z.id),f=S.floors.find(x=>x.id===S.floor);
+  if(o)return`<div class="insp"><label>${z.k==='z'?'Section name':'Feature label'}<input id="${z.k==='z'?'zn':'fn'}" value="${esc(z.k==='z'?o.name:o.kind)}" maxlength="24" style="width:180px"></label>${z.k==='f'?`<label>Quick pick<select id="fk"><option value="">Choose…</option>${['Bar','Kitchen','Entrance','Stairs','Toilets','Till','Window','Wall','Garden'].map(k=>`<option>${k}</option>`).join('')}</select></label>`:''}<button class="btn" data-a="delZ">Delete ${z.k==='z'?'section':'feature'}</button></div>`;
+  return`<div class="insp"><label>This floor is called<input id="fln" value="${esc(f.name)}" maxlength="24" style="width:180px"></label>${S.floors.length>1?'<button class="btn" data-a="delFloor">Delete this floor</button>':''}<span class="muted" style="align-self:center">Select anything on the plan to edit it.</span></div>`}
 function bindFloor(){
   const svg=$('#fsvg');if(!svg)return;
-  const pt=e=>{const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*1000,y:(e.clientY-r.top)/r.height*620}};
+  const pt=e=>{const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*1000,y:(e.clientY-r.top)/r.height*620}},sn=n=>Math.round(n/10)*10,cl=(n,a,b)=>Math.min(b,Math.max(a,n));
   let drag=null;
-  svg.addEventListener('pointerdown',e=>{const g=e.target.closest('.tb');if(!g)return;const t=tb(g.dataset.t);
-    if(!S.edit){return}
-    const p=pt(e);drag={t,g,dx:p.x-t.x,dy:p.y-t.y,moved:false};g.setPointerCapture(e.pointerId);e.preventDefault()});
-  svg.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e),g=shapeOf(drag.t);
-    const x=Math.round(Math.min(1000-g.w/2-8,Math.max(g.w/2+8,p.x-drag.dx))/10)*10,y=Math.round(Math.min(620-g.h/2-16,Math.max(g.h/2+16,p.y-drag.dy))/10)*10;
-    if(x!==drag.t.x||y!==drag.t.y){drag.moved=true;drag.t.x=x;drag.t.y=y;drag.g.setAttribute('transform',`translate(${x} ${y})`)}});
-  const end=()=>{if(!drag)return;const d=drag;drag=null;const z=ZONES.find(z=>d.t.x>=z.x&&d.t.x<=z.x+z.w&&d.t.y>=z.y&&d.t.y<=z.y+z.h);if(z)d.t.zone=z.id;S.sel=d.t.id;S.dirty=S.dirty||d.moved;render()};
+  svg.addEventListener('pointerdown',e=>{if(!S.edit)return;const p=pt(e),hh=e.target.classList.contains('hdl'),g=!hh&&e.target.closest('.tb'),zg=!g&&!hh&&e.target.closest('.zg,.fg');
+    if(hh&&S.selZ){const k=S.selZ.k,o=(k==='z'?ZONES:S.fix).find(x=>x.id===S.selZ.id);if(!o)return;drag={k,o,g:svg.querySelector(`[data-${k}="${o.id}"]`),h:e.target,rs:true,moved:false}}
+    else if(g){const t=tb(g.dataset.t);drag={k:'t',t,g,dx:p.x-t.x,dy:p.y-t.y,moved:false}}
+    else if(zg){const k=zg.dataset.z?'z':'f',o=(k==='z'?ZONES:S.fix).find(x=>x.id===(zg.dataset.z||zg.dataset.f));if(!o)return;drag={k,o,g:zg,h:svg.querySelector('.hdl'),rs:false,dx:p.x-o.x,dy:p.y-o.y,moved:false};if(!S.selZ||S.selZ.id!==o.id)drag.h=null}
+    else{if(S.selZ||S.sel){S.selZ=null;S.sel=null;render()}return}
+    svg.setPointerCapture(e.pointerId);e.preventDefault()});
+  svg.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e);
+    if(drag.k==='t'){const g=shapeOf(drag.t),x=sn(cl(p.x-drag.dx,g.w/2+8,1000-g.w/2-8)),y=sn(cl(p.y-drag.dy,g.h/2+16,620-g.h/2-16));
+      if(x!==drag.t.x||y!==drag.t.y){drag.moved=true;drag.t.x=x;drag.t.y=y;drag.g.setAttribute('transform',`translate(${x} ${y})`)}return}
+    const o=drag.o,r=drag.g.querySelector('rect'),h=drag.h,mn=drag.k==='z'?80:30,hp=()=>{if(h){h.setAttribute('x',o.x+o.w-20);h.setAttribute('y',o.y+o.h-20)}};
+    if(drag.rs){const w=sn(cl(p.x-o.x,mn,1000-o.x)),hh=sn(cl(p.y-o.y,drag.k==='z'?60:30,620-o.y));if(w!==o.w||hh!==o.h){drag.moved=true;o.w=w;o.h=hh;r.setAttribute('width',w);r.setAttribute('height',hh);hp()}}
+    else{const x=sn(cl(p.x-drag.dx,0,1000-o.w)),y=sn(cl(p.y-drag.dy,0,620-o.h));if(x!==o.x||y!==o.y){drag.moved=true;o.x=x;o.y=y;drag.g.setAttribute('transform',`translate(${x} ${y})`);hp()}}});
+  const end=()=>{if(!drag)return;const d=drag;drag=null;
+    if(d.k==='t'){const z=ZONES.find(z=>fl(z)===fl(d.t)&&d.t.x>=z.x&&d.t.x<=z.x+z.w&&d.t.y>=z.y&&d.t.y<=z.y+z.h);d.t.zone=z?z.id:'';S.sel=d.t.id;S.selZ=null}
+    else{S.selZ={k:d.k,id:d.o.id};S.sel=null;if(d.k==='z')S.tables.forEach(t=>{if(fl(t)!==fl(d.o))return;const z=ZONES.find(z=>fl(z)===fl(t)&&t.x>=z.x&&t.x<=z.x+z.w&&t.y>=z.y&&t.y<=z.y+z.h);t.zone=z?z.id:''})}
+    S.dirty=S.dirty||d.moved;render()};
   svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
   svg.addEventListener('click',e=>{if(S.edit)return;const g=e.target.closest('.tb');if(g){S.sel=g.dataset.t;render()}});
   svg.addEventListener('keydown',e=>{const g=e.target.closest('.tb');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();S.sel=g.dataset.t;render()}});
 }
+document.addEventListener('change',e=>{if(!S.edit)return;const id=e.target.id,v=e.target.value.trim(),z=S.selZ,o=z&&(z.k==='z'?ZONES:S.fix).find(x=>x.id===z.id);
+  if(id==='zn'&&o&&v)o.name=v;else if((id==='fn'||id==='fk')&&o&&v)o.kind=v;else if(id==='fln'&&v){const f=S.floors.find(x=>x.id===S.floor);if(f)f.name=v}else return;render()});
 
 /* ---------- table sheet ---------- */
 function sheet(){
@@ -547,7 +572,7 @@ ${S.set.service?`<div class="muted" style="display:flex;justify-content:space-be
 ${sp.paid?`<div style="display:flex;justify-content:space-between;color:var(--s-available)"><span>Paid so far · ${sp.done} of ${sp.n}</span><span class="mono">${gbp2(sp.paid)}</span></div>`:''}
 <button class="btn pri big" data-a="pay">${sp.n>1?`Take ${gbp2(sp.amt)} · ${sp.done+1} of ${sp.n}`:`Take payment · ${gbp2(sp.amt)}`}</button><div style="display:flex;gap:10px"><button class="btn" data-a="showBill" style="flex:1">Show bill</button><button class="btn" data-a="startOrder" style="flex:1">Add items</button></div>`}
   else foot=`${ready.length?`<button class="btn pri big" data-a="served">Mark ${ready.length>1?ready.length+' orders':'order #'+ready[0].id} served</button>`:''}<button class="btn ${ready.length?'':'pri'} big" data-a="startOrder">${os.length?'Add more items':'Start order'}</button>${os.length?`<button class="btn" data-a="bill">Request bill</button>`:''}`;
-  return`<div class="scrim" data-a="closeSheet"><aside class="sheet" role="dialog" aria-label="${esc(t.name)}"><header><div><div class="eyebrow">${zone?zone.name:''} · ${t.seats} seats</div><h2>${esc(t.name)}</h2><span class="pill p-${l.status}" style="margin-top:8px">${STATUS[l.status]}</span></div><button class="x" data-a="closeSheet" aria-label="Close">×</button></header>
+  return`<div class="scrim" data-a="closeSheet"><aside class="sheet" role="dialog" aria-label="${esc(t.name)}"><header><div><div class="eyebrow">${zone?esc(zone.name)+' · ':''}${t.seats} seats</div><h2>${esc(t.name)}</h2><span class="pill p-${l.status}" style="margin-top:8px">${STATUS[l.status]}</span></div><button class="x" data-a="closeSheet" aria-label="Close">×</button></header>
 <div class="body">${facts}${l.note?`<div class="note"><b>Note</b> · ${esc(l.note)}</div>`:''}
 ${os.length?`<div><div class="eyebrow" style="margin-bottom:8px">Order</div>${os.map(o=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px"><span class="mono dim">#${o.id} · ${hhmm(o.at)}</span><span class="pill p-${o.status}">${OSTATE[o.status]}</span></div>${o.lines.map(x=>`<div class="line"><span class="q">${x.qty}×</span><div>${esc(ln(x))}${x.note?`<small>${esc(x.note)}</small>`:''}</div><span class="p">${gbp2(lineTotal(x))}</span></div>`).join('')}</div>`).join('')}<div class="total"><span>Total</span><span class="mono">${gbp2(tot)}</span></div></div>`:l.guests?'<div class="empty">Nothing ordered yet.</div>':`<div class="empty">${l.status==='reserved'?'Held for a reservation.':l.status==='cleaning'?'Being cleared and reset.':'Free to seat.'}</div>`}
 ${S.role==='owner'||S.role==='manager'?`<div><div class="eyebrow" style="margin-bottom:8px">Set status</div><div class="chips">${Object.keys(STATUS).map(s=>`<button class="chip ${l.status===s?'on':''}" data-a="setStatus" data-s="${s}">${STATUS[s]}</button>`).join('')}</div></div>`:''}</div>
@@ -650,7 +675,7 @@ function settingsPage(){
 <div class="fld"><label class="eyebrow" for="set-service">Service charge %</label><input id="set-service" type="number" inputmode="decimal" min="0" max="30" step="0.5" value="${S.set.service}" style="max-width:140px" ${adm?'':'disabled'}></div>
 ${adm?'<button class="btn pri" data-a="saveSet" style="align-self:flex-start">Save changes</button>':'<span class="dim" style="font-size:13px">These details are managed by Zema Hospitality. Ask us if something needs changing.</span>'}</div></section>
 <div style="display:flex;flex-direction:column;gap:16px"><section class="panel"><header><h2>Payment methods</h2></header>${Object.keys(S.set.methods).map(m=>`<div class="row"><div class="grow"><b>${m}</b></div><button class="chip ${S.set.methods[m]?'on':''}" data-method="${m}" ${adm?'':'disabled'} aria-pressed="${S.set.methods[m]}">${S.set.methods[m]?'Accepted':'Off'}</button></div>`).join('')}</section>
-<section class="panel"><header><h2>Sections and tables</h2><button class="btn quiet" data-go="floor">Open floor plan</button></header>${ZONES.map(z=>{const l=S.tables.filter(t=>t.zone===z.id);return`<div class="row"><div class="grow"><b>${z.name}</b></div><span class="mono muted">${l.length} tables · ${l.reduce((a,t)=>a+t.seats,0)} seats</span></div>`}).join('')}</section>
+<section class="panel"><header><h2>Sections and tables</h2><button class="btn quiet" data-go="floor">Open floor plan</button></header>${ZONES.map(z=>{const l=S.tables.filter(t=>t.zone===z.id);return`<div class="row"><div class="grow"><b>${esc(z.name)}</b>${S.floors.length>1?`<span class="dim" style="display:block;font-size:13px">${esc((S.floors.find(f=>f.id===fl(z))||{}).name||'')}</span>`:''}</div><span class="mono muted">${l.length} tables · ${l.reduce((a,t)=>a+t.seats,0)} seats</span></div>`}).join('')}</section>
 ${LIVE?linkPanel():''}<section class="panel"><header><h2>Account</h2>${own?'':'<span class="pill">Owner only</span>'}</header>${own?`<div class="row"><div class="grow"><b>Plan</b><span class="dim" style="display:block;font-size:13px">One restaurant · ${STAFF.length} staff</span></div><span class="pill p-available">Active</span></div><div class="row"><div class="grow"><b>Locations</b><span class="dim" style="display:block;font-size:13px">${esc(S.set.name)}</span></div><button class="btn quiet" disabled>Add a restaurant</button></div><div class="row"><div class="grow"><b>Ownership</b><span class="dim" style="display:block;font-size:13px">${esc((STAFF.find(x=>x.role==='Owner')||{name:''}).name)}</span></div><button class="btn quiet" disabled>Transfer</button></div>`:'<p class="muted" style="margin:0">Billing, extra locations and ownership can only be changed by the owner.</p>'}</section></div></div>`}
 
 /* ---------- cashier: bills and payments ---------- */
@@ -666,7 +691,7 @@ function txPage(){
 /* ---------- actions ---------- */
 function go(page){S.page=page;S.rcpt=null;S.sel=null;S.edit=false;S.mod=null;render();const v=$('#view');if(v)v.scrollTop=0}
 document.addEventListener('click',e=>{
-  const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin]');if(!el)return;const d=el.dataset;
+  const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin],[data-floor]');if(!el)return;const d=el.dataset;
   if(d.go)return go(d.go);
   if(d.who){S.pick=d.who;S.pin='';return render()}
   if(d.pin!=null){if(d.pin==='x')S.pin=S.pin.slice(0,-1);else if(S.pin.length<4)S.pin+=d.pin;if(S.pin.length===4){if(LIVE){liveSignin();return draw()}const u=staff(S.pick);S.user=u.id;S.role=ROLEKEY[u.role];if(S.role==='waiter')ME=u.id;S.pick=null;S.pin='';toast('Signed in as '+u.name.replace(/^Chef /,''));return go(NAV[S.role][0][0])}return render()}
@@ -676,7 +701,8 @@ document.addEventListener('click',e=>{
   if(d.refund){const x=S.tx.find(q=>q.id==d.refund);x.refunded=true;if(!LIVE)BASE.rev-=x.total;repStale();toast(gbp2(x.total)+' refunded to '+x.method.toLowerCase());return render()}
   if(d.method){if(S.role!=='admin')return;S.set.methods[d.method]=!S.set.methods[d.method];if(!S.set.methods[S.payM])S.payM=Object.keys(S.set.methods).find(m=>S.set.methods[m])||'Card';return render()}
   if(d.range){S.range=d.range;return render()}
-  if(d.open){if(S.page!=='floor'&&!(S.role==='waiter'&&S.page==='dashboard'))S.page='floor';S.sel=d.open;S.edit=false;return render()}
+  if(d.floor){S.floor=d.floor;S.sel=null;S.selZ=null;return render()}
+  if(d.open){const ot=tb(d.open);if(ot)S.floor=fl(ot);if(S.page!=='floor'&&!(S.role==='waiter'&&S.page==='dashboard'))S.page='floor';S.sel=d.open;S.edit=false;return render()}
   if(d.cat){S.cat=d.cat;return render()}
   if(d.dish){const m=item(d.dish);if(!m.on)return toast(m.name+' is sold out tonight');S.mod={item:m.id,qty:1,mods:[],note:''};return render()}
   if(d.bump){const o=S.orders.find(x=>x.id==d.bump);o.status=d.next;syncTable(o.table);toast(d.next==='ready'?`${tb(o.table).name} is ready · ${staff(o.waiter).name.split(' ')[0]} notified`:`#${o.id} ${OSTATE[d.next].toLowerCase()}`);return render()}
@@ -714,9 +740,15 @@ document.addEventListener('click',e=>{
   if(a==='saveSet'){if(S.role!=='admin')return;['name','address','phone','email','hours'].forEach(k=>{const v=$('#set-'+k).value.trim();if(v)S.set[k]=v});const sv=parseFloat($('#set-service').value);S.set.service=sv>=0&&sv<=30?sv:0;toast('Settings saved');return render()}
   if(a==='closeSheet'){if(e.target!==el&&el.classList.contains('scrim'))return;S.sel=null;S.gN=null;return render()}
   if(a==='editOn'){if(S.role!=='admin')return;S.edit=true;S.sel=null;return render()}
-  if(a==='saveLayout'){if(!LIVE)try{localStorage.setItem('zh-layout',JSON.stringify({tables:S.tables,fix:S.fix}))}catch(_){}S.edit=false;S.sel=null;toast('Layout saved');return render()}
-  if(a==='resetLayout'){if(!LIVE)try{localStorage.removeItem('zh-layout')}catch(_){}S.tables=JSON.parse(JSON.stringify(DEFAULT_TABLES));S.sel=null;toast('Back to the original layout');return render()}
-  if(a==='addTable'){let n=S.tables.length+1;while(tb('T'+n))n++;const nt={id:'T'+n,name:'T'+n,x:310,y:300,shape:'square',seats:4,zone:'main'};S.tables.push(nt);lv(nt.id);S.sel=nt.id;toast(nt.name+' added. Drag it into place.');return render()}
+  if(a==='saveLayout'){if(!LIVE)try{localStorage.setItem('zh-layout',JSON.stringify(layoutDoc()))}catch(_){}S.edit=false;S.sel=null;S.selZ=null;toast('Layout saved');return render()}
+  if(a==='resetLayout'){if(!S.edit||!window.confirm('Replace the whole floor plan with the sample layout? Your current tables, sections and floors will be removed.'))return;if(!LIVE)try{localStorage.removeItem('zh-layout')}catch(_){}S.tables=JSON.parse(JSON.stringify(DEFAULT_TABLES));S.fix=JSON.parse(JSON.stringify(DEFAULT_FIX));setZones();S.sel=null;S.selZ=null;toast('Sample layout loaded. Press Save layout to keep it.');return render()}
+  if(a==='clearFloor'){if(!S.edit||!window.confirm('Remove every table, section and feature from this floor so you can draw it from scratch?'))return;const k=x=>fl(x)!==S.floor;S.tables=S.tables.filter(k);S.fix=S.fix.filter(k);const z=ZONES.filter(k);ZONES.length=0;ZONES.push(...z);S.sel=null;S.selZ=null;toast('Floor cleared. Add sections and tables.');return render()}
+  if(a==='addZone'&&S.edit){const o={id:'z'+now().toString(36),name:'New section',x:330,y:210,w:320,h:190,floor:S.floor};ZONES.push(o);S.selZ={k:'z',id:o.id};S.sel=null;toast('Section added. Drag it into place and name it.');return render()}
+  if(a==='addFix'&&S.edit){const o={id:'x'+now().toString(36),kind:'Bar',x:410,y:280,w:180,h:60,floor:S.floor};S.fix.push(o);S.selZ={k:'f',id:o.id};S.sel=null;toast('Feature added. Rename it to anything: bar, stairs, toilets.');return render()}
+  if(a==='delZ'&&S.edit&&S.selZ){if(S.selZ.k==='z'){const i=ZONES.findIndex(x=>x.id===S.selZ.id);if(i>=0)ZONES.splice(i,1)}else S.fix=S.fix.filter(x=>x.id!==S.selZ.id);S.selZ=null;return render()}
+  if(a==='addFloor'&&S.edit){const o={id:'fl'+now().toString(36),name:S.floors.length===1?'First floor':'Floor '+(S.floors.length+1)};S.floors.push(o);S.floor=o.id;S.sel=null;S.selZ=null;toast(o.name+' added. Rename it below, then add sections and tables.');return render()}
+  if(a==='delFloor'&&S.edit){if(S.floors.length<2)return;if(S.tables.some(t=>fl(t)===S.floor))return toast('Delete or clear the tables on this floor first');const id=S.floor;S.fix=S.fix.filter(x=>fl(x)!==id);const z=ZONES.filter(x=>fl(x)!==id);ZONES.length=0;ZONES.push(...z);S.floors=S.floors.filter(f=>f.id!==id);S.floor=S.floors[0].id;S.selZ=null;return render()}
+  if(a==='addTable'){let n=S.tables.length+1;while(tb('T'+n))n++;const nt={id:'T'+n,name:'T'+n,x:500,y:310,shape:'square',seats:4,zone:'',floor:S.floor};S.tables.push(nt);lv(nt.id);S.sel=nt.id;S.selZ=null;toast(nt.name+' added. Drag it into place.');return render()}
   if(a==='delTable'&&t){S.tables=S.tables.filter(x=>x.id!==t.id);S.sel=null;toast(t.name+' removed');return render()}
   if(a==='gPlus'||a==='gMinus'){S.gN=Math.max(1,Math.min(12,(S.gN||Math.min(t.seats,2))+(a==='gPlus'?1:-1)));$('#gN').textContent=S.gN;return}
   if(a==='seat'){Object.assign(l,{paid:0,parts:0,split:1,status:'ordering',guests:S.gN||Math.min(t.seats,2),waiter:S.role==='waiter'?ME:(l.waiter||ME),seated:now(),note:''});S.gN=null;return startOrder(t.id)}
@@ -789,12 +821,12 @@ function netFail(e){if(e&&/SESSION/.test(e.code||'')&&S.role==='admin'){adminBac
   if(e&&/SESSION/.test(e.code||'')){TOKEN=null;lsDel('zh-tok');S.sel=null;S.mod=null;S.edit=false;S.pick=null;S.pin='';S.page='signin';S.pinMsg='';draw();toast('Signed out. Please sign in again.');return}
   if(!S.offline){S.offline=true;softRender()}}
 function setStaff(l){if(!Array.isArray(l))return;const j=J(l);if(j===staffJ)return false;staffJ=j;STAFF.length=0;OLD.length=0;l.forEach(x=>(x.gone?OLD:STAFF).push(x));return true}
-function resetData(){S.tables=clone(DEFAULT_TABLES);S.fix=clone(DEFAULT_FIX);S.live={};S.orders=[];S.tx=[];S.res=[];S.paid=[];MENU.length=0;SYNCED=new Map();SINCE=null;REP={};
+function resetData(){S.tables=clone(DEFAULT_TABLES);S.fix=clone(DEFAULT_FIX);setZones();S.selZ=null;S.live={};S.orders=[];S.tx=[];S.res=[];S.paid=[];MENU.length=0;SYNCED=new Map();SINCE=null;REP={};
   S.set={...clone(DEFAULT_SET),name:S.lobbyName||''};BASE.rev=BASE.orders=BASE.covers=0}
 
 /* ---- documents ---- */
 function snapshot(){const m=new Map(),mg=S.role==='owner'||S.role==='manager',rk=S.role;
-  m.set('set',J(S.set));m.set('layout',S.edit&&SYNCED.has('layout')?SYNCED.get('layout'):J({tables:S.tables,fix:S.fix}));
+  m.set('set',J(S.set));m.set('layout',S.edit&&SYNCED.has('layout')?SYNCED.get('layout'):J(layoutDoc()));
   MENU.forEach(x=>m.set('menu:'+x.id,J(x)));
   Object.keys(S.live).forEach(id=>{const k='live:'+id,v=J(S.live[id]);if(SYNCED.has(k)||v!==LIVE0)m.set(k,v)});
   S.orders.forEach(o=>m.set('order:'+o.id,J(o)));S.tx.forEach(x=>m.set('tx:'+x.id,J(x)));S.res.forEach(r=>{if(r.id)m.set('res:'+r.id,J(r))});
@@ -805,7 +837,7 @@ function snapshot(){const m=new Map(),mg=S.role==='owner'||S.role==='manager',rk
   return m}
 function applyDoc(key,data,del){const i=key.indexOf(':'),kd=i<0?key:key.slice(0,i),id=i<0?'':key.slice(i+1),up=(arr,same)=>{const n=arr.findIndex(same);if(del){if(n>=0)arr.splice(n,1)}else if(n>=0)arr[n]=data;else arr.push(data)};
   if(kd==='set'){if(!del)S.set={...clone(DEFAULT_SET),...data,methods:{...DEFAULT_SET.methods,...(data.methods||{})}}}
-  else if(kd==='layout'){if(!del&&Array.isArray(data.tables)){S.tables=data.tables;S.fix=data.fix||[];if(S.sel&&!tb(S.sel))S.sel=null}}
+  else if(kd==='layout'){if(!del&&Array.isArray(data.tables)){S.tables=data.tables;S.fix=data.fix||[];setZones(data.zones,data.floors);if(S.sel&&!tb(S.sel))S.sel=null}}
   else if(kd==='live'){if(del)delete S.live[id];else S.live[id]=data}
   else if(kd==='menu'){up(MENU,x=>x.id===id);const od=m=>m.id[0]==='i'?+m.id.slice(1):parseInt(m.id.slice(1),36)||0;MENU.sort((x,y)=>od(x)-od(y))}
   else if(kd==='order'){const o=S.orders.find(x=>String(x.id)===id);

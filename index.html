@@ -335,6 +335,7 @@ circle.hdl{cursor:grab}
 .gchk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);cursor:pointer;margin-right:4px}.gchk input{width:18px;height:18px;accent-color:var(--accent)}
 .tb .ch{fill:var(--chc,var(--line))}.tb.tcol .sh{stroke-width:3.4}
 .wstaff{border-top:1px solid var(--line2);padding-top:14px}.wstaff summary{cursor:pointer;color:var(--ink2);font-weight:600}.wstaff input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)}
+.pw{position:relative;display:block}.pw input{width:100%;padding-right:72px!important}.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);min-height:34px;padding:0 12px;border-radius:8px;font:600 13px var(--body);color:var(--ink2);background:var(--sunk)}.eye:hover{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -457,9 +458,13 @@ const SOON={};
 
 /* ---------- shell ---------- */
 function render(){DIRTY=0;draw();queueSync()}
+/* a Show / Hide button inside every password box */
+function addEyes(){document.querySelectorAll('#app input[type=password]').forEach(x=>{if(x.parentNode.classList.contains('pw'))return;const w=document.createElement('span');w.className='pw';x.parentNode.insertBefore(w,x);w.appendChild(x);
+  const b=document.createElement('button');b.type='button';b.className='eye';b.textContent='Show';b.setAttribute('aria-label','Show password');b.setAttribute('aria-pressed','false');w.appendChild(b)})}
+document.addEventListener('click',e=>{const b=e.target.closest('.eye');if(!b)return;e.stopPropagation();const x=b.parentNode.querySelector('input'),show=x.type==='password';x.type=show?'text':'password';b.textContent=show?'Hide':'Show';b.setAttribute('aria-label',show?'Hide password':'Show password');b.setAttribute('aria-pressed',String(show));x.focus()},true);
 function draw(){
   document.documentElement.dataset.skin='service';
-  if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox])').forEach(x=>{keep[x.id]=x.value});$('#app').innerHTML=GATES[S.page]();Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});return}
+  if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox])').forEach(x=>{keep[x.id]=x.value});$('#app').innerHTML=GATES[S.page]();Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
   if(S.page==='signin'){$('#app').innerHTML=signIn();return}
   const u=LIVE&&S.role==='admin'?{name:'Zema Hospitality',role:'Admin'}:staff(S.user);
   const nav=NAV[S.role],title=S.page==='order'?`Order · ${esc(tb(S.orderFor).name)}`:(typeof TITLE[S.page]==='object'?TITLE[S.page][S.role]:TITLE[S.page]);

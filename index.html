@@ -219,7 +219,7 @@ h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance;l
   .brand,.rail-foot{display:none}.nav{flex-direction:row;gap:2px}.nav button{flex-direction:column;gap:3px;font-size:11px;padding:8px 12px}.nav .soon{display:none}
   .top{padding:12px 16px}.top h1{font-size:18px;flex-basis:100%;margin:0}.view{padding:16px 16px 28px}
   .kds{grid-template-columns:minmax(0,1fr)}
-  .fscroll svg{min-width:760px}
+  .fscroll .fwrap{min-width:760px}
   .scrim{align-items:flex-end}.sheet{width:100%;height:auto;max-height:92%;border-left:0;border-top:1px solid var(--line);border-radius:18px 18px 0 0;animation:up .22s ease}
   @keyframes up{from{transform:translateY(24px);opacity:0}}
   .kpi .num{font-size:28px}
@@ -304,6 +304,30 @@ input:disabled,button.chip:disabled{opacity:.6;cursor:not-allowed}
 .fdot{width:8px;height:8px;border-radius:50%;background:var(--s-bill);margin-left:8px}
 .hdl{fill:var(--accent);cursor:nwse-resize}.selz{stroke:var(--accent)!important;stroke-width:2!important;stroke-dasharray:7 5}
 .floor.edit .zg,.floor.edit .fg{cursor:move}.floor.edit .zone{fill-opacity:.6}
+.wall{stroke:var(--ink2);stroke-width:7;stroke-linecap:round}.dline{stroke:var(--ink3);stroke-width:2.5;stroke-dasharray:9 7;stroke-linecap:round}.glass{stroke:#7FB8D6;stroke-width:4;stroke-linecap:round;stroke-dasharray:22 4}
+.hit{stroke:transparent;stroke-width:22}.hitbox{fill:transparent}
+.shp{fill:none;stroke:var(--ink3);stroke-width:2}.shp.fill-light{fill:var(--sunk)}.shp.fill-dark{fill:var(--line)}
+.door{fill:none;stroke:var(--ink3);stroke-width:2}.plant{fill:#2F6B3F;stroke:#4E9A62;stroke-width:2}.plant-in{fill:#4E9A62}
+.stext{fill:var(--ink2);font-family:var(--body);font-weight:600}
+.floor:not(.edit) .sg{pointer-events:none}.floor.edit .sg{cursor:move}
+line.selz,.wall.selz{stroke:var(--accent)!important}.hitbox.selz{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:5 4}.plant.selz{stroke:var(--accent)}
+circle.hdl{cursor:grab}
+.drawbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.drawbar .eyebrow{margin-right:4px}
+.fwrap{position:relative;width:100%;aspect-ratio:1000/620;overflow:hidden}
+.fscene{position:absolute;left:50%;top:50%;width:1000px;height:620px;margin:-310px 0 0 -500px;transform-origin:500px 310px;transform:scale(var(--k,1))}
+.floor .fscene>svg{width:1000px;height:620px}
+.fwrap.v3{perspective:2400px;background:radial-gradient(ellipse at 50% 40%,var(--surface),var(--sunk))}
+.fwrap.v3 .fscene{transform:scale(calc(var(--k,1)*.84)) rotateX(50deg) rotateZ(-22deg);transform-style:preserve-3d}
+.fwrap.v3 .fscene>svg .tb{opacity:.22}.fwrap.v3 .fscene>svg .tb text{opacity:0}
+.l3{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.l3 i{position:absolute;left:0;top:0;transform-origin:0 0;display:block;backface-visibility:visible}
+.p3{background:#5A524B}.w3-wall{background:linear-gradient(#EDE5DA,#CFC4B6)}.w3-line{background:#8F857A}.w3-glass{background:linear-gradient(rgba(170,215,240,.45),rgba(120,180,215,.25));border-top:2px solid rgba(200,235,255,.8)}
+.wtop{background:#F7F1E8}
+.t3{display:grid!important;place-items:center;overflow:hidden}.t3 b{font:700 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.85);text-align:center;padding:2px}
+.fx3.p3{background:#4A3628}.fx3.t3{background:linear-gradient(135deg,#7A5A40,#5E4430);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.b3-light.p3{background:#5E5850}.b3-light.t3{background:#8A8178}.b3-dark.p3{background:#26221F}.b3-dark.t3{background:#3A3531}
+.pot.p3{background:#7B4A33}.pot.t3{background:#5A3626}.leaf{border-radius:50%;background:radial-gradient(circle at 40% 35%,#6FBF7E,#2F6B3F 70%);opacity:.95}
+.t3tb svg{display:block;overflow:visible}.t3tb .tb{opacity:1}
 </style>
 </head>
 <body>
@@ -374,13 +398,14 @@ const DEFAULT_TABLES=[T(1,180,100,'round',2,'window'),T(2,270,100,'round',2,'win
 
 const S={user:'o1',pick:null,pin:'',rr:'day',payM:'Card',tx:[],set:{name:'Zema Kitchen',address:'14 Camden Passage, London N1 8EA',phone:'020 7946 0182',email:'hello@zemakitchen.example',hours:'Tue to Sun · 12:00 to 23:00',service:12.5,methods:{Card:true,Cash:true,'Apple Pay':true,Voucher:false}},
  role:'owner',page:'dashboard',sel:null,edit:false,range:'today',cat:'Starters',orderFor:null,draft:[],mod:null,toast:null,
- tables:[],fix:[],floors:[{id:'g',name:'Ground floor'}],floor:'g',selZ:null,live:{},orders:[],paid:[],nextOrder:105,
+ tables:[],fix:[],floors:[{id:'g',name:'Ground floor'}],floor:'g',shapes:[],selZ:null,live:{},orders:[],paid:[],nextOrder:105,
  res:[{t:'19:00',name:'John & Sarah Whitmore',guests:4,table:'T12',note:'Anniversary'},{t:'19:30',name:'Michael Asante',guests:2,table:'T4',note:''},{t:'19:45',name:'Bethlehem Family',guests:8,table:'T19',note:'Birthday cake at 21:00'},{t:'20:15',name:'Dr. Patel',guests:6,table:'T13',note:'One vegetarian, one nut allergy'},{t:'20:30',name:'Leor Films',guests:4,table:'T9',note:''}]};
 
 function loadLayout(){let d=null;try{d=JSON.parse(localStorage.getItem('zh-layout')||'null')}catch(_){}
-  S.tables=(d&&d.tables)||JSON.parse(JSON.stringify(DEFAULT_TABLES));S.fix=(d&&d.fix)||JSON.parse(JSON.stringify(DEFAULT_FIX));setZones(d&&d.zones,d&&d.floors)}
-function setZones(z,f){ZONES.length=0;ZONES.push(...JSON.parse(JSON.stringify(Array.isArray(z)?z:DEFAULT_ZONES)));S.floors=JSON.parse(JSON.stringify(Array.isArray(f)&&f.length?f:DEFAULT_FLOORS));if(!S.floors.some(x=>x.id===S.floor))S.floor=S.floors[0].id}
-const fl=o=>o.floor&&S.floors.some(x=>x.id===o.floor)?o.floor:S.floors[0].id,layoutDoc=()=>({tables:S.tables,fix:S.fix,zones:ZONES,floors:S.floors});
+  S.tables=(d&&d.tables)||JSON.parse(JSON.stringify(DEFAULT_TABLES));S.fix=(d&&d.fix)||JSON.parse(JSON.stringify(DEFAULT_FIX));setZones(d&&d.zones,d&&d.floors,d&&d.shapes)}
+const W=(id,type,x1,y1,x2,y2)=>({id,type,x1,y1,x2,y2,floor:'g'}),DEFAULT_SHAPES=[W('w1','wall',30,20,60,20),W('w2','glass',60,20,500,20),W('w3','wall',500,20,980,20),W('w4','wall',980,20,980,605),W('w5','wall',980,605,30,605),W('w6','wall',30,605,30,345),W('w7','wall',30,245,30,20),W('w8','line',570,180,570,410),W('w9','glass',580,430,960,430),{id:'w10',type:'plant',x:528,y:152,w:30,h:30,floor:'g'},{id:'w11',type:'plant',x:932,y:552,w:30,h:30,floor:'g'}];
+function setZones(z,f,sh){S.shapes=JSON.parse(JSON.stringify(Array.isArray(sh)?sh:(z==null&&!Array.isArray(f)?DEFAULT_SHAPES:[])));ZONES.length=0;ZONES.push(...JSON.parse(JSON.stringify(Array.isArray(z)?z:DEFAULT_ZONES)));S.floors=JSON.parse(JSON.stringify(Array.isArray(f)&&f.length?f:DEFAULT_FLOORS));if(!S.floors.some(x=>x.id===S.floor))S.floor=S.floors[0].id}
+const fl=o=>o.floor&&S.floors.some(x=>x.id===o.floor)?o.floor:S.floors[0].id,layoutDoc=()=>({tables:S.tables,fix:S.fix,zones:ZONES,floors:S.floors,shapes:S.shapes});
 function seed(){
   loadLayout();
   const L=(id,status,o={})=>{S.live[id]={status,guests:0,waiter:null,seated:null,note:'',...o}};
@@ -516,51 +541,101 @@ ${t.shape==='round'?`<circle class="sh" r="${g.r}"/>`:`<rect class="sh" x="${-g.
 <text class="n" text-anchor="middle" y="${sub?1:5}">${esc(t.name)}</text>${sub?`<text class="m" text-anchor="middle" y="15">${esc(sub)}</text>`:''}</g>`}
 function floorSvg(){
   if(!S.floors.some(f=>f.id===S.floor))S.floor=S.floors[0].id;
-  const on=o=>fl(o)===S.floor,sz=S.edit&&S.selZ,so=sz&&(sz.k==='z'?ZONES:S.fix).find(x=>x.id===sz.id),hd=()=>'',se=(o,k)=>sz&&sz.k===k&&sz.id===o.id?' selz':'';
-  const tabs=S.floors.length>1||S.edit?`<div class="ftabs" role="tablist" aria-label="Floors">${S.floors.map(f=>{const n=S.tables.filter(t=>fl(t)===f.id),b=n.filter(t=>['bill'].includes(lv(t.id).status)).length;return`<button class="chip ${f.id===S.floor?'on':''}" role="tab" aria-selected="${f.id===S.floor}" data-floor="${f.id}">${esc(f.name)}<span class="mono" style="opacity:.7;margin-left:6px">${n.length}</span>${b&&!S.edit?`<span class="fdot" title="${b} bill requested"></span>`:''}</button>`}).join('')}${S.edit?'<button class="chip" data-a="addFloor">+ Add floor</button>':''}</div>`:'';
-  return`${tabs}<div class="fscroll"><svg viewBox="0 0 1000 620" id="fsvg" aria-label="Restaurant floor plan">
-${ZONES.filter(on).map(z=>`<g class="zg" data-z="${z.id}" transform="translate(${z.x} ${z.y})"><rect class="zone${se(z,'z')}" width="${z.w}" height="${z.h}" rx="16"/><text class="zone-l" x="14" y="22">${esc(z.name)}</text>${hd(z,'z')}</g>`).join('')}
-${S.fix.filter(on).map(f=>`<g class="fg" data-f="${f.id}" transform="translate(${f.x} ${f.y})"><rect class="fx${se(f,'f')}" width="${f.w}" height="${f.h}" rx="10"/><text class="fx-l" text-anchor="middle" ${f.w<50?`transform="translate(${f.w/2+4} ${f.h/2}) rotate(-90)"`:`x="${f.w/2}" y="${f.h/2+4}"`}>${esc(f.kind)}</text>${hd(f,'f')}</g>`).join('')}
-${S.tables.filter(on).map(tableSvg).join('')}${so&&on(so)?`<rect class="hdl" x="${so.x+so.w-20}" y="${so.y+so.h-20}" width="22" height="22" rx="5"/>`:''}</svg></div>`}
+  const v3=S.v3&&!S.edit,tabs=`<div class="ftabs" role="tablist" aria-label="Floors">${(S.floors.length>1||S.edit?S.floors:[]).map(f=>{const n=S.tables.filter(t=>fl(t)===f.id),b=n.filter(t=>lv(t.id).status==='bill').length;return`<button class="chip ${f.id===S.floor?'on':''}" role="tab" aria-selected="${f.id===S.floor}" data-floor="${f.id}">${esc(f.name)}<span class="mono" style="opacity:.7;margin-left:6px">${n.length}</span>${b&&!S.edit?`<span class="fdot" title="${b} bill requested"></span>`:''}</button>`}).join('')}${S.edit?'<button class="chip" data-a="addFloor">+ Add floor</button>':`<button class="chip ${S.v3?'on':''}" data-a="v3" aria-pressed="${!!S.v3}" style="margin-left:auto">3D view</button>`}</div>`;
+  return`${tabs}<div class="fscroll"><div class="fwrap${v3?' v3':''}"><div class="fscene"><svg viewBox="0 0 1000 620" width="1000" height="620" id="fsvg" aria-label="Restaurant floor plan">${floorInner()}</svg>${v3?scene3d():''}</div></div></div>`}
+/* ---------- 3D view: the same plan tilted, with walls, counters and plants standing up ---------- */
+const H3={wall:64,glass:64,line:24},FXH={bar:44,kitchen:80,stairs:30,toilets:80,till:44,lift:80,entrance:0,window:0,garden:0};
+function p3(x1,y1,x2,y2,h,cls,z){const L=Math.hypot(x2-x1,y2-y1),a=Math.atan2(y2-y1,x2-x1)*180/Math.PI,lit=(.72+.28*Math.cos((a-30)*Math.PI/180)).toFixed(2);
+  return`<i class="p3 ${cls}" style="width:${L.toFixed(1)}px;height:${h}px;filter:brightness(${lit});transform:translate3d(${x1}px,${y1}px,${z||0}px) rotateZ(${a.toFixed(2)}deg) rotateX(90deg)"></i>`}
+function box3(x,y,w,h,ht,cls,label,round){let o='';
+  if(round){const n=14,cx=x+w/2,cy=y+h/2,pts=[...Array(n+1)].map((_,i)=>[cx+Math.cos(i/n*2*Math.PI)*w/2,cy+Math.sin(i/n*2*Math.PI)*h/2]);for(let i=0;i<n;i++)o+=p3(pts[i][0],pts[i][1],pts[i+1][0],pts[i+1][1],ht,cls)}
+  else o+=p3(x,y,x+w,y,ht,cls)+p3(x+w,y,x+w,y+h,ht,cls)+p3(x+w,y+h,x,y+h,ht,cls)+p3(x,y+h,x,y,ht,cls);
+  return o+`<i class="t3 ${cls}" style="width:${w}px;height:${h}px;${round?'border-radius:50%;':''}transform:translate3d(${x}px,${y}px,${ht}px)">${label?`<b>${esc(label)}</b>`:''}</i>`}
+function scene3d(){const on=o=>fl(o)===S.floor;let o='';
+  S.shapes.filter(on).forEach(s=>{
+    if(isLine(s)){const h=H3[s.type]||24;o+=p3(s.x1,s.y1,s.x2,s.y2,h,'w3 w3-'+s.type);const L=Math.hypot(s.x2-s.x1,s.y2-s.y1),a=Math.atan2(s.y2-s.y1,s.x2-s.x1)*180/Math.PI;
+      if(s.type!=='glass')o+=`<i class="t3 wtop" style="width:${L.toFixed(1)}px;height:7px;transform:translate3d(${s.x1}px,${s.y1}px,${h}px) rotateZ(${a.toFixed(2)}deg) translateY(-3.5px)"></i>`;return}
+    if(s.type==='plant'){const r=Math.min(s.w,s.h);o+=box3(s.x,s.y,r,r,8,'pot',0,1)+`<i class="t3 leaf" style="width:${r+14}px;height:${r+14}px;transform:translate3d(${s.x-7}px,${s.y-7}px,46px)"></i><i class="t3 leaf" style="width:${r}px;height:${r}px;transform:translate3d(${s.x}px,${s.y}px,58px)"></i>`;return}
+    if((s.type==='rect'||s.type==='circle')&&s.fill&&s.fill!=='none')o+=box3(s.x,s.y,s.w,s.h,s.fill==='dark'?40:10,'b3 b3-'+s.fill,0,s.type==='circle')});
+  S.fix.filter(on).forEach(f=>{const k=String(f.kind||'').toLowerCase(),ht=k in FXH?FXH[k]:40;if(ht)o+=box3(f.x,f.y,f.w,f.h,ht,'b3 fx3',f.kind)});
+  S.tables.filter(on).forEach(t=>{o+=`<i class="t3tb" style="transform:translate3d(${t.x-100}px,${t.y-100}px,16px)"><svg viewBox="${t.x-100} ${t.y-100} 200 200" width="200" height="200">${tableSvg(t)}</svg></i>`});
+  return`<div class="l3" aria-hidden="true">${o}</div>`}
+function fitFloor(){document.querySelectorAll('.fwrap').forEach(w=>w.style.setProperty('--k',(w.clientWidth/1000).toFixed(4)))}
+window.addEventListener('resize',fitFloor);
+const LST=k=>k==='z'?ZONES:k==='f'?S.fix:S.shapes, isLine=o=>o.type==='wall'||o.type==='line'||o.type==='glass';
+/* lines and shapes drawn on the plan: walls, dividers, outlines, doors, plants and labels */
+function shapeSvg(o,sel){const c=sel?' selz':'';
+  if(isLine(o))return`<g class="sg" data-s="${o.id}"><line class="hit" x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}"/><line class="${o.type==='wall'?'wall':o.type==='glass'?'glass':'dline'}${c}" x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}"/></g>`;
+  const g=`<g class="sg" data-s="${o.id}" transform="translate(${o.x} ${o.y})">`,fill=' fill-'+(o.fill||'none');
+  if(o.type==='rect')return g+`<rect class="shp${fill}${c}" width="${o.w}" height="${o.h}" rx="6"/></g>`;
+  if(o.type==='circle')return g+`<ellipse class="shp${fill}${c}" cx="${o.w/2}" cy="${o.h/2}" rx="${o.w/2}" ry="${o.h/2}"/></g>`;
+  if(o.type==='door')return g+`<rect class="hitbox" width="${o.w}" height="${o.h}"/><g transform="rotate(${o.rot||0} ${o.w/2} ${o.h/2})"><path class="door${c}" d="M0 ${o.h} L0 0 M0 0 A${o.w} ${o.h} 0 0 1 ${o.w} ${o.h}"/><line class="door${c}" x1="0" y1="${o.h}" x2="${o.w}" y2="${o.h}" stroke-dasharray="3 4"/></g></g>`;
+  if(o.type==='plant'){const r=Math.min(o.w,o.h)/2;return g+`<circle class="plant${c}" cx="${o.w/2}" cy="${o.h/2}" r="${r}"/><circle class="plant-in" cx="${o.w/2}" cy="${o.h/2}" r="${r*.45}"/></g>`}
+  if(o.type==='text'){const sz=o.size||16;o.w=Math.max(30,Math.round(String(o.label||'').length*sz*.62));o.h=Math.round(sz*1.4);return g+`<rect class="hitbox${c}" width="${o.w}" height="${o.h}" rx="4"/><text class="stext" x="0" y="${sz}" font-size="${sz}">${esc(o.label||'Label')}</text></g>`}
+  return''}
+function floorInner(){const on=o=>fl(o)===S.floor,sz=S.edit&&S.selZ,sel=(o,k)=>!!(sz&&sz.k===k&&sz.id===o.id),so=sz&&LST(sz.k).find(x=>x.id===sz.id);
+  let hd='';if(so&&on(so)){hd=isLine(so)?[1,2].map(n=>`<circle class="hdl" data-end="${n}" cx="${so['x'+n]}" cy="${so['y'+n]}" r="11"/>`).join(''):so.type==='text'?'':`<rect class="hdl" x="${so.x+so.w-20}" y="${so.y+so.h-20}" width="22" height="22" rx="5"/>`}
+  return`${ZONES.filter(on).map(z=>`<g class="zg" data-z="${z.id}" transform="translate(${z.x} ${z.y})"><rect class="zone${sel(z,'z')?' selz':''}" width="${z.w}" height="${z.h}" rx="16"/><text class="zone-l" x="14" y="22">${esc(z.name)}</text></g>`).join('')}
+${S.shapes.filter(on).map(o=>shapeSvg(o,sel(o,'s'))).join('')}
+${S.fix.filter(on).map(f=>`<g class="fg" data-f="${f.id}" transform="translate(${f.x} ${f.y})"><rect class="fx${sel(f,'f')?' selz':''}" width="${f.w}" height="${f.h}" rx="10"/><text class="fx-l" text-anchor="middle" ${f.w<50?`transform="translate(${f.w/2+4} ${f.h/2}) rotate(-90)"`:`x="${f.w/2}" y="${f.h/2+4}"`}>${esc(f.kind)}</text></g>`).join('')}
+${S.tables.filter(on).map(tableSvg).join('')}${hd}`}
 function floorLegend(){const cnt=s=>S.tables.filter(t=>lv(t.id).status===s).length;return`<div class="legend">${Object.keys(STATUS).map(s=>`<span><i style="background:var(--s-${s})"></i>${STATUS[s]} <b class="mono">${cnt(s)}</b></span>`).join('')}</div>`}
 function floorPage(){
   const t=S.edit&&S.sel?tb(S.sel):null,can=S.role==='admin';
-  return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0;margin-right:auto">${S.edit?'Drag tables, sections and features into place. Tap one to rename it; drag the orange corner to resize a section or feature.':S.role==='waiter'?'Your tables are in full colour. Tap any table to open it.':'Live view of the room. Tap a table to see who is there and what they ordered.'}</p>
+  return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0;margin-right:auto">${S.edit?'Drag tables, sections and features into place, and use Draw for walls, lines, shapes, doors, plants and labels. Tap anything to edit it; drag the orange handles to resize.':S.role==='waiter'?'Your tables are in full colour. Tap any table to open it.':'Live view of the room. Tap a table to see who is there and what they ordered.'}</p>
 ${can?(S.edit?`<button class="btn" data-a="addTable">+ Table</button><button class="btn" data-a="addZone">+ Section</button><button class="btn" data-a="addFix">+ Feature</button><button class="btn quiet" data-a="clearFloor">Clear floor</button><button class="btn quiet" data-a="resetLayout">Sample layout</button><button class="btn pri" data-a="saveLayout">Save layout</button>`:`<button class="btn" data-a="editOn">Edit layout</button>`):''}</div>
 <div class="floor ${S.edit?'edit':''}">${floorSvg()}<div class="floor-bar">${S.edit?(t?`<div class="insp"><label>Name<input id="tn" value="${esc(t.name)}" maxlength="6" style="width:96px"></label>
 <label>Seats<select id="ts">${[1,2,3,4,5,6,7,8,10,12].map(n=>`<option ${t.seats===n?'selected':''}>${n}</option>`).join('')}</select></label>
 <label>Shape<select id="tsh">${[['round','Round'],['square','Square'],['rect','Rectangle']].map(([a,b])=>`<option value="${a}" ${t.shape===a?'selected':''}>${b}</option>`).join('')}</select></label>${t.shape==='rect'?`<label>Direction<select id="ttn"><option value="" ${t.turn?'':'selected'}>Across</option><option value="1" ${t.turn?'selected':''}>Up and down</option></select></label>`:''}<label>Chairs<select id="tch">${(t.shape==='round'?[['all','All around'],['t','Top half'],['b','Bottom half'],['l','Left half'],['r','Right half']]:[['all','All sides'],['tb','Top and bottom'],['lr','Left and right'],['t','Top only'],['b','Bottom only'],['l','Left only'],['r','Right only']]).map(([a,b])=>`<option value="${a}" ${chairMode(t)===a?'selected':''}>${b}</option>`).join('')}</select></label>
 <label>Section<select id="tz"><option value="">None</option>${ZONES.filter(z=>fl(z)===fl(t)).map(z=>`<option value="${z.id}" ${t.zone===z.id?'selected':''}>${esc(z.name)}</option>`).join('')}</select></label>
 <button class="btn" data-a="delTable">Delete table</button></div>`:inspZ()):floorLegend()}</div></div>`}
-function inspZ(){const z=S.selZ,o=z&&(z.k==='z'?ZONES:S.fix).find(x=>x.id===z.id),f=S.floors.find(x=>x.id===S.floor);
-  if(o)return`<div class="insp"><label>${z.k==='z'?'Section name':'Feature label'}<input id="${z.k==='z'?'zn':'fn'}" value="${esc(z.k==='z'?o.name:o.kind)}" maxlength="24" style="width:180px"></label>${z.k==='f'?`<label>Quick pick<select id="fk"><option value="">Choose…</option>${['Bar','Kitchen','Entrance','Stairs','Toilets','Till','Window','Wall','Garden'].map(k=>`<option>${k}</option>`).join('')}</select></label>`:''}<button class="btn" data-a="delZ">Delete ${z.k==='z'?'section':'feature'}</button></div>`;
-  return`<div class="insp"><label>This floor is called<input id="fln" value="${esc(f.name)}" maxlength="24" style="width:180px"></label>${S.floors.length>1?'<button class="btn" data-a="delFloor">Delete this floor</button>':''}<span class="muted" style="align-self:center">Select anything on the plan to edit it.</span></div>`}
+const DRAW=[['wall','Wall'],['line','Divider'],['glass','Glass wall'],['rect','Rectangle'],['circle','Circle'],['door','Door'],['plant','Plant'],['text','Label']];
+function inspZ(){const z=S.selZ,o=z&&LST(z.k).find(x=>x.id===z.id),f=S.floors.find(x=>x.id===S.floor),sel=(id,opts,v)=>`<select id="${id}">${opts.map(([a,b])=>`<option value="${a}" ${String(v)===String(a)?'selected':''}>${b}</option>`).join('')}</select>`;
+  const tools=`<div class="drawbar"><span class="eyebrow">Draw</span>${DRAW.map(([a,b])=>`<button class="chip" data-a="addS" data-t="${a}">${b}</button>`).join('')}</div>`;
+  if(o&&z.k==='s'){const nm=(DRAW.find(d=>d[0]===o.type)||[])[1]||'Shape';
+    return tools+`<div class="insp"><span class="pill" style="align-self:center">${nm}</span>
+${isLine(o)?`<label>Type${sel('sty',[['wall','Wall'],['line','Divider'],['glass','Glass wall']],o.type)}</label>`:''}
+${o.type==='rect'||o.type==='circle'?`<label>Fill${sel('sfl',[['none','None'],['light','Light'],['dark','Dark']],o.fill||'none')}</label>`:''}
+${o.type==='door'?`<label>Opens${sel('srt',[[0,'Up and right'],[90,'Down and right'],[180,'Down and left'],[270,'Up and left']],o.rot||0)}</label>`:''}
+${o.type==='text'?`<label>Text<input id="stx" value="${esc(o.label||'')}" maxlength="30" style="width:170px"></label><label>Size${sel('ssz',[[12,'Small'],[16,'Medium'],[22,'Large'],[30,'Huge']],o.size||16)}</label>`:''}
+<button class="btn" data-a="dupZ">Duplicate</button><button class="btn" data-a="delZ">Delete</button></div>
+<span class="dim" style="font-size:13px">${isLine(o)?'Drag the round ends to set length and angle. Near-straight lines snap level.':o.type==='text'?'Drag the label to move it.':'Drag to move. Drag the orange corner to resize.'}</span>`}
+  if(o)return tools+`<div class="insp"><label>${z.k==='z'?'Section name':'Feature label'}<input id="${z.k==='z'?'zn':'fn'}" value="${esc(z.k==='z'?o.name:o.kind)}" maxlength="24" style="width:180px"></label>${z.k==='f'?`<label>Quick pick<select id="fk"><option value="">Choose…</option>${['Bar','Kitchen','Entrance','Stairs','Toilets','Till','Window','Garden','Lift'].map(k=>`<option>${k}</option>`).join('')}</select></label>`:''}<button class="btn" data-a="dupZ">Duplicate</button><button class="btn" data-a="delZ">Delete ${z.k==='z'?'section':'feature'}</button></div>`;
+  return tools+`<div class="insp"><label>This floor is called<input id="fln" value="${esc(f.name)}" maxlength="24" style="width:180px"></label>${S.floors.length>1?'<button class="btn" data-a="delFloor">Delete this floor</button>':''}<span class="muted" style="align-self:center">Select anything on the plan to edit it.</span></div>`}
 function bindFloor(){
-  const svg=$('#fsvg');if(!svg)return;
-  const pt=e=>{const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*1000,y:(e.clientY-r.top)/r.height*620}},sn=n=>Math.round(n/10)*10,cl=(n,a,b)=>Math.min(b,Math.max(a,n));
+  fitFloor();const svg=$('#fsvg');if(!svg)return;
+  const pt=e=>{const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*1000,y:(e.clientY-r.top)/r.height*620}},sn=n=>Math.round(n/10)*10,cl=(n,a,b)=>Math.min(b,Math.max(a,n)),redraw=()=>{svg.innerHTML=floorInner()};
   let drag=null;
-  svg.addEventListener('pointerdown',e=>{if(!S.edit)return;const p=pt(e),hh=e.target.classList.contains('hdl'),g=!hh&&e.target.closest('.tb'),zg=!g&&!hh&&e.target.closest('.zg,.fg');
-    if(hh&&S.selZ){const k=S.selZ.k,o=(k==='z'?ZONES:S.fix).find(x=>x.id===S.selZ.id);if(!o)return;drag={k,o,g:svg.querySelector(`[data-${k}="${o.id}"]`),h:e.target,rs:true,moved:false}}
+  svg.addEventListener('pointerdown',e=>{if(!S.edit)return;const p=pt(e),hh=e.target.classList.contains('hdl'),g=!hh&&e.target.closest('.tb'),zg=!g&&!hh&&e.target.closest('.zg,.fg,.sg');
+    if(hh&&S.selZ){const k=S.selZ.k,o=LST(k).find(x=>x.id===S.selZ.id);if(!o)return;drag={k,o,end:+e.target.dataset.end||0,rs:!e.target.dataset.end,moved:false}}
     else if(g){const t=tb(g.dataset.t);drag={k:'t',t,g,dx:p.x-t.x,dy:p.y-t.y,moved:false}}
-    else if(zg){const k=zg.dataset.z?'z':'f',o=(k==='z'?ZONES:S.fix).find(x=>x.id===(zg.dataset.z||zg.dataset.f));if(!o)return;drag={k,o,g:zg,h:svg.querySelector('.hdl'),rs:false,dx:p.x-o.x,dy:p.y-o.y,moved:false};if(!S.selZ||S.selZ.id!==o.id)drag.h=null}
+    else if(zg){const k=zg.dataset.z?'z':zg.dataset.f?'f':'s',o=LST(k).find(x=>x.id===(zg.dataset.z||zg.dataset.f||zg.dataset.s));if(!o)return;
+      drag=isLine(o)?{k,o,line:true,p0:p,a:{x1:o.x1,y1:o.y1,x2:o.x2,y2:o.y2},moved:false}:{k,o,dx:p.x-o.x,dy:p.y-o.y,moved:false};
+      if(!S.selZ||S.selZ.id!==o.id){S.selZ={k,id:o.id};S.sel=null;redraw()}}
     else{if(S.selZ||S.sel){S.selZ=null;S.sel=null;render()}return}
     svg.setPointerCapture(e.pointerId);e.preventDefault()});
-  svg.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e);
+  svg.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e),o=drag.o;
     if(drag.k==='t'){const g=shapeOf(drag.t),x=sn(cl(p.x-drag.dx,g.w/2+8,1000-g.w/2-8)),y=sn(cl(p.y-drag.dy,g.h/2+16,620-g.h/2-16));
       if(x!==drag.t.x||y!==drag.t.y){drag.moved=true;drag.t.x=x;drag.t.y=y;drag.g.setAttribute('transform',`translate(${x} ${y})`)}return}
-    const o=drag.o,r=drag.g.querySelector('rect'),h=drag.h,mn=drag.k==='z'?80:30,hp=()=>{if(h){h.setAttribute('x',o.x+o.w-20);h.setAttribute('y',o.y+o.h-20)}};
-    if(drag.rs){const w=sn(cl(p.x-o.x,mn,1000-o.x)),hh=sn(cl(p.y-o.y,drag.k==='z'?60:30,620-o.y));if(w!==o.w||hh!==o.h){drag.moved=true;o.w=w;o.h=hh;r.setAttribute('width',w);r.setAttribute('height',hh);hp()}}
-    else{const x=sn(cl(p.x-drag.dx,0,1000-o.w)),y=sn(cl(p.y-drag.dy,0,620-o.h));if(x!==o.x||y!==o.y){drag.moved=true;o.x=x;o.y=y;drag.g.setAttribute('transform',`translate(${x} ${y})`);hp()}}});
+    if(drag.end){const n=drag.end,m=3-n;let x=sn(cl(p.x,0,1000)),y=sn(cl(p.y,0,620));if(Math.abs(y-o['y'+m])<=20&&Math.abs(x-o['x'+m])>40)y=o['y'+m];else if(Math.abs(x-o['x'+m])<=20&&Math.abs(y-o['y'+m])>40)x=o['x'+m];
+      if(x!==o['x'+n]||y!==o['y'+n]){o['x'+n]=x;o['y'+n]=y;drag.moved=true;redraw()}return}
+    if(drag.line){const a=drag.a,dx=sn(p.x-drag.p0.x),dy=sn(p.y-drag.p0.y),mx=cl(dx,-Math.min(a.x1,a.x2),1000-Math.max(a.x1,a.x2)),my=cl(dy,-Math.min(a.y1,a.y2),620-Math.max(a.y1,a.y2));
+      if(a.x1+mx!==o.x1||a.y1+my!==o.y1){o.x1=a.x1+mx;o.y1=a.y1+my;o.x2=a.x2+mx;o.y2=a.y2+my;drag.moved=true;redraw()}return}
+    const mn=drag.k==='z'?80:20;
+    if(drag.rs){const w=sn(cl(p.x-o.x,mn,1000-o.x)),h=sn(cl(p.y-o.y,drag.k==='z'?60:20,620-o.y));if(w!==o.w||h!==o.h){o.w=w;o.h=h;if(o.type==='door'||o.type==='plant')o.h=o.w=Math.max(w,h);drag.moved=true;redraw()}}
+    else{const x=sn(cl(p.x-drag.dx,0,1000-o.w)),y=sn(cl(p.y-drag.dy,0,620-o.h));if(x!==o.x||y!==o.y){o.x=x;o.y=y;drag.moved=true;redraw()}}});
   const end=()=>{if(!drag)return;const d=drag;drag=null;
     if(d.k==='t'){const z=ZONES.find(z=>fl(z)===fl(d.t)&&d.t.x>=z.x&&d.t.x<=z.x+z.w&&d.t.y>=z.y&&d.t.y<=z.y+z.h);d.t.zone=z?z.id:'';S.sel=d.t.id;S.selZ=null}
     else{S.selZ={k:d.k,id:d.o.id};S.sel=null;if(d.k==='z')S.tables.forEach(t=>{if(fl(t)!==fl(d.o))return;const z=ZONES.find(z=>fl(z)===fl(t)&&t.x>=z.x&&t.x<=z.x+z.w&&t.y>=z.y&&t.y<=z.y+z.h);t.zone=z?z.id:''})}
+    if(isLine(d.o||{})&&d.o.x1===d.o.x2&&d.o.y1===d.o.y2){d.o.x2+=60}
     S.dirty=S.dirty||d.moved;render()};
   svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
   svg.addEventListener('click',e=>{if(S.edit)return;const g=e.target.closest('.tb');if(g){S.sel=g.dataset.t;render()}});
   svg.addEventListener('keydown',e=>{const g=e.target.closest('.tb');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();S.sel=g.dataset.t;render()}});
 }
-document.addEventListener('change',e=>{if(!S.edit)return;const id=e.target.id,v=e.target.value.trim(),z=S.selZ,o=z&&(z.k==='z'?ZONES:S.fix).find(x=>x.id===z.id);
-  if(id==='zn'&&o&&v)o.name=v;else if((id==='fn'||id==='fk')&&o&&v)o.kind=v;else if(id==='fln'&&v){const f=S.floors.find(x=>x.id===S.floor);if(f)f.name=v}else return;render()});
+document.addEventListener('change',e=>{if(!S.edit)return;const id=e.target.id,v=e.target.value.trim(),z=S.selZ,o=z&&LST(z.k).find(x=>x.id===z.id);
+  if(id==='zn'&&o&&v)o.name=v;else if((id==='fn'||id==='fk')&&o&&v)o.kind=v;else if(id==='fln'&&v){const f=S.floors.find(x=>x.id===S.floor);if(f)f.name=v}
+  else if(id==='sty'&&o)o.type=v;else if(id==='sfl'&&o)o.fill=v;else if(id==='srt'&&o)o.rot=+v;else if(id==='stx'&&o)o.label=v||'Label';else if(id==='ssz'&&o)o.size=+v;else return;render()});
 
 /* ---------- table sheet ---------- */
 function sheet(){
@@ -748,12 +823,18 @@ document.addEventListener('click',e=>{
   if(a==='editOn'){if(S.role!=='admin')return;S.edit=true;S.sel=null;return render()}
   if(a==='saveLayout'){if(!LIVE)try{localStorage.setItem('zh-layout',JSON.stringify(layoutDoc()))}catch(_){}S.edit=false;S.sel=null;S.selZ=null;toast('Layout saved');return render()}
   if(a==='resetLayout'){if(!S.edit||!window.confirm('Replace the whole floor plan with the sample layout? Your current tables, sections and floors will be removed.'))return;if(!LIVE)try{localStorage.removeItem('zh-layout')}catch(_){}S.tables=JSON.parse(JSON.stringify(DEFAULT_TABLES));S.fix=JSON.parse(JSON.stringify(DEFAULT_FIX));setZones();S.sel=null;S.selZ=null;toast('Sample layout loaded. Press Save layout to keep it.');return render()}
-  if(a==='clearFloor'){if(!S.edit||!window.confirm('Remove every table, section and feature from this floor so you can draw it from scratch?'))return;const k=x=>fl(x)!==S.floor;S.tables=S.tables.filter(k);S.fix=S.fix.filter(k);const z=ZONES.filter(k);ZONES.length=0;ZONES.push(...z);S.sel=null;S.selZ=null;toast('Floor cleared. Add sections and tables.');return render()}
+  if(a==='clearFloor'){if(!S.edit||!window.confirm('Remove every table, section and feature from this floor so you can draw it from scratch?'))return;const k=x=>fl(x)!==S.floor;S.tables=S.tables.filter(k);S.fix=S.fix.filter(k);S.shapes=S.shapes.filter(k);const z=ZONES.filter(k);ZONES.length=0;ZONES.push(...z);S.sel=null;S.selZ=null;toast('Floor cleared. Add sections and tables.');return render()}
   if(a==='addZone'&&S.edit){const o={id:'z'+now().toString(36),name:'New section',x:330,y:210,w:320,h:190,floor:S.floor};ZONES.push(o);S.selZ={k:'z',id:o.id};S.sel=null;toast('Section added. Drag it into place and name it.');return render()}
   if(a==='addFix'&&S.edit){const o={id:'x'+now().toString(36),kind:'Bar',x:410,y:280,w:180,h:60,floor:S.floor};S.fix.push(o);S.selZ={k:'f',id:o.id};S.sel=null;toast('Feature added. Rename it to anything: bar, stairs, toilets.');return render()}
-  if(a==='delZ'&&S.edit&&S.selZ){if(S.selZ.k==='z'){const i=ZONES.findIndex(x=>x.id===S.selZ.id);if(i>=0)ZONES.splice(i,1)}else S.fix=S.fix.filter(x=>x.id!==S.selZ.id);S.selZ=null;return render()}
+  if(a==='delZ'&&S.edit&&S.selZ){const L=LST(S.selZ.k),i=L.findIndex(x=>x.id===S.selZ.id);if(i>=0)L.splice(i,1);S.selZ=null;return render()}
+  if(a==='dupZ'&&S.edit&&S.selZ){const L=LST(S.selZ.k),o=L.find(x=>x.id===S.selZ.id);if(!o)return;const c=JSON.parse(JSON.stringify(o));c.id=S.selZ.k+now().toString(36);
+    if(isLine(c)){c.x1=Math.min(980,c.x1+20);c.x2=Math.min(980,c.x2+20);c.y1=Math.min(600,c.y1+20);c.y2=Math.min(600,c.y2+20)}else{c.x=Math.min(1000-c.w,c.x+20);c.y=Math.min(620-c.h,c.y+20)}if(c.name)c.name+=' 2';L.push(c);S.selZ={k:S.selZ.k,id:c.id};return render()}
+  if(a==='v3'){S.v3=!S.v3;lsSet('zh-3d',S.v3?'1':'');return render()}
+  if(a==='addS'&&S.edit){const t=d.t,id='s'+now().toString(36),b={id,type:t,floor:S.floor};
+    Object.assign(b,isLine(b)?{x1:380,y1:310,x2:620,y2:310}:t==='door'?{x:480,y:290,w:50,h:50,rot:0}:t==='plant'?{x:485,y:295,w:34,h:34}:t==='text'?{x:440,y:300,label:'Label',size:16,w:60,h:22}:{x:420,y:250,w:160,h:110,fill:'none'});
+    S.shapes.push(b);S.selZ={k:'s',id};S.sel=null;toast((DRAW.find(x=>x[0]===t)||['',''])[1]+' added. Drag it into place.');return render()}
   if(a==='addFloor'&&S.edit){const o={id:'fl'+now().toString(36),name:S.floors.length===1?'First floor':'Floor '+(S.floors.length+1)};S.floors.push(o);S.floor=o.id;S.sel=null;S.selZ=null;toast(o.name+' added. Rename it below, then add sections and tables.');return render()}
-  if(a==='delFloor'&&S.edit){if(S.floors.length<2)return;if(S.tables.some(t=>fl(t)===S.floor))return toast('Delete or clear the tables on this floor first');const id=S.floor;S.fix=S.fix.filter(x=>fl(x)!==id);const z=ZONES.filter(x=>fl(x)!==id);ZONES.length=0;ZONES.push(...z);S.floors=S.floors.filter(f=>f.id!==id);S.floor=S.floors[0].id;S.selZ=null;return render()}
+  if(a==='delFloor'&&S.edit){if(S.floors.length<2)return;if(S.tables.some(t=>fl(t)===S.floor))return toast('Delete or clear the tables on this floor first');const id=S.floor;S.fix=S.fix.filter(x=>fl(x)!==id);S.shapes=S.shapes.filter(x=>fl(x)!==id);const z=ZONES.filter(x=>fl(x)!==id);ZONES.length=0;ZONES.push(...z);S.floors=S.floors.filter(f=>f.id!==id);S.floor=S.floors[0].id;S.selZ=null;return render()}
   if(a==='addTable'){let n=S.tables.length+1;while(tb('T'+n))n++;const nt={id:'T'+n,name:'T'+n,x:500,y:310,shape:'square',seats:4,zone:'',floor:S.floor};S.tables.push(nt);lv(nt.id);S.sel=nt.id;S.selZ=null;toast(nt.name+' added. Drag it into place.');return render()}
   if(a==='delTable'&&t){S.tables=S.tables.filter(x=>x.id!==t.id);S.sel=null;toast(t.name+' removed');return render()}
   if(a==='gPlus'||a==='gMinus'){S.gN=Math.max(1,Math.min(12,(S.gN||Math.min(t.seats,2))+(a==='gPlus'?1:-1)));$('#gN').textContent=S.gN;return}
@@ -843,7 +924,7 @@ function snapshot(){const m=new Map(),mg=S.role==='owner'||S.role==='manager',rk
   return m}
 function applyDoc(key,data,del){const i=key.indexOf(':'),kd=i<0?key:key.slice(0,i),id=i<0?'':key.slice(i+1),up=(arr,same)=>{const n=arr.findIndex(same);if(del){if(n>=0)arr.splice(n,1)}else if(n>=0)arr[n]=data;else arr.push(data)};
   if(kd==='set'){if(!del)S.set={...clone(DEFAULT_SET),...data,methods:{...DEFAULT_SET.methods,...(data.methods||{})}}}
-  else if(kd==='layout'){if(!del&&Array.isArray(data.tables)){S.tables=data.tables;S.fix=data.fix||[];setZones(data.zones,data.floors);if(S.sel&&!tb(S.sel))S.sel=null}}
+  else if(kd==='layout'){if(!del&&Array.isArray(data.tables)){S.tables=data.tables;S.fix=data.fix||[];setZones(data.zones,data.floors,data.shapes);if(S.sel&&!tb(S.sel))S.sel=null}}
   else if(kd==='live'){if(del)delete S.live[id];else S.live[id]=data}
   else if(kd==='menu'){up(MENU,x=>x.id===id);const od=m=>m.id[0]==='i'?+m.id.slice(1):parseInt(m.id.slice(1),36)||0;MENU.sort((x,y)=>od(x)-od(y))}
   else if(kd==='order'){const o=S.orders.find(x=>String(x.id)===id);
@@ -948,7 +1029,7 @@ async function liveSignin(){const id=S.pick,pin=S.pin;S.pinMsg='Checking…';
   catch(e){S.pin='';TOKEN=null;S.pinMsg='No connection. Try again.';S.page='signin';draw()}}
 function liveOut(){if(S.role==='admin')return adminBack();const t=TOKEN;TOKEN=null;lsDel('zh-tok');rpc('h_signout',{p_token:t}).catch(()=>{});S.pick=null;S.pin='';S.pinMsg='';S.sel=null;S.mod=null;S.edit=false;S.page='signin';draw();
   rpc('h_lobby',{p_code:CODE}).then(r=>{if(setStaff(r.staff)&&S.page==='signin'&&!S.pick)draw()}).catch(()=>{})}
-function boot(){const q=new URLSearchParams(location.search);
+function boot(){const q=new URLSearchParams(location.search);S.v3=lsGet('zh-3d')==='1';
   if(!SB_URL||q.has('demo')){seed();return render()}
   if(q.has('admin'))return adminStart();
   const c=((q.get('r')||lsGet('zh-code')||'').match(/[0-9a-f]{24}/)||[])[0];

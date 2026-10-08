@@ -219,7 +219,7 @@ h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance;l
   .brand,.rail-foot{display:none}.nav{flex-direction:row;gap:2px}.nav button{flex-direction:column;gap:3px;font-size:11px;padding:8px 12px}.nav .soon{display:none}
   .top{padding:12px 16px}.top h1{font-size:18px;flex-basis:100%;margin:0}.view{padding:16px 16px 28px}
   .kds{grid-template-columns:minmax(0,1fr)}
-  .fscroll .fwrap{min-width:760px}
+
   .scrim{align-items:flex-end}.sheet{width:100%;height:auto;max-height:92%;border-left:0;border-top:1px solid var(--line);border-radius:18px 18px 0 0;animation:up .22s ease}
   @keyframes up{from{transform:translateY(24px);opacity:0}}
   .kpi .num{font-size:28px}
@@ -349,6 +349,18 @@ circle.hdl{cursor:grab}
 .unit .grow{flex:1;min-width:0}
 .brow{flex-wrap:wrap}.brow .grow{min-width:150px}
 @media (max-width:760px){.brow .btn{width:100%}}
+/* app feel: no rubber-band, no tap flashes, room for the notch and home bar, no zoom-on-focus */
+html,body{overscroll-behavior:none}body{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.top{padding-top:calc(14px + env(safe-area-inset-top,0px))}.signin{padding-top:calc(32px + env(safe-area-inset-top,0px));padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
+@media (min-width:761px){.rail{padding-top:calc(22px + env(safe-area-inset-top,0px));padding-left:calc(14px + env(safe-area-inset-left,0px))}}
+@media (pointer:coarse){input,select,textarea{font-size:16px!important}}
+.si-card .btn{white-space:normal;text-align:center;line-height:1.3;padding-top:8px;padding-bottom:8px}
+.fzoom{display:inline-flex;gap:4px;margin-left:auto}.fzoom .chip{min-width:40px;justify-content:center}.fzoom .chip:disabled{opacity:.35}
+.fscroll{overflow:auto;-webkit-overflow-scrolling:touch}
+.instb{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:10px;padding:12px 12px 12px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--accent);box-shadow:var(--shadow);font-size:14px;max-width:560px;margin:0 auto}
+.hashint .signin{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))}.hashint .view{padding-bottom:130px}
+.instb span{flex:1}.instb .x{flex:none}
 </style>
 </head>
 <body>
@@ -471,11 +483,13 @@ const SOON={};
 
 /* ---------- shell ---------- */
 function render(){DIRTY=0;draw();queueSync()}
+function afterDraw(){try{appMeta();installHint()}catch(_){}}
 /* a Show / Hide button inside every password box */
 function addEyes(){document.querySelectorAll('#app input[type=password]').forEach(x=>{if(x.parentNode.classList.contains('pw'))return;const w=document.createElement('span');w.className='pw';x.parentNode.insertBefore(w,x);w.appendChild(x);
   const b=document.createElement('button');b.type='button';b.className='eye';b.textContent='Show';b.setAttribute('aria-label','Show password');b.setAttribute('aria-pressed','false');w.appendChild(b)})}
 document.addEventListener('click',e=>{const b=e.target.closest('.eye');if(!b)return;e.stopPropagation();const x=b.parentNode.querySelector('input'),show=x.type==='password';x.type=show?'text':'password';b.textContent=show?'Hide':'Show';b.setAttribute('aria-label',show?'Hide password':'Show password');b.setAttribute('aria-pressed',String(show));x.focus()},true);
-function draw(){
+function draw(){draw0();afterDraw()}
+function draw0(){
   document.documentElement.dataset.skin='service';
   if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox])').forEach(x=>{keep[x.id]=x.value});$('#app').innerHTML=GATES[S.page]();Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
   if(S.page==='signin'){$('#app').innerHTML=signIn();return}
@@ -567,8 +581,8 @@ ${t.shape==='round'?`<circle class="sh" r="${g.r}"${tp?` style="fill:${tp}"`:''}
 <text class="n" text-anchor="middle" y="${sub?1:5}"${tp?` style="fill:${inkOn(t)}"`:''}>${esc(t.name)}</text>${sub?`<text class="m" text-anchor="middle" y="15"${tp?` style="fill:${inkOn(t)};opacity:.8"`:''}>${esc(sub)}</text>`:''}</g>`}
 function floorSvg(){
   if(!S.floors.some(f=>f.id===S.floor))S.floor=S.floors[0].id;
-  const v3=S.v3&&!S.edit,tabs=`<div class="ftabs" role="tablist" aria-label="Floors">${(S.floors.length>1||S.edit?S.floors:[]).map(f=>{const n=S.tables.filter(t=>fl(t)===f.id),b=n.filter(t=>lv(t.id).status==='bill').length;return`<button class="chip ${f.id===S.floor?'on':''}" role="tab" aria-selected="${f.id===S.floor}" data-floor="${f.id}">${esc(f.name)}<span class="mono" style="opacity:.7;margin-left:6px">${n.length}</span>${b&&!S.edit?`<span class="fdot" title="${b} bill requested"></span>`:''}</button>`}).join('')}${S.edit?'<button class="chip" data-a="addFloor">+ Add floor</button>':`<button class="chip ${S.v3?'on':''}" data-a="v3" aria-pressed="${!!S.v3}" style="margin-left:auto">3D view</button>`}</div>`;
-  return`${tabs}<div class="fscroll"><div class="fwrap${v3?' v3':''}"><div class="fscene"><svg viewBox="0 0 1000 620" width="1000" height="620" id="fsvg" aria-label="Restaurant floor plan">${floorInner()}</svg>${v3?scene3d():''}</div></div></div>`}
+  const v3=S.v3&&!S.edit,tabs=`<div class="ftabs" role="tablist" aria-label="Floors">${(S.floors.length>1||S.edit?S.floors:[]).map(f=>{const n=S.tables.filter(t=>fl(t)===f.id),b=n.filter(t=>lv(t.id).status==='bill').length;return`<button class="chip ${f.id===S.floor?'on':''}" role="tab" aria-selected="${f.id===S.floor}" data-floor="${f.id}">${esc(f.name)}<span class="mono" style="opacity:.7;margin-left:6px">${n.length}</span>${b&&!S.edit?`<span class="fdot" title="${b} bill requested"></span>`:''}</button>`}).join('')}${S.edit?'<button class="chip" data-a="addFloor">+ Add floor</button>':''}<span class="fzoom"><button class="chip" data-a="fzOut" aria-label="Zoom out" ${(S.fz||1)<=1?'disabled':''}>−</button><button class="chip" data-a="fzFit">Fit</button><button class="chip" data-a="fzIn" aria-label="Zoom in" ${(S.fz||1)>=3?'disabled':''}>+</button></span>${S.edit?'':`<button class="chip ${S.v3?'on':''}" data-a="v3" aria-pressed="${!!S.v3}">3D view</button>`}</div>`;
+  return`${tabs}<div class="fscroll"><div class="fwrap${v3?' v3':''}" style="width:${100*(S.fz||1)}%"><div class="fscene"><svg viewBox="0 0 1000 620" width="1000" height="620" id="fsvg" aria-label="Restaurant floor plan">${floorInner()}</svg>${v3?scene3d():''}</div></div></div>`}
 /* ---------- 3D view: the same plan tilted, with walls, counters and plants standing up ---------- */
 const H3={wall:64,glass:64,line:24},FXH={bar:44,kitchen:80,stairs:30,toilets:80,till:44,lift:80,entrance:0,window:0,garden:0};
 function p3(x1,y1,x2,y2,h,cls,z,bgc){const L=Math.hypot(x2-x1,y2-y1),a=Math.atan2(y2-y1,x2-x1)*180/Math.PI,lit=(.72+.28*Math.cos((a-30)*Math.PI/180)).toFixed(2);
@@ -821,7 +835,7 @@ function txPage(){
 /* ---------- actions ---------- */
 function go(page){S.page=page;S.rcpt=null;S.sel=null;S.edit=false;S.mod=null;render();const v=$('#view');if(v)v.scrollTop=0}
 document.addEventListener('click',e=>{
-  const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin],[data-floor],[data-col],[data-aemail],[data-oopen],[data-adel],[data-apay],[data-abill],[data-u]');if(!el)return;const d=el.dataset;
+  const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin],[data-floor],[data-col],[data-aemail],[data-oopen],[data-adel],[data-apay],[data-abill],[data-u],[data-olink]');if(!el)return;const d=el.dataset;
   if(d.go)return go(d.go);
   if(d.who){S.pick=d.who;S.pin='';return render()}
   if(d.pin!=null){if(d.pin==='x')S.pin=S.pin.slice(0,-1);else if(S.pin.length<4)S.pin+=d.pin;if(S.pin.length===4){if(LIVE){liveSignin();return draw()}const u=staff(S.pick);S.user=u.id;S.role=ROLEKEY[u.role];if(S.role==='waiter')ME=u.id;S.pick=null;S.pin='';toast('Signed in as '+u.name.replace(/^Chef /,''));return go(NAV[S.role][0][0])}return render()}
@@ -845,6 +859,7 @@ document.addEventListener('click',e=>{
   if(d.u!=null){S.selU=S.selU||[];const i=S.selU.indexOf(d.u);if(i<0)S.selU.push(d.u);else S.selU.splice(i,1);return render()}
   if(d.adel){S.aDel=S.aDel===d.adel?null:d.adel;return draw()}
   if(d.aemail){S.aEmail=S.aEmail===d.aemail?null:d.aemail;return draw()}
+  if(d.olink){const u=appUrl()+'?owner';(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Owner app link copied')).catch(()=>window.prompt('Copy this owner app link',u));return}
   if(d.alink){const u=location.origin+location.pathname+'?r='+d.alink;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Device link copied')).catch(()=>window.prompt('Copy this device link',u));return}
   if(d.apin){S.aPin=S.aPin===d.apin?null:d.apin;return draw()}
   if(d.rc){S.rcpt={tx:d.rc};return render()}
@@ -890,6 +905,10 @@ document.addEventListener('click',e=>{
     if(isLine(c)){c.x1=Math.min(980,c.x1+20);c.x2=Math.min(980,c.x2+20);c.y1=Math.min(600,c.y1+20);c.y2=Math.min(600,c.y2+20)}else{c.x=Math.min(1000-c.w,c.x+20);c.y=Math.min(620-c.h,c.y+20)}if(c.name)c.name+=' 2';L.push(c);S.selZ={k:S.selZ.k,id:c.id};return render()}
   if(d.col&&S.edit){const c=colTarget();if(c.o&&cv(d.col)){c.o[d.key==='chc'?'chc':'col']=d.col}return render()}
   if(a==='colReset'&&S.edit){const c=colTarget();if(c.o){delete c.o.col;delete c.o.col2;delete c.o.chc}return render()}
+  if(a==='fzIn'){const c=S.fz||1;return setFz(FZ.find(z=>z>c+.01)||3)}
+  if(a==='fzOut'){const c=S.fz||1;return setFz([...FZ].reverse().find(z=>z<c-.01)||1)}
+  if(a==='fzFit')return setFz(1);
+  if(a==='reloadApp'){location.reload();return}
   if(a==='v3'){S.v3=!S.v3;lsSet('zh-3d',S.v3?'1':'');return render()}
   if(a==='addS'&&S.edit){const t=d.t,id='s'+now().toString(36),b={id,type:t,floor:S.floor};
     Object.assign(b,isLine(b)?{x1:380,y1:310,x2:620,y2:310}:t==='door'?{x:480,y:290,w:50,h:50,rot:0}:t==='plant'?{x:485,y:295,w:34,h:34}:t==='text'?{x:440,y:300,label:'Label',size:16,w:60,h:22}:{x:420,y:250,w:160,h:110,fill:'none'});
@@ -1056,7 +1075,7 @@ function reportsLive(){
 function resForm(){if(!(S.role==='owner'||S.role==='manager'||S.role==='waiter'))return'';const IN='min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body);width:100%';
   return`<section class="panel"><header><h2>Add a booking</h2></header><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end"><div class="fld"><label class="eyebrow" for="rt">Time</label><input id="rt" type="time" value="19:00"></div><div class="fld"><label class="eyebrow" for="rn">Name</label><input id="rn" maxlength="60" placeholder="Guest name"></div><div class="fld"><label class="eyebrow" for="rg">Guests</label><input id="rg" type="number" inputmode="numeric" min="1" max="40" value="2"></div><div class="fld"><label class="eyebrow" for="rtb">Table</label><select id="rtb" style="${IN}">${S.tables.map(t=>`<option value="${esc(t.id)}">${esc(t.name)} · ${t.seats} seats</option>`).join('')}</select></div><div class="fld"><label class="eyebrow" for="rno">Note</label><input id="rno" maxlength="100" placeholder="Allergy, occasion"></div></div><button class="btn pri" data-a="resAdd" style="margin-top:14px">Add booking</button></section>`}
 const deviceLink=()=>location.origin+location.pathname+'?r='+CODE;
-function linkPanel(){return`<section class="panel"><header><h2>Device link</h2><button class="btn quiet" data-a="copyLink">Copy</button></header><p class="mono" style="margin:0;word-break:break-all;font-size:13px;user-select:all">${esc(deviceLink())}</p><p class="muted" style="margin:10px 0 0;font-size:14px">Open this link once on every till, tablet and phone used in the restaurant, then add it to the Home Screen. Keep it private: it shows who works here, and each person still needs their own PIN.</p></section>`}
+function linkPanel(){return`<section class="panel"><header><h2>Staff app link</h2><button class="btn quiet" data-a="copyLink">Copy</button></header><p class="mono" style="margin:0;word-break:break-all;font-size:13px;user-select:all">${esc(deviceLink())}</p><p class="muted" style="margin:10px 0 0;font-size:14px">Open this link once on every till, tablet and phone used in the restaurant, then add it to the Home Screen. Keep it private: it shows who works here, and each person still needs their own PIN.</p></section>`}
 
 /* ---- opening screens ---- */
 const gate=inner=>`<div class="signin"><div class="si-card"><div class="brand" style="padding:0"><i>Z</i><div><b>Zema Hospitality</b><small>Restaurant management</small></div></div>${inner}</div></div>`;
@@ -1100,7 +1119,7 @@ async function liveSignin(){const id=S.pick,pin=S.pin;S.pinMsg='Checking…';
   catch(e){S.pin='';TOKEN=null;S.pinMsg='No connection. Try again.';S.page='signin';draw()}}
 function liveOut(){if(S.role==='admin')return adminBack();const t=TOKEN;TOKEN=null;lsDel('zh-tok');rpc('h_signout',{p_token:t}).catch(()=>{});S.pick=null;S.pin='';S.pinMsg='';S.sel=null;S.mod=null;S.edit=false;S.page='signin';draw();
   rpc('h_lobby',{p_code:CODE}).then(r=>{if(setStaff(r.staff)&&S.page==='signin'&&!S.pick)draw()}).catch(()=>{})}
-function boot(){const q=new URLSearchParams(location.search);S.v3=lsGet('zh-3d')==='1';
+function boot(){const q=new URLSearchParams(location.search);S.v3=lsGet('zh-3d')==='1';S.fz=+lsGet('zh-fz')||(innerWidth<760?2:1);
   if(!SB_URL||q.has('demo')){seed();return render()}
   if(q.has('admin'))return adminStart();
   {const ln=ownerFromLink();if(ln==='recovery'){S.page='ownerReset';return draw()}if(ln||q.has('owner'))return ownerStart()}
@@ -1115,11 +1134,11 @@ GATES.adminLogin=()=>gate(`<div><h2 style="font-size:28px">${S.aSetup?'Admin sig
 <div class="fld"><label class="eyebrow" for="apw">Password</label><input id="apw" type="password" autocomplete="${S.aSetup?'current-password':'new-password'}" maxlength="80"></div>
 ${S.aSetup?'':'<div class="fld"><label class="eyebrow" for="apw2">Repeat the password</label><input id="apw2" type="password" autocomplete="new-password" maxlength="80"></div>'}
 <button class="btn pri big" data-a="aIn">${S.aSetup?'Sign in':'Save password and continue'}</button>`);
-GATES.adminHome=()=>{const l=S.aList||[];return`<div class="signin" style="align-items:flex-start"><div class="si-card" style="max-width:760px;width:100%"><div style="display:flex;align-items:center;gap:12px"><div class="brand" style="padding:0;margin-right:auto"><i>Z</i><div><b>Zema Hospitality</b><small>Admin · ${l.length} restaurant${l.length===1?'':'s'}</small></div></div><button class="btn quiet" data-a="aOut">Sign out</button></div>
+GATES.adminHome=()=>{const l=S.aList||[];return`<div class="signin" style="align-items:flex-start"><div class="si-card" style="max-width:760px;width:100%"><div style="display:flex;align-items:center;gap:12px"><div class="brand" style="padding:0;margin-right:auto"><i>Z</i><div><b>Zema Hospitality</b><small>Admin · ${l.length} restaurant${l.length===1?'':'s'}</small></div></div><button class="btn quiet" data-a="reloadApp">Reload</button><button class="btn quiet" data-a="aOut">Sign out</button></div>
 ${adminSummary()}
 ${l.map(r=>`<section class="panel"><header><h2>${esc(r.name)}</h2><span class="dim">since ${new Date(r.created).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></header>
 ${adminBillUI(r)}<p class="muted" style="margin:0 0 14px">Owner ${esc(r.owner||'not set')} · ${r.email?esc(r.email):'no email yet'} · ${r.staff} staff · ${r.dishes} dishes</p>
-<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" data-aopen="${r.id}">Open and set up</button><button class="btn" data-alink="${r.code}">Copy device link</button><button class="btn quiet" data-apin="${r.id}">Reset owner PIN</button><button class="btn quiet" data-aemail="${r.id}">${r.email?'Change':'Add'} owner email</button><button class="btn quiet" data-apay="${r.id}">Payment received</button><button class="btn quiet" data-abill="${r.id}">Billing</button><button class="btn quiet" data-adel="${r.id}" style="color:var(--s-bill)">Delete restaurant</button></div>${S.aDel===r.id?`<div class="note" style="margin-top:12px;border-color:var(--s-bill)"><b>Delete ${esc(r.name)} for good?</b> Its menu, photos, floor plan, staff, orders, payments and reports are all removed, and its device link stops working. This cannot be undone.<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="adc" placeholder="Type the restaurant name to confirm" aria-label="Type ${esc(r.name)} to confirm" autocomplete="off" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn" data-a="aDelGo" style="background:var(--s-bill);border-color:var(--s-bill);color:#fff">Delete</button><button class="btn quiet" data-adel="${r.id}">Cancel</button></div></div>`:''}${S.aEmail===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="aem" type="email" value="${esc(r.email||'')}" placeholder="owner@example.com" aria-label="Owner email for ${esc(r.name)}" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aEmailSave">Save email</button></div>`:''}
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" data-aopen="${r.id}">Open and set up</button><button class="btn" data-alink="${r.code}">Copy staff app link</button><button class="btn" data-olink="1">Copy owner app link</button><button class="btn quiet" data-apin="${r.id}">Reset owner PIN</button><button class="btn quiet" data-aemail="${r.id}">${r.email?'Change':'Add'} owner email</button><button class="btn quiet" data-apay="${r.id}">Payment received</button><button class="btn quiet" data-abill="${r.id}">Billing</button><button class="btn quiet" data-adel="${r.id}" style="color:var(--s-bill)">Delete restaurant</button></div>${S.aDel===r.id?`<div class="note" style="margin-top:12px;border-color:var(--s-bill)"><b>Delete ${esc(r.name)} for good?</b> Its menu, photos, floor plan, staff, orders, payments and reports are all removed, and its device link stops working. This cannot be undone.<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="adc" placeholder="Type the restaurant name to confirm" aria-label="Type ${esc(r.name)} to confirm" autocomplete="off" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn" data-a="aDelGo" style="background:var(--s-bill);border-color:var(--s-bill);color:#fff">Delete</button><button class="btn quiet" data-adel="${r.id}">Cancel</button></div></div>`:''}${S.aEmail===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="aem" type="email" value="${esc(r.email||'')}" placeholder="owner@example.com" aria-label="Owner email for ${esc(r.name)}" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aEmailSave">Save email</button></div>`:''}
 ${S.aPin===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="apin" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="New 4-digit PIN" aria-label="New PIN for ${esc(r.owner||'the owner')}" style="flex:1;min-width:150px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aPinSave">Save PIN</button></div>`:''}</section>`).join('')||'<div class="empty">No restaurants yet. Create the first one below.</div>'}
 <section class="panel"><header><h2>Create a restaurant</h2><span class="dim">or a second location</span></header><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px"><div class="fld"><label class="eyebrow" for="an">Restaurant name</label><input id="an" maxlength="80" placeholder="e.g. Zema Kitchen Soho"></div><div class="fld"><label class="eyebrow" for="ao">Owner's name</label><input id="ao" maxlength="60" placeholder="First and last name"></div><div class="fld"><label class="eyebrow" for="ae">Owner's email</label><input id="ae" type="email" maxlength="120" placeholder="For their owner sign-in"></div><div class="fld"><label class="eyebrow" for="ap">Owner's PIN (4 digits)</label><input id="ap" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="They can change it later"></div></div>
 <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;margin-top:14px"><input type="checkbox" id="ad" style="width:20px;height:20px;margin-top:2px;accent-color:var(--accent)"><span>Start from the sample menu of 31 dishes</span></label>
@@ -1175,7 +1194,7 @@ ${l.map(r=>`<button class="person" data-oopen="${r.id}"><span class="ava">${ini(
 <button class="btn quiet" data-a="oOut">Sign out of owner account</button>`)}});
 const LG=()=>CODE&&LIVE?'ownerLogin':'welcome';
 async function ownerStart(){if(!OWN){S.page=LG();return draw()}S.page='loading';S.gMsg='Opening your restaurants…';S.gRetry=false;draw();
-  try{const h=await rpcOwn('h_owner_home');S.oList=h.restaurants;S.gMsg='';S.page='ownerHome';draw()}
+  try{const h=await rpcOwn('h_owner_home');S.oList=h.restaurants;S.gMsg='';S.page='ownerHome';if(!CODE||!LIVE)history.replaceState(null,'','?owner');draw()}
   catch(e){S.gMsg=e.code==='UNCONFIRMED'?'Please confirm your email first: tap the link we sent you.':e.code==='AUTH'?'Please sign in again.':'Could not reach the server. Check the internet connection.';if(e.code==='AUTH'||e.code==='UNCONFIRMED')ownSave(null);S.page=LG();draw()}}
 Object.assign(GACT,{
   oIn(){S.gMsg='';if(!OWN){S.page=CODE&&LIVE?'ownerLogin':'welcome';return draw()}ownerStart()},oBack(){S.gMsg='';S.page=CODE&&LIVE&&!TOKEN?'signin':'welcome';draw()},oNew(){S.gMsg='';S.page='ownerSignup';draw()},oForgot(){S.gMsg='';S.page='ownerForgot';draw()},
@@ -1228,6 +1247,34 @@ Object.assign(GACT,{
 Object.assign(GACT,{async aDelGo(){const r=(S.aList||[]).find(x=>x.id===S.aDel),v=$('#adc').value.trim();if(!r)return;if(v.toLowerCase()!==r.name.trim().toLowerCase()){$('#adc').focus();return toast('Type the name exactly: '+r.name)}
   try{await rpc('h_admin_delete',{p_token:ADM,p_rid:r.id,p_confirm:v});if(lsGet('zh-code')===r.code){lsDel('zh-code');lsDel('zh-tok')}S.aDel=null;await admList();draw();toast(r.name+' deleted')}catch(e){toast(e.code==='CONFIRM'?'The name did not match':errMsg(e))}},
   async aEmailSave(){const em=$('#aem').value.trim();try{await rpc('h_admin_set_email',{p_token:ADM,p_rid:S.aEmail,p_email:em||null});S.aEmail=null;await admList();draw();toast(em?'Owner email saved':'Owner email removed')}catch(e){toast(e.code==='EMAIL'?'That email does not look right':errMsg(e))}}});
+/* ---- Home-screen app: full screen, its own icon and name, opens straight into the right place ---- */
+const STANDALONE=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+let APPKEY='',BIP=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();BIP=e;installHint()});
+function appMeta(){const adm=S.page==='adminLogin'||S.page==='adminHome'||(LIVE&&S.role==='admin'),own=!adm&&/^owner/.test(S.page),
+  start=appUrl()+(adm?'?admin':CODE&&LIVE&&!own?'?r='+CODE:'?owner'),name=adm?'Zema Admin':CODE&&LIVE&&!own&&S.lobbyName?S.lobbyName:'Zema Hospitality',key=start+'|'+name;
+  if(key===APPKEY)return;APPKEY=key;const base=appUrl(),ic=adm?'admin-':'';
+  const link=(rel,href)=>{let l=document.querySelector(`link[rel="${rel}"]`);if(!l){l=document.createElement('link');l.rel=rel;document.head.appendChild(l)}l.href=href};
+  link('apple-touch-icon',base+ic+'apple-touch-icon.png');
+  let t=document.querySelector('meta[name="apple-mobile-web-app-title"]');if(!t){t=document.createElement('meta');t.name='apple-mobile-web-app-title';document.head.appendChild(t)}t.content=name;
+  const m={name,short_name:name.length>14?(adm?'Zema Admin':'Zema'):name,start_url:start,scope:base,display:'standalone',orientation:'any',background_color:'#0B0A09',theme_color:'#0B0A09',
+    icons:[{src:base+ic+'icon-192.png',sizes:'192x192',type:'image/png'},{src:base+ic+'icon-512.png',sizes:'512x512',type:'image/png'},{src:base+ic+'icon-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}]};
+  try{link('manifest',URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'})))}catch(_){}}
+const HINTPAGES={welcome:1,signin:1,adminLogin:1,adminHome:1,ownerHome:1,ownerLogin:1};
+function installHint(){let el=document.getElementById('instb');const key='zh-hint-'+(APPKEY.split('|')[0]||''),show=SB_URL&&!STANDALONE()&&HINTPAGES[S.page]&&!lsGet(key);
+  document.body.classList.toggle('hashint',!!show);
+  if(!show){if(el)el.remove();return}
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const msg=BIP?'Install this as an app on this device.':ios?'Install as an app: tap <b>Share</b> <span aria-hidden="true">⬆︎</span>, then <b>Add to Home Screen</b>.':'Install as an app from your browser menu: <b>Install app</b> or <b>Add to Home Screen</b>.';
+  if(!el){el=document.createElement('div');el.id='instb';el.className='instb';el.setAttribute('role','note');document.body.appendChild(el)}
+  el.innerHTML=`<span>${msg}</span>${BIP?'<button class="btn pri" data-inst="go">Install</button>':''}<button class="x" data-inst="x" aria-label="Hide this tip">×</button>`}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-inst]');if(!b)return;e.stopPropagation();
+  if(b.dataset.inst==='go'&&BIP){BIP.prompt();BIP.userChoice.finally(()=>{BIP=null;installHint()});return}
+  lsSet('zh-hint-'+(APPKEY.split('|')[0]||''),'1');installHint()},true);
+const FZ=[1,1.5,2,2.5,3];
+function setFz(z){S.fz=Math.max(1,Math.min(3,z));lsSet('zh-fz',String(S.fz));render();requestAnimationFrame(()=>{const sc=$('.fscroll');if(sc)sc.scrollLeft=(sc.scrollWidth-sc.clientWidth)/2})}
+if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
 boot();
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())render()},30000);
 </script>

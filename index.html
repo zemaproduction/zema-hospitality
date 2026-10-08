@@ -420,6 +420,12 @@ button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select
 
 .zp{text-align:center;font-size:12px;letter-spacing:.06em;color:var(--ink3);margin:8px 0 0;padding:4px 0}.zp b{color:var(--accent);font-weight:600}
 .signin{flex-direction:column;align-items:center;justify-content:flex-start}.signin>.si-card{flex:none}.signin>.zp{margin-top:18px}.gm .zp{color:rgba(243,234,217,.55);padding:26px 0 calc(26px + env(safe-area-inset-bottom,0px))}.gm .zp b{color:var(--gold)}
+
+.zp a{color:inherit;text-decoration:none}.zp a:hover b,.zp a:focus-visible b{text-decoration:underline}
+.zad{display:flex;flex-direction:column;gap:4px;max-width:560px;width:100%;margin:22px auto 0;padding:16px 18px;border:1px solid rgba(217,186,120,.35);border-radius:14px;background:linear-gradient(135deg,rgba(217,186,120,.10),rgba(217,186,120,.02));color:var(--ink);text-decoration:none;text-align:left}
+.zad-k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.zad b{font-size:17px;font-weight:600}.zad-t{font-size:14px;color:var(--ink2)}.zad-b{align-self:flex-start;margin-top:8px;padding:8px 14px;border-radius:999px;background:var(--accent);color:var(--on-accent,#1A1308);font-weight:600;font-size:14px}
+.gm .zad{color:#F3EAD9;margin:26px auto 0;max-width:720px;width:calc(100% - 36px)}.gm .zad-k{color:var(--gold)}.gm .zad-t{color:rgba(243,234,217,.75)}.gm .zad-b{background:var(--gold);color:#1A1308}
+.prom{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}.prom label.eyebrow{display:flex;flex-direction:column;gap:4px}.prom .wide{grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -555,8 +561,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('.eye');if(!b)ret
 function draw(){draw0();afterDraw()}
 function draw0(){
   document.documentElement.dataset.skin='service';
-  if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox])').forEach(x=>{keep[x.id]=x.value});$('#app').innerHTML=GATES[S.page]().replace(/<\/div>(\s*)$/,ZP+'</div>$1');Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
-  if(S.page==='signin'){$('#app').innerHTML=signIn().replace(/<\/div>(\s*)$/,ZP+'</div>$1');return}
+  if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox])').forEach(x=>{keep[x.id]=x.value});$('#app').innerHTML=GATES[S.page]().replace(/<\/div>(\s*)$/,(S.page==='guest'?adH('guest'):/^admin/.test(S.page)?'':adH('app'))+zpH()+'</div>$1');Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
+  if(S.page==='signin'){$('#app').innerHTML=signIn().replace(/<\/div>(\s*)$/,adH('app')+zpH()+'</div>$1');return}
   const u=LIVE&&S.role==='admin'?{name:'Zema Hospitality',role:'Admin'}:staff(S.user);
   const nav=NAV[S.role],title=S.page==='order'?`Order · ${esc(tb(S.orderFor).name)}`:(typeof TITLE[S.page]==='object'?TITLE[S.page][S.role]:TITLE[S.page]);
   $('#app').innerHTML=`<aside class="rail"><div class="brand"><i>Z</i><div><b>${esc(S.set.name)}</b><small>Zema Hospitality</small></div></div>
@@ -564,7 +570,7 @@ function draw0(){
 <div class="rail-foot"><span style="display:block;margin-bottom:4px">Powered by <b style="color:var(--accent)">Zema Production</b></span>${LIVE?(S.offline?'Offline · changes are waiting':'Live · every device in sync'):'Prototype · sample data<br>Thursday dinner service'}</div></aside>
 <div class="main"><div class="top"><h1>${title}</h1>${LIVE?`<span class="pill ${S.offline?'p-bill':'p-available'}">${S.offline?'Offline':'Live'}</span>`:''}<span class="clock" id="clock">${hhmm(now())}</span>
 <button class="userchip" data-a="switch" aria-label="Switch user"><span class="ava">${ini(u.name)}</span><span><b>${esc(u.name.replace(/^Chef /,''))}</b><small>${LIVE&&S.role==='admin'?'Admin · all restaurants':u.role+' · switch'}</small></span></button></div>
-<div class="view" id="view"><div class="wrap">${billBanner()}${page()}${ZP}</div></div></div>${sheet()}`;
+<div class="view" id="view"><div class="wrap">${billBanner()}${page()}${S.role==='admin'?'':adH('app')}${zpH()}</div></div></div>${sheet()}`;
   if(S.page==='floor'||(S.role==='waiter'&&S.page==='dashboard'))bindFloor();
 }
 function page(){
@@ -1148,7 +1154,11 @@ const deviceLink=()=>location.origin+location.pathname+'?r='+CODE;
 function linkPanel(){return`<section class="panel"><header><h2>Staff app link</h2><button class="btn quiet" data-a="copyLink">Copy</button></header><p class="mono" style="margin:0;word-break:break-all;font-size:13px;user-select:all">${esc(deviceLink())}</p><p class="muted" style="margin:10px 0 0;font-size:14px">Open this link once on every till, tablet and phone used in the restaurant, then add it to the Home Screen. Keep it private: it shows who works here, and each person still needs their own PIN.</p></section>`}
 
 /* ---- opening screens ---- */
-const ZP='<p class="zp">Powered by <b>Zema Production</b></p>';
+let PROMO=(()=>{try{return JSON.parse(localStorage.getItem('zh-promo')||'{}')||{}}catch(_){return{}}})();
+const zpH=()=>PROMO.url?`<p class="zp"><a href="${esc(PROMO.url)}" target="_blank" rel="noopener">Powered by <b>Zema Production</b></a></p>`:'<p class="zp">Powered by <b>Zema Production</b></p>';
+function adH(place){const P=PROMO;if(!P.ad_on||!P.ad_title||(place==='guest'?P.ad_guest===false:!P.ad_app))return'';const tag=P.ad_url?'a':'div';
+  return`<${tag} class="zad"${P.ad_url?` href="${esc(P.ad_url)}" target="_blank" rel="noopener sponsored"`:''}><span class="zad-k">From Zema Production</span><b>${esc(P.ad_title)}</b>${P.ad_text?`<span class="zad-t">${esc(P.ad_text)}</span>`:''}${P.ad_url&&P.ad_btn?`<span class="zad-b">${esc(P.ad_btn)}</span>`:''}</${tag}>`}
+function loadPromo(){if(!SB_URL)return;rpc('h_promo').then(p=>{p=p||{};if(JSON.stringify(p)===JSON.stringify(PROMO))return;PROMO=p;try{localStorage.setItem('zh-promo',JSON.stringify(p))}catch(_){}if(GATES[S.page]||S.page==='signin')draw();else softRender()}).catch(()=>{})}
 const gate=inner=>`<div class="signin"><div class="si-card"><div class="brand" style="padding:0"><i>Z</i><div><b>Zema Hospitality</b><small>Restaurant management</small></div></div>${inner}</div></div>`;
 const GATES={
   welcome:()=>gate(`<div><h2 style="font-size:28px">Welcome to Zema Hospitality</h2><p class="muted" style="margin:6px 0 0">${esc(S.gMsg||'Restaurant owners: sign in with your email.')}</p></div>
@@ -1156,8 +1166,7 @@ const GATES={
 <div class="fld"><label class="eyebrow" for="op">Password</label><input id="op" type="password" autocomplete="current-password" maxlength="120"></div>
 <button class="btn pri big" data-a="oLogin">${S.busy?'Signing in…':'Sign in'}</button>
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn quiet" data-a="oNew" style="flex:1">First time? Set your password</button><button class="btn quiet" data-a="oForgot" style="flex:1">Forgot password</button></div>
-<details class="wstaff"><summary>Staff: open your restaurant</summary><p class="muted" style="margin:10px 0">Use the device link your manager gave you, or paste it here.</p><input id="gcode" placeholder="https://…?r=…" autocomplete="off" aria-label="Device link"><button class="btn big" data-a="gOpen" style="margin-top:10px;width:100%">Open restaurant</button></details>
-<button class="btn quiet" data-a="gDemo">Look around the demo</button>`),
+<details class="wstaff"><summary>Staff: open your restaurant</summary><p class="muted" style="margin:10px 0">Use the device link your manager gave you, or paste it here.</p><input id="gcode" placeholder="https://…?r=…" autocomplete="off" aria-label="Device link"><button class="btn big" data-a="gOpen" style="margin-top:10px;width:100%">Open restaurant</button></details>`),
   create:()=>gate(`<div><h2 style="font-size:28px">Create your restaurant</h2><p class="muted" style="margin:6px 0 0">You become the owner. You can add your team afterwards.</p></div>
 <div class="fld"><label class="eyebrow" for="cn">Restaurant name</label><input id="cn" maxlength="80" placeholder="e.g. Zema Kitchen"></div>
 <div class="fld"><label class="eyebrow" for="co">Your name</label><input id="co" maxlength="60" placeholder="First and last name"></div>
@@ -1191,7 +1200,8 @@ async function liveSignin(){const id=S.pick,pin=S.pin;S.pinMsg='Checking…';
 function liveOut(){if(S.role==='admin')return adminBack();const t=TOKEN;TOKEN=null;lsDel('zh-tok');rpc('h_signout',{p_token:t}).catch(()=>{});S.pick=null;S.pin='';S.pinMsg='';S.sel=null;S.mod=null;S.edit=false;S.page='signin';draw();
   rpc('h_lobby',{p_code:CODE}).then(r=>{if(setStaff(r.staff)&&S.page==='signin'&&!S.pick)draw()}).catch(()=>{})}
 function boot(){try{appMeta()}catch(_){}const q=new URLSearchParams(location.search);S.lang=lsGet('zh-lang')||'en';S.v3=lsGet('zh-3d')==='1';S.fz=+lsGet('zh-fz')||(innerWidth<760?2:1);S.goAfter=(q.get('go')||'').replace(/[^a-z]/g,'')||null;
-  if(!SB_URL||q.has('demo')){seed();return render()}
+  if(!SB_URL){seed();return render()}
+  loadPromo();
   {const mc=((q.get('m')||'').match(/[0-9a-f]{24}/)||[])[0];if(mc)return menuStart(mc)}
   if(q.has('admin'))return adminStart();
   {const ln=ownerFromLink();if(ln==='recovery'){S.page='ownerReset';return draw()}if(ln||q.has('owner'))return ownerStart()}
@@ -1206,8 +1216,8 @@ GATES.adminLogin=()=>gate(`<div><h2 style="font-size:28px">${S.aSetup?'Admin sig
 <div class="fld"><label class="eyebrow" for="apw">Password</label><input id="apw" type="password" autocomplete="${S.aSetup?'current-password':'new-password'}" maxlength="80"></div>
 ${S.aSetup?'':'<div class="fld"><label class="eyebrow" for="apw2">Repeat the password</label><input id="apw2" type="password" autocomplete="new-password" maxlength="80"></div>'}
 <button class="btn pri big" data-a="aIn">${S.aSetup?'Sign in':'Save password and continue'}</button>`);
-GATES.adminHome=()=>{const l=S.aList||[];return`<div class="signin" style="align-items:flex-start"><div class="si-card" style="max-width:760px;width:100%"><div style="display:flex;align-items:center;gap:12px"><div class="brand" style="padding:0;margin-right:auto"><i>Z</i><div><b>Zema Hospitality</b><small>Admin · ${l.length} restaurant${l.length===1?'':'s'}</small></div></div><button class="btn quiet" data-a="reloadApp">Reload</button><button class="btn quiet" data-a="aOut">Sign out</button></div>
-${adminLiveSummary()}${adminSummary()}
+GATES.adminHome=()=>{const l=S.aList||[];return`<div class="signin"><div class="si-card" style="max-width:760px;width:100%;margin:0 0 auto"><div style="display:flex;align-items:center;gap:12px"><div class="brand" style="padding:0;margin-right:auto"><i>Z</i><div><b>Zema Hospitality</b><small>Admin · ${l.length} restaurant${l.length===1?'':'s'}</small></div></div><button class="btn quiet" data-a="reloadApp">Reload</button><button class="btn quiet" data-a="aOut">Sign out</button></div>
+${adminLiveSummary()}${adminSummary()}${promoPanel()}
 ${l.map(r=>`<section class="panel"><header><h2>${esc(r.name)}</h2><span class="dim">since ${new Date(r.created).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></header>
 ${adminLiveLine(r)}${adminBillUI(r)}<p class="muted" style="margin:0 0 14px">Owner ${esc(r.owner||'not set')} · ${r.email?esc(r.email):'no email yet'} · ${r.staff} staff · ${r.dishes} dishes</p>
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" data-aopen="${r.id}">Open and set up</button><button class="btn" data-alink="${r.code}">Copy staff app link</button><button class="btn" data-olink="1">Copy owner app link</button><button class="btn" data-a="aGm" data-c="${r.code}">Copy guest menu link</button><button class="btn" data-a="aQR" data-c="${r.code}" data-n="${esc(r.name)}">Guest menu QR code</button><button class="btn quiet" data-apin="${r.id}">Reset owner PIN</button><button class="btn quiet" data-aemail="${r.id}">${r.email?'Change':'Add'} owner email</button><button class="btn quiet" data-apay="${r.id}">Payment received</button><button class="btn quiet" data-abill="${r.id}">Billing</button><button class="btn quiet" data-adel="${r.id}" style="color:var(--s-bill)">Delete restaurant</button></div>${S.aDel===r.id?`<div class="note" style="margin-top:12px;border-color:var(--s-bill)"><b>Delete ${esc(r.name)} for good?</b> Its menu, photos, floor plan, staff, orders, payments and reports are all removed, and its device link stops working. This cannot be undone.<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="adc" placeholder="Type the restaurant name to confirm" aria-label="Type ${esc(r.name)} to confirm" autocomplete="off" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn" data-a="aDelGo" style="background:var(--s-bill);border-color:var(--s-bill);color:#fff">Delete</button><button class="btn quiet" data-adel="${r.id}">Cancel</button></div></div>`:''}${S.aEmail===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="aem" type="email" value="${esc(r.email||'')}" placeholder="owner@example.com" aria-label="Owner email for ${esc(r.name)}" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aEmailSave">Save email</button></div>`:''}
@@ -1635,8 +1645,26 @@ const tCount=r=>r.tables==null?DEFAULT_TABLES.length:+r.tables;
 function adminLiveLine(r){const n=tCount(r),b=+r.busy||0,on=+r.online||0;return`<div class="alive"><span class="pill ${b?'p-occupied':on?'p-available':'p-cleaning'}">${on||b?'Open now':'Quiet'}</span><span><b>${b}</b> of ${n} tables occupied</span><span>${+r.guests||0} guests</span>${+r.held?`<span>${r.held} reserved</span>`:''}<span>${+r.kitchen||0} in the kitchen</span><span>${on} staff online</span></div>`}
 function adminLiveSummary(){const l=S.aList||[];if(!l.length)return'';const n=l.reduce((a,r)=>a+tCount(r),0),b=l.reduce((a,r)=>a+(+r.busy||0),0),g=l.reduce((a,r)=>a+(+r.guests||0),0),open=l.filter(r=>+r.online||+r.busy).length,k=l.reduce((a,r)=>a+(+r.kitchen||0),0);
   return`<section class="panel"><header><h2>Right now</h2><span class="dim">updates every 20 seconds · ${hhmm(S.aAt||now())}</span></header><div class="grid g4" style="gap:0"><div class="kpi"><span class="eyebrow">Tables occupied</span><span class="num">${b}<span class="dim" style="font-size:18px"> / ${n}</span></span><small>${n?Math.round(b/n*100):0}% across all restaurants</small></div><div class="kpi"><span class="eyebrow">Guests seated</span><span class="num">${g}</span></div><div class="kpi"><span class="eyebrow">Restaurants open</span><span class="num">${open}<span class="dim" style="font-size:18px"> / ${l.length}</span></span><small>staff signed in or tables seated</small></div><div class="kpi"><span class="eyebrow">Kitchen tickets</span><span class="num">${k}</span><small>being made now</small></div></div></section>`}
-setInterval(async()=>{if(S.page!=='adminHome'||!ADM||document.hidden||S.busy||S.aPay||S.aBill||S.aDel||S.aEmail||S.aPin)return;const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
+setInterval(async()=>{if(S.page!=='adminHome'||!ADM||document.hidden||S.busy||S.prOpen||S.aPay||S.aBill||S.aDel||S.aEmail||S.aPin)return;const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
   try{S.aList=await rpc('h_admin_list',{p_token:ADM});S.aAt=now();if(S.page==='adminHome')draw()}catch(_){}},20000);
+
+/* ---------- Zema Hospitality admin: the "Powered by" link and the advert ---------- */
+function promoPanel(){const P=PROMO,IN='min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body);width:100%;text-transform:none;letter-spacing:0';
+  return`<details class="panel" ${S.prOpen?'open':''}><summary style="cursor:pointer;font-weight:600;font-size:17px" data-a="prTog">Powered by Zema Production · link and advert</summary>
+<p class="muted" style="margin:10px 0 0;font-size:14px">Every page shows “Powered by Zema Production”. Add your website and it becomes a link. The advert appears at the bottom of guest menus and, if you choose, in the restaurant apps.</p>
+<div class="prom"><label class="eyebrow wide">Your website (leave empty until it is ready)<input id="pu" value="${esc(P.url||'')}" placeholder="e.g. zemaproduction.com" style="${IN}"></label>
+<label class="gchk wide"><input type="checkbox" id="pa" ${P.ad_on?'checked':''}> Show the advert</label>
+<label class="eyebrow">Headline<input id="pt" maxlength="80" value="${esc(P.ad_title||'')}" placeholder="e.g. Wedding photography and film" style="${IN}"></label>
+<label class="eyebrow">Button text<input id="pb" maxlength="30" value="${esc(P.ad_btn||'')}" placeholder="e.g. See our work" style="${IN}"></label>
+<label class="eyebrow wide">One line about it<input id="px" maxlength="200" value="${esc(P.ad_text||'')}" placeholder="e.g. Ethiopian and Eritrean weddings across London and abroad" style="${IN}"></label>
+<label class="eyebrow wide">Where the advert goes when tapped<input id="pl" value="${esc(P.ad_url||'')}" placeholder="e.g. zemaproduction.com/weddings or an Instagram link" style="${IN}"></label>
+<label class="gchk"><input type="checkbox" id="pg" ${P.ad_guest===false?'':'checked'}> On guest menus</label><label class="gchk"><input type="checkbox" id="pp" ${P.ad_app?'checked':''}> In the restaurant apps (staff and owners)</label></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn pri" data-a="prSave">Save</button></div>
+${P.ad_on&&P.ad_title?`<div class="eyebrow" style="margin-top:16px">How it looks</div>${adH('guest')||adH('app')}`:''}</details>`}
+Object.assign(GACT,{prTog(){S.prOpen=!S.prOpen},
+  async prSave(){const g=id=>($('#'+id)||{}).value||'',c=id=>!!($('#'+id)||{}).checked;
+    try{PROMO=await rpc('h_admin_promo',{p_token:ADM,p_promo:{url:g('pu'),ad_on:c('pa'),ad_title:g('pt'),ad_text:g('px'),ad_url:g('pl'),ad_btn:g('pb'),ad_guest:c('pg'),ad_app:c('pp')}})||{};
+      lsSet('zh-promo',JSON.stringify(PROMO));S.prOpen=true;draw();toast('Saved. Every page picks it up the next time it opens.')}catch(e){admErr(e)}}});
 
 boot();
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())render()},30000);

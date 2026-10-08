@@ -1075,7 +1075,7 @@ const sortK=o=>Array.isArray(o)?o.map(sortK):o&&typeof o==='object'?Object.keys(
 const LIVE0=J({status:'available',guests:0,waiter:null,seated:null,note:''});
 async function rpc(fn,args){const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
   const j=await r.json().catch(()=>null);if(!r.ok){const e=new Error((j&&j.message)||'ERR');e.code=(j&&j.message)||'ERR';throw e}return j}
-const errMsg=e=>({EMAIL:'That email does not look right',DENIED:'You are not allowed to do that',PIN:'PINs are 4 digits',NAME:'Add a name first',BUSY:'Too many at once. Try again later.'}[e&&e.code]||'No connection. Try again.');
+const errMsg=e=>(e&&/schema cache|Could not find the function|does not exist/i.test(String(e.code||e.message)))?'The database needs updating. Run the latest database script from the setup page.':({IMAGE:'That picture is too large. Try a smaller one.',EMAIL:'That email does not look right',DENIED:'You are not allowed to do that',PIN:'PINs are 4 digits',NAME:'Add a name first',BUSY:'Too many at once. Try again later.'}[e&&e.code]||'No connection. Try again.');
 let DIRTY=0;document.addEventListener('input',()=>{DIRTY=Date.now()});
 const safe=()=>{const a=document.activeElement;return!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))&&!S.edit&&Date.now()-DIRTY>120000&&!GATES[S.page]};
 function softRender(){if(safe())draw()}
@@ -1758,7 +1758,7 @@ Object.assign(GACT,{
   adsTog(){S.adsOpen=!S.adsOpen;if(S.adsOpen)admAdsLoad()},
   adNew(){S.adE='new';S.adImg=undefined;S.adDraft=null;draw()},adEdit(d){S.adE=d.id;S.adImg=undefined;S.adDraft=null;draw()},adCancel(){S.adE=null;S.adImg=undefined;S.adDraft=null;draw()},adNoImg(){S.adDraft=adFormRead();S.adImg=null;draw()},
   async adSave(){const o=adFormRead();if(o.title.length<2)return toast('Add a headline');if(!o.places.length)return toast('Choose where it shows');
-    try{await rpc('h_admin_ad_save',{p_token:ADM,p_ad:o});S.adE=null;S.adImg=undefined;S.adDraft=null;ADMADS=null;admAdsLoad();toast('Advert saved')}catch(e){toast(e.code==='IMAGE'?'That picture is too large':errMsg(e))}},
+    try{await rpc('h_admin_ad_save',{p_token:ADM,p_ad:o});S.adE=null;S.adImg=undefined;S.adDraft=null;ADMADS=null;admAdsLoad();toast('Advert saved')}catch(e){toast(errMsg(e))}},
   async adDel(){if(!confirm('Delete this advert and its figures?'))return;try{await rpc('h_admin_ad_del',{p_token:ADM,p_id:S.adE});S.adE=null;ADMADS=null;admAdsLoad();toast('Advert deleted')}catch(e){admErr(e)}}});
 document.addEventListener('change',e=>{if(e.target.id==='adall'&&e.target.checked)document.querySelectorAll('[data-adr]').forEach(x=>{x.checked=false});if(e.target.dataset&&e.target.dataset.adr&&e.target.checked){const a=$('#adall');if(a)a.checked=false}
   if(e.target.id!=='adimg')return;const f=e.target.files&&e.target.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);

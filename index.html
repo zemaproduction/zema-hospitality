@@ -498,10 +498,16 @@ function ownerHome(){
  <section class="panel"><header><h2>Arriving tonight</h2><button class="btn quiet" data-go="res">All</button></header>${S.res.slice(0,5).map(r=>`<div class="row"><span class="t">${r.t}</span><div class="grow"><b class="ell">${esc(r.name)}</b><span class="dim" style="font-size:13px">${r.guests} guests · ${esc(tb(r.table)?tb(r.table).name:r.table)}</span></div></div>`).join('')}</section></div>`}
 
 /* ---------- floor plan ---------- */
-function shapeOf(t){const s=t.seats;if(t.shape==='round'){const r=s<=2?26:s<=4?34:42;return{w:r*2,h:r*2,r}}if(t.shape==='square'){const w=s<=2?52:s<=4?66:80;return{w,h:w}}return{w:s<=4?92:s<=6?118:150,h:62}}
-function chairs(t){const g=shapeOf(t),o=[],n=t.seats;
-  if(t.shape==='round'){for(let i=0;i<n;i++){const a=i/n*Math.PI*2-Math.PI/2,d=g.r+9;o.push(`<rect class="ch" x="${(Math.cos(a)*d-7).toFixed(1)}" y="${(Math.sin(a)*d-7).toFixed(1)}" width="14" height="14" rx="4"/>`)}}
-  else{const top=Math.ceil(n/2),bot=n-top,put=(k,y)=>{for(let i=0;i<k;i++){const x=-g.w/2+g.w*(i+.5)/k;o.push(`<rect class="ch" x="${(x-8).toFixed(1)}" y="${y}" width="16" height="11" rx="3.5"/>`)}};put(top,-g.h/2-15);put(bot,g.h/2+4)}
+function shapeOf(t){const s=t.seats;if(t.shape==='round'){const r=s<=2?26:s<=4?34:s<=8?42:50;return{w:r*2,h:r*2,r}}if(t.shape==='square'){const w=s<=2?52:s<=4?66:80;return{w,h:w}}const md=chairMode(t),one=t.turn?(md==='l'||md==='r'):(md==='t'||md==='b'),L=Math.max(s<=4?92:s<=6?118:s<=8?150:180,one?s*24+8:0);return t.turn?{w:62,h:L}:{w:L,h:62}}
+/* which sides get chairs: set per table in the layout designer */
+const CHS={all:['t','r','b','l'],tb:['t','b'],lr:['l','r'],t:['t'],b:['b'],l:['l'],r:['r']};
+const chairMode=t=>{const c=t.chairs;if(t.shape==='round')return['all','t','b','l','r'].includes(c)?c:'all';return CHS[c]?c:(t.shape==='square'?'all':t.turn?'lr':'tb')};
+function chairs(t){const g=shapeOf(t),o=[],n=t.seats,md=chairMode(t);
+  if(t.shape==='round'){const c={t:-90,r:0,b:90,l:180}[md];for(let i=0;i<n;i++){const a=(md==='all'?i/n*360-90:c-75+(n>1?150*i/(n-1):75))*Math.PI/180,d=g.r+9;o.push(`<rect class="ch" x="${(Math.cos(a)*d-7).toFixed(1)}" y="${(Math.sin(a)*d-7).toFixed(1)}" width="14" height="14" rx="4"/>`)}return o.join('')}
+  const sides=CHS[md],len=k=>k==='t'||k==='b'?g.w:g.h,cnt={};sides.forEach(k=>cnt[k]=0);
+  for(let i=0;i<n;i++){let best=sides[0];sides.forEach(k=>{if(len(k)/(cnt[k]+1)>len(best)/(cnt[best]+1))best=k});cnt[best]++}
+  sides.forEach(k=>{const c=cnt[k];for(let i=0;i<c;i++){if(k==='t'||k==='b'){const x=-g.w/2+g.w*(i+.5)/c;o.push(`<rect class="ch" x="${(x-8).toFixed(1)}" y="${k==='t'?-g.h/2-15:g.h/2+4}" width="16" height="11" rx="3.5"/>`)}
+    else{const y=-g.h/2+g.h*(i+.5)/c;o.push(`<rect class="ch" x="${k==='l'?-g.w/2-15:g.w/2+4}" y="${(y-8).toFixed(1)}" width="11" height="16" rx="3.5"/>`)}}});
   return o.join('')}
 function tableSvg(t){const g=shapeOf(t),l=lv(t.id),mine=l.waiter===ME,dim=S.role==='waiter'&&!S.edit&&l.waiter&&!mine;
   const sub=S.edit?t.seats+' seats':l.status==='reserved'?(l.note||'').split(' · ')[0]:l.seated?since(l.seated):l.status==='cleaning'?'clean':'';
@@ -522,8 +528,8 @@ function floorPage(){
   return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0;margin-right:auto">${S.edit?'Drag tables, sections and features into place. Tap one to rename it; drag the orange corner to resize a section or feature.':S.role==='waiter'?'Your tables are in full colour. Tap any table to open it.':'Live view of the room. Tap a table to see who is there and what they ordered.'}</p>
 ${can?(S.edit?`<button class="btn" data-a="addTable">+ Table</button><button class="btn" data-a="addZone">+ Section</button><button class="btn" data-a="addFix">+ Feature</button><button class="btn quiet" data-a="clearFloor">Clear floor</button><button class="btn quiet" data-a="resetLayout">Sample layout</button><button class="btn pri" data-a="saveLayout">Save layout</button>`:`<button class="btn" data-a="editOn">Edit layout</button>`):''}</div>
 <div class="floor ${S.edit?'edit':''}">${floorSvg()}<div class="floor-bar">${S.edit?(t?`<div class="insp"><label>Name<input id="tn" value="${esc(t.name)}" maxlength="6" style="width:96px"></label>
-<label>Seats<select id="ts">${[2,4,6,8,10].map(n=>`<option ${t.seats===n?'selected':''}>${n}</option>`).join('')}</select></label>
-<label>Shape<select id="tsh">${[['round','Round'],['square','Square'],['rect','Rectangle']].map(([a,b])=>`<option value="${a}" ${t.shape===a?'selected':''}>${b}</option>`).join('')}</select></label>
+<label>Seats<select id="ts">${[1,2,3,4,5,6,7,8,10,12].map(n=>`<option ${t.seats===n?'selected':''}>${n}</option>`).join('')}</select></label>
+<label>Shape<select id="tsh">${[['round','Round'],['square','Square'],['rect','Rectangle']].map(([a,b])=>`<option value="${a}" ${t.shape===a?'selected':''}>${b}</option>`).join('')}</select></label>${t.shape==='rect'?`<label>Direction<select id="ttn"><option value="" ${t.turn?'':'selected'}>Across</option><option value="1" ${t.turn?'selected':''}>Up and down</option></select></label>`:''}<label>Chairs<select id="tch">${(t.shape==='round'?[['all','All around'],['t','Top half'],['b','Bottom half'],['l','Left half'],['r','Right half']]:[['all','All sides'],['tb','Top and bottom'],['lr','Left and right'],['t','Top only'],['b','Bottom only'],['l','Left only'],['r','Right only']]).map(([a,b])=>`<option value="${a}" ${chairMode(t)===a?'selected':''}>${b}</option>`).join('')}</select></label>
 <label>Section<select id="tz"><option value="">None</option>${ZONES.filter(z=>fl(z)===fl(t)).map(z=>`<option value="${z.id}" ${t.zone===z.id?'selected':''}>${esc(z.name)}</option>`).join('')}</select></label>
 <button class="btn" data-a="delTable">Delete table</button></div>`:inspZ()):floorLegend()}</div></div>`}
 function inspZ(){const z=S.selZ,o=z&&(z.k==='z'?ZONES:S.fix).find(x=>x.id===z.id),f=S.floors.find(x=>x.id===S.floor);
@@ -772,7 +778,7 @@ document.addEventListener('click',e=>{
   if(a==='modAdd'){const note=[...S.mod.mods,$('#mnote').value.trim()].filter(Boolean).join(' · ');S.draft.push({item:S.mod.item,qty:S.mod.qty,note});S.mod=null;return render()}
 });
 document.addEventListener('change',e=>{const t=S.edit&&S.sel&&tb(S.sel);if(!t)return;const id=e.target.id;
-  if(id==='tn'){const v=e.target.value.trim();if(v)t.name=v}else if(id==='ts')t.seats=+e.target.value;else if(id==='tsh')t.shape=e.target.value;else if(id==='tz')t.zone=e.target.value;else return;render()});
+  if(id==='tn'){const v=e.target.value.trim();if(v)t.name=v}else if(id==='ts')t.seats=+e.target.value;else if(id==='tsh')t.shape=e.target.value;else if(id==='tz')t.zone=e.target.value;else if(id==='tch')t.chairs=e.target.value;else if(id==='ttn'){t.turn=!!e.target.value;delete t.chairs}else return;render()});
 /* a dish photo is cropped to 4:3 and shrunk in the browser, so it stays small enough to sync quickly */
 document.addEventListener('change',e=>{if(e.target.id!=='dph')return;const f=e.target.files&&e.target.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);
   img.onload=()=>{const W=400,H=300,c=document.createElement('canvas'),k=Math.max(W/img.width,H/img.height),w=img.width*k,h=img.height*k;c.width=W;c.height=H;c.getContext('2d').drawImage(img,(W-w)/2,(H-h)/2,w,h);URL.revokeObjectURL(u);

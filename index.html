@@ -367,43 +367,43 @@ button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select
 .cattab{display:flex;flex-direction:column;gap:8px}.catrow{display:grid;grid-template-columns:auto 1.2fr 1fr 1fr auto;gap:8px;align-items:center}.catmv{display:flex;gap:4px}.catmv .chip{min-width:34px;justify-content:center;padding:0 8px}
 @media (max-width:760px){.catrow{grid-template-columns:auto 1fr auto}.catrow input[data-catf="am"],.catrow input[data-catf="ti"]{grid-column:2}}
 /* ---- guest menu ---- */
-.gm{grid-column:1/-1;height:100%;overflow:auto;background:radial-gradient(ellipse at 50% -10%,#1d1812,#0b0a09 60%);color:#F3EAD9;--gold:#D9BA78;font-family:var(--body),var(--ge);-webkit-overflow-scrolling:touch}
+.gm{grid-column:1/-1;height:100%;overflow:auto;background:var(--gm-bg);color:var(--gm-ink);font-family:var(--body),var(--ge);-webkit-overflow-scrolling:touch}
 .gm[lang="am"],.gm[lang="ti"]{font-family:"Noto Sans Ethiopic",var(--body)}
 .gm-in{max-width:760px;margin:0 auto;padding:0 18px}
-.tibeb{display:block;width:100%;height:14px;color:#8A6B32;opacity:1}.gm.nopat .tibeb{display:none}
+.tibeb{display:block;width:100%;height:14px;color:var(--gm-tibeb);opacity:1}.gm.nopat .tibeb{display:none}
 .gm-head{text-align:center;padding:calc(10px + env(safe-area-inset-top,0px)) 0 18px}
-.gm-lang{display:flex;justify-content:center;gap:6px;margin:16px 0 10px}.gm-lang button{padding:7px 14px;border-radius:99px;border:1px solid rgba(217,186,120,.35);color:#E9DCC3;font:500 14px var(--body),var(--ge)}.gm-lang button.on{background:var(--gold);color:#1A1408;border-color:var(--gold)}
+.gm-lang{display:flex;justify-content:center;gap:6px;margin:16px 0 10px}.gm-lang button{padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,var(--gold) 35%,transparent);color:var(--gm-ink);font:500 14px var(--body),var(--ge)}.gm-lang button.on{background:var(--gold);color:var(--gm-on);border-color:var(--gold)}
 .gm-mark{color:var(--gold);font-size:18px;margin-top:10px}
-.gm-title{font:500 clamp(32px,8vw,52px)/1.05 "Fraunces","Noto Serif Ethiopic",Georgia,serif;color:var(--gold);margin:6px 0 6px;letter-spacing:.01em}
-.gm-sub{color:#CBBEA6;margin:0;font-size:15px;letter-spacing:.08em;text-transform:uppercase}
-.gm-cats{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:12px 18px;background:rgba(11,10,9,.92);backdrop-filter:blur(8px);border-top:1px solid rgba(217,186,120,.18);border-bottom:1px solid rgba(217,186,120,.18);justify-content:safe center}
-.gm-cats button{white-space:nowrap;padding:9px 16px;border-radius:99px;color:#D8CCB5;font:600 15px "Fraunces","Noto Serif Ethiopic",Georgia,serif;letter-spacing:.02em}.gm-cats button.on{color:#1A1408;background:var(--gold)}
+.gm-title{font:500 clamp(32px,8vw,52px)/1.05 var(--gm-serif);color:var(--gold);margin:6px 0 6px;letter-spacing:.01em}
+.gm-sub{color:var(--gm-mute);margin:0;font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.gm-cats{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:12px 18px;background:var(--gm-bar);backdrop-filter:blur(8px);border-top:1px solid color-mix(in srgb,var(--gold) 18%,transparent);border-bottom:1px solid color-mix(in srgb,var(--gold) 18%,transparent);justify-content:safe center}
+.gm-cats button{white-space:nowrap;padding:9px 16px;border-radius:99px;color:var(--gm-ink2);font:600 15px var(--gm-serif);letter-spacing:.02em}.gm-cats button.on{color:var(--gm-on);background:var(--gold)}
 .gm-list{display:flex;flex-direction:column;padding-top:20px;padding-bottom:30px}
-.gm-card{display:flex;flex-direction:row;align-items:center;gap:clamp(14px,4vw,26px);text-align:left;padding:18px 0;border-bottom:1px solid rgba(217,186,120,.2);color:inherit}.gm-card:last-of-type{border-bottom:0}
-.gm-card.out{opacity:.55}.gm-img{display:block;flex:0 0 48%;aspect-ratio:4/3;overflow:hidden;background:#1a1612;border-radius:10px;border:1px solid rgba(217,186,120,.28);box-shadow:0 14px 30px rgba(0,0,0,.5)}
+.gm-card{display:flex;flex-direction:row;align-items:center;gap:clamp(14px,4vw,26px);text-align:left;padding:18px 0;border-bottom:1px solid color-mix(in srgb,var(--gold) 20%,transparent);color:inherit}.gm-card:last-of-type{border-bottom:0}
+.gm-card.out{opacity:.55}.gm-img{display:block;flex:0 0 48%;aspect-ratio:4/3;overflow:hidden;background:var(--gm-card);border-radius:var(--gm-r);border:1px solid color-mix(in srgb,var(--gold) 28%,transparent);box-shadow:0 14px 30px var(--gm-shadow)}
 @media (min-width:700px){.gm-img{flex-basis:42%}}
 .gm-pic,.gm-heroimg{width:100%;height:100%;object-fit:cover;display:block}
-.gm-ph{display:grid;place-items:center;width:100%;height:100%;font-size:clamp(44px,12vw,84px);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--ft,#A8432A) 45%,#1a1612),#14110e)}
+.gm-ph{display:grid;place-items:center;width:100%;height:100%;font-size:clamp(44px,12vw,84px);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--ft,#A8432A) 45%,var(--gm-card)),var(--gm-card))}
 .gm-txt{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
-.gm-name{font:500 clamp(18px,4.6vw,24px)/1.22 "Fraunces","Noto Serif Ethiopic",Georgia,serif;color:#F6EBD6}.gm-price{font:600 1em "Fraunces",Georgia,serif;color:var(--gold);white-space:nowrap}
-.gm-sec{font:600 clamp(24px,6vw,32px)/1.1 "Fraunces","Noto Serif Ethiopic",Georgia,serif;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin:6px 0 4px;padding-bottom:12px;border-bottom:1px solid rgba(217,186,120,.35)}
-.gm-alt{color:var(--gold);opacity:.85;font-size:14px;margin:0}.gm-desc{color:#C9BDA7;font-size:clamp(13px,3.4vw,15px);line-height:1.45}
-.gm-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.gm-tags span{font-size:12px;padding:3px 8px;border-radius:99px;border:1px solid rgba(217,186,120,.3);color:#E2D3B5}
+.gm-name{font:500 clamp(18px,4.6vw,24px)/1.22 var(--gm-serif);color:var(--gm-ink)}.gm-price{font:600 1em var(--gm-serif);color:var(--gold);white-space:nowrap}
+.gm-sec{font:600 clamp(24px,6vw,32px)/1.1 var(--gm-serif);color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin:6px 0 4px;padding-bottom:12px;border-bottom:1px solid color-mix(in srgb,var(--gold) 35%,transparent)}
+.gm-alt{color:var(--gold);opacity:.85;font-size:14px;margin:0}.gm-desc{color:var(--gm-ink2);font-size:clamp(13px,3.4vw,15px);line-height:1.45}
+.gm-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.gm-tags span{font-size:12px;padding:3px 8px;border-radius:99px;border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);color:var(--gm-ink2)}
 .gm-out{color:#F0808A;font-size:13px;font-weight:600}
-.gm-foot{text-align:center;color:#BFB29B;padding:6px 0 calc(28px + env(safe-area-inset-bottom,0px))}.gm-foot p{margin:14px 0 0}.gm-small{font-size:13px;color:#A99C86;margin:6px 0 0}
-.gm-det{position:fixed;inset:0;z-index:40;overflow:auto;background:#0B0A09;animation:gmIn .22s ease-out}
+.gm-foot{text-align:center;color:var(--gm-mute);padding:6px 0 calc(28px + env(safe-area-inset-bottom,0px))}.gm-foot p{margin:14px 0 0}.gm-small{font-size:13px;color:var(--gm-mute);margin:6px 0 0}
+.gm-det{position:fixed;inset:0;z-index:40;overflow:auto;background:var(--gm-base);animation:gmIn .22s ease-out}
 @keyframes gmIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.gm-close{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:12px;z-index:2;padding:10px 16px;border-radius:99px;background:rgba(11,10,9,.72);backdrop-filter:blur(8px);color:#F3EAD9;border:1px solid rgba(217,186,120,.35);font-weight:600}
-.gm-hero{aspect-ratio:4/3;max-height:62vh;width:100%;overflow:hidden;background:#1a1612}.gm-hero .gm-ph{font-size:120px}
+.gm-close{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:12px;z-index:2;padding:10px 16px;border-radius:99px;background:var(--gm-bar);backdrop-filter:blur(8px);color:var(--gm-ink);border:1px solid color-mix(in srgb,var(--gold) 35%,transparent);font-weight:600}
+.gm-hero{aspect-ratio:4/3;max-height:62vh;width:100%;overflow:hidden;background:var(--gm-card)}.gm-hero .gm-ph{font-size:120px}
 @media (min-width:900px){.gm-hero{max-width:900px;margin:0 auto;border-radius:0 0 22px 22px}}
 .gm-detbody{padding-top:18px;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
-.gm-dname{font:500 clamp(30px,7vw,44px)/1.1 "Fraunces","Noto Serif Ethiopic",Georgia,serif;color:var(--gold);margin:16px 0 4px}
-.gm-dprice{font:600 20px "Fraunces",Georgia,serif;color:#F6EBD6;margin:8px 0 10px}.gm-ddesc{font-size:17px;line-height:1.55;color:#DCCFB8}
+.gm-dname{font:500 clamp(30px,7vw,44px)/1.1 var(--gm-serif);color:var(--gold);margin:16px 0 4px}
+.gm-dprice{font:600 20px var(--gm-serif);color:var(--gm-ink);margin:8px 0 10px}.gm-ddesc{font-size:17px;line-height:1.55;color:var(--gm-ink2)}
 .gm-h3{font:500 15px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:26px 0 8px}
-.gm-story{font:400 17px/1.75 "Fraunces","Noto Serif Ethiopic",Georgia,serif;color:#E9DECB;margin:0}
+.gm-story{font:400 17px/1.75 var(--gm-serif);color:var(--gm-ink);margin:0}
 .gm[lang="am"] .gm-story,.gm[lang="ti"] .gm-story{font-family:"Noto Serif Ethiopic",Georgia,serif}
-.gm-ask{margin-top:26px;color:#BFB29B;font-style:italic}
-.gm-exit{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;padding:10px 16px;border-radius:99px;background:var(--gold);color:#1A1408;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.gm-ask{margin-top:26px;color:var(--gm-mute);font-style:italic}
+.gm-exit{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;padding:10px 16px;border-radius:99px;background:var(--gold);color:var(--gm-on);font-weight:700;box-shadow:0 8px 24px var(--gm-shadow)}
 
 .line.void>div,.line.void .p,.line.void .q{opacity:.5;text-decoration:line-through}.line .vtag,.tk .vtag{display:block;text-decoration:none;color:var(--s-bill);font-size:12px;font-weight:600}.tk li.void{opacity:.7}.tk .vtag{display:inline;margin-left:6px}
 .oblk{margin-bottom:12px}.ohead{display:flex;align-items:center;gap:10px;margin-bottom:2px}.ohead .pill{margin-left:auto}.lnk{background:none;border:0;color:var(--accent);font:600 13px var(--body);padding:8px 0 8px 6px;cursor:pointer;min-height:36px}
@@ -419,13 +419,32 @@ button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select
 .qrline{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:12px}.qrbox{width:148px;height:148px;padding:8px;background:#fff;border-radius:12px;display:grid;place-items:center;color:#333;font-size:12px;text-align:center}.qrbox img,.qrbox canvas{display:block}
 
 .zp{text-align:center;font-size:12px;letter-spacing:.06em;color:var(--ink3);margin:8px 0 0;padding:4px 0}.zp b{color:var(--accent);font-weight:600}
-.signin{flex-direction:column;align-items:center;justify-content:flex-start}.signin>.si-card{flex:none}.signin>.zp{margin-top:18px}.gm .zp{color:rgba(243,234,217,.55);padding:26px 0 calc(26px + env(safe-area-inset-bottom,0px))}.gm .zp b{color:var(--gold)}
+.signin{flex-direction:column;align-items:center;justify-content:flex-start}.signin>.si-card{flex:none}.signin>.zp{margin-top:18px}.gm .zp{color:var(--gm-mute);padding:26px 0 calc(26px + env(safe-area-inset-bottom,0px))}.gm .zp b{color:var(--gold)}
 
 .zp a{color:inherit;text-decoration:none}.zp a:hover b,.zp a:focus-visible b{text-decoration:underline}
 .zad{display:flex;flex-direction:column;gap:4px;max-width:560px;width:100%;margin:22px auto 0;padding:16px 18px;border:1px solid rgba(217,186,120,.35);border-radius:14px;background:linear-gradient(135deg,rgba(217,186,120,.10),rgba(217,186,120,.02));color:var(--ink);text-decoration:none;text-align:left}
 .zad-k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.zad b{font-size:17px;font-weight:600}.zad-t{font-size:14px;color:var(--ink2)}.zad-b{align-self:flex-start;margin-top:8px;padding:8px 14px;border-radius:999px;background:var(--accent);color:var(--on-accent,#1A1308);font-weight:600;font-size:14px}
-.gm .zad{color:#F3EAD9;margin:26px auto 0;max-width:720px;width:calc(100% - 36px)}.gm .zad-k{color:var(--gold)}.gm .zad-t{color:rgba(243,234,217,.75)}.gm .zad-b{background:var(--gold);color:#1A1308}
+.gm .zad{color:var(--gm-ink);margin:26px auto 0;max-width:720px;width:calc(100% - 36px)}.gm .zad-k{color:var(--gold)}.gm .zad-t{color:var(--gm-ink2)}.gm .zad-b{background:var(--gold);color:var(--gm-on)}
 .prom{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}.prom label.eyebrow{display:flex;flex-direction:column;gap:4px}.prom .wide{grid-column:1/-1}
+
+.gm{--gold:#D9BA78;--gm-bg:radial-gradient(ellipse at 50% -10%,#1d1812,#0b0a09 60%);--gm-base:#0B0A09;--gm-ink:#F3EAD9;--gm-ink2:#D2C5AE;--gm-mute:#BFB29B;--gm-on:#1A1408;--gm-bar:rgba(11,10,9,.92);--gm-card:#1a1612;--gm-tibeb:#8A6B32;--gm-serif:"Fraunces","Noto Serif Ethiopic",Georgia,serif;--gm-shadow:rgba(0,0,0,.5);--gm-r:10px}
+.gm .gm-title,.gm .gm-name,.gm .gm-sec,.gm .gm-cats button,.gm .gm-dname{font-family:var(--gm-serif)}
+.gm.lay-stack .gm-card{flex-direction:column;align-items:stretch;gap:14px;padding:22px 0}.gm.lay-stack .gm-img{flex:none;width:100%;aspect-ratio:16/10}
+.gm.lay-grid .gm-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 14px}.gm.lay-grid .gm-sec,.gm.lay-grid .gm-list>.zad,.gm.lay-grid .gm-list>p{grid-column:1/-1}
+.gm.lay-grid .gm-card{flex-direction:column;align-items:stretch;gap:10px;padding:0;border-bottom:0}.gm.lay-grid .gm-img{flex:none;width:100%;aspect-ratio:1}.gm.lay-grid .gm-name{font-size:clamp(16px,4.2vw,20px)}.gm.lay-grid .gm-desc{display:none}
+@media (min-width:700px){.gm.lay-grid .gm-list{grid-template-columns:repeat(3,minmax(0,1fr))}.gm.lay-grid .gm-desc{display:block}}
+.gm.lay-text .gm-img{display:none}.gm.lay-text .gm-card{padding:16px 0}.gm.lay-text .gm-name{display:flex;align-items:baseline;gap:10px}.gm.lay-text .gm-name::after{content:"";flex:1;order:1;border-bottom:1px dotted color-mix(in srgb,var(--gold) 55%,transparent);transform:translateY(-5px);min-width:20px}.gm.lay-text .gm-price{order:2}
+.zad-img{width:calc(100% + 36px);margin:-16px -18px 10px;aspect-ratio:16/9;object-fit:cover;border-radius:14px 14px 0 0;display:block}
+.gm .ad-wrap .zad{margin:6px auto 16px;width:100%}.gm .gm-list>.zad{margin:18px 0;width:100%;max-width:none}
+.adpop{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:grid;place-items:center;padding:20px;animation:gmIn .25s ease-out}
+.adpop-in{position:relative;width:min(440px,100%)}.adpop .zad{margin:0;max-width:none;background:var(--gm-base,#141210);box-shadow:0 24px 60px rgba(0,0,0,.5)}.adpop .zad b{font-size:22px}
+.adpop-x{position:absolute;top:-14px;right:-6px;z-index:2;width:40px;height:40px;border-radius:50%;background:var(--gm-ink,#fff);color:var(--gm-base,#000);font-size:22px;font-weight:600;display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.thgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.thcard{display:flex;flex-direction:column;gap:6px;padding:6px;border-radius:14px;border:2px solid transparent;text-align:left;background:var(--sunk)}.thcard.on{border-color:var(--accent)}
+.thprev{display:flex;flex-direction:column;gap:8px;padding:12px 10px;border-radius:10px;background:var(--gm-bg);min-height:96px}.thtitle{font:600 15px var(--gm-serif);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.throw{display:flex;gap:8px;align-items:center}.thimg{width:42%;aspect-ratio:4/3;border-radius:calc(var(--gm-r) / 2);background:var(--gm-card);border:1px solid color-mix(in srgb,var(--gold) 30%,transparent)}.thlines{flex:1;display:flex;flex-direction:column;gap:5px}.thlines i{height:6px;border-radius:3px;background:var(--gm-ink);opacity:.8}.thlines i+i{width:60%;background:var(--gold)}
+.thname{font-size:13px;font-weight:600;padding:2px 4px}
+.adform{border-top:1px solid var(--line2);margin-top:14px;padding-top:14px}
 </style>
 </head>
 <body>
@@ -495,7 +514,7 @@ const DEFAULT_TABLES=[T(1,180,100,'round',2,'window'),T(2,270,100,'round',2,'win
  T(19,680,518,'rect',8,'private'),T(20,860,518,'rect',8,'private')];
 
 const S={user:'o1',pick:null,pin:'',rr:'day',payM:'Card',tx:[],set:{name:'Zema Kitchen',address:'14 Camden Passage, London N1 8EA',phone:'020 7946 0182',email:'hello@zemakitchen.example',hours:'Tue to Sun · 12:00 to 23:00',service:12.5,methods:{Card:true,Cash:true,'Apple Pay':true,Voucher:false}},
- costs:{},exp:[],stock:{},role:'owner',page:'dashboard',sel:null,edit:false,range:'today',cat:'Starters',orderFor:null,draft:[],mod:null,toast:null,
+ costs:{},exp:[],stock:{},look:{},role:'owner',page:'dashboard',sel:null,edit:false,range:'today',cat:'Starters',orderFor:null,draft:[],mod:null,toast:null,
  tables:[],fix:[],floors:[{id:'g',name:'Ground floor'}],floor:'g',shapes:[],selZ:null,live:{},orders:[],paid:[],nextOrder:105,
  res:[{t:'19:00',name:'John & Sarah Whitmore',guests:4,table:'T12',note:'Anniversary'},{t:'19:30',name:'Michael Asante',guests:2,table:'T4',note:''},{t:'19:45',name:'Bethlehem Family',guests:8,table:'T19',note:'Birthday cake at 21:00'},{t:'20:15',name:'Dr. Patel',guests:6,table:'T13',note:'One vegetarian, one nut allergy'},{t:'20:30',name:'Leor Films',guests:4,table:'T9',note:''}]};
 
@@ -553,7 +572,7 @@ const SOON={};
 
 /* ---------- shell ---------- */
 function render(){DIRTY=0;draw();queueSync()}
-function afterDraw(){try{appMeta();installHint();if(S.page==='guest')gmLoadBig();keepAwake();drawQRs();if(LIVE&&TOKEN&&!PCHK&&pushCan()){PCHK=1;pushCheck()}}catch(_){}}
+function afterDraw(){try{appMeta();installHint();if(S.page==='guest')gmLoadBig();keepAwake();drawQRs();appTint();if(SB_URL&&(S.page==='guest'||LIVE||GATES[S.page]))loadAds(adCode());adPopupArm();if(LIVE&&TOKEN&&!PCHK&&pushCan()){PCHK=1;pushCheck()}}catch(_){}}
 /* a Show / Hide button inside every password box */
 function addEyes(){document.querySelectorAll('#app input[type=password]').forEach(x=>{if(x.parentNode.classList.contains('pw'))return;const w=document.createElement('span');w.className='pw';x.parentNode.insertBefore(w,x);w.appendChild(x);
   const b=document.createElement('button');b.type='button';b.className='eye';b.textContent='Show';b.setAttribute('aria-label','Show password');b.setAttribute('aria-pressed','false');w.appendChild(b)})}
@@ -561,7 +580,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('.eye');if(!b)ret
 function draw(){draw0();afterDraw()}
 function draw0(){
   document.documentElement.dataset.skin='service';
-  if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox])').forEach(x=>{keep[x.id]=x.value});$('#app').innerHTML=GATES[S.page]().replace(/<\/div>(\s*)$/,(S.page==='guest'?adH('guest'):/^admin/.test(S.page)?'':adH('app'))+zpH()+'</div>$1');Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
+  if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox]):not([type=file])').forEach(x=>{keep[x.id]=x.value});$('#app').innerHTML=GATES[S.page]().replace(/<\/div>(\s*)$/,(S.page==='guest'?adH('guest'):/^admin/.test(S.page)?'':adH('app'))+zpH()+'</div>$1');Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
   if(S.page==='signin'){$('#app').innerHTML=signIn().replace(/<\/div>(\s*)$/,adH('app')+zpH()+'</div>$1');return}
   const u=LIVE&&S.role==='admin'?{name:'Zema Hospitality',role:'Admin'}:staff(S.user);
   const nav=NAV[S.role],title=S.page==='order'?`Order · ${esc(tb(S.orderFor).name)}`:(typeof TITLE[S.page]==='object'?TITLE[S.page][S.role]:TITLE[S.page]);
@@ -888,10 +907,10 @@ function reportsPage(){
 function settingsPage(){
   const adm=S.role==='admin';
   const f=(k,l,ph)=>`<div class="fld"><label class="eyebrow" for="set-${k}">${l}</label><input id="set-${k}" value="${esc(S.set[k])}" maxlength="120" placeholder="${ph||''}" ${adm?'':'disabled'}></div>`,own=S.role==='owner';
-  return`<div class="grid g2" style="align-items:start"><section class="panel"><header><h2>Restaurant</h2></header><div style="display:flex;flex-direction:column;gap:12px">${f('name','Restaurant name')}${f('address','Address')}<div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">${f('phone','Phone')}${f('email','Email')}</div>${f('hours','Opening hours')}
+  return`<div class="grid g2" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><section class="panel"><header><h2>Restaurant</h2></header><div style="display:flex;flex-direction:column;gap:12px">${f('name','Restaurant name')}${f('address','Address')}<div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">${f('phone','Phone')}${f('email','Email')}</div>${f('hours','Opening hours')}
 <div class="fld"><label class="eyebrow" for="set-service">Service charge %</label><input id="set-service" type="number" inputmode="decimal" min="0" max="30" step="0.5" value="${S.set.service}" style="max-width:140px" ${adm?'':'disabled'}></div>
-${adm?'<button class="btn pri" data-a="saveSet" style="align-self:flex-start">Save changes</button>':'<span class="dim" style="font-size:13px">These details are managed by Zema Hospitality. Ask us if something needs changing.</span>'}</div></section>
-<div style="display:flex;flex-direction:column;gap:16px"><section class="panel"><header><h2>Payment methods</h2></header>${Object.keys(S.set.methods).map(m=>`<div class="row"><div class="grow"><b>${m}</b></div><button class="chip ${S.set.methods[m]?'on':''}" data-method="${m}" ${adm?'':'disabled'} aria-pressed="${S.set.methods[m]}">${S.set.methods[m]?'Accepted':'Off'}</button></div>`).join('')}</section>
+${adm?'<button class="btn pri" data-a="saveSet" style="align-self:flex-start">Save changes</button>':'<span class="dim" style="font-size:13px">These details are managed by Zema Hospitality. Ask us if something needs changing.</span>'}</div></section>${lookPanel()}</div>
+<div style="display:flex;flex-direction:column;gap:16px;min-width:0"><section class="panel"><header><h2>Payment methods</h2></header>${Object.keys(S.set.methods).map(m=>`<div class="row"><div class="grow"><b>${m}</b></div><button class="chip ${S.set.methods[m]?'on':''}" data-method="${m}" ${adm?'':'disabled'} aria-pressed="${S.set.methods[m]}">${S.set.methods[m]?'Accepted':'Off'}</button></div>`).join('')}</section>
 <section class="panel"><header><h2>Sections and tables</h2><button class="btn quiet" data-go="floor">Open floor plan</button></header>${ZONES.map(z=>{const l=S.tables.filter(t=>t.zone===z.id);return`<div class="row"><div class="grow"><b>${esc(z.name)}</b>${S.floors.length>1?`<span class="dim" style="display:block;font-size:13px">${esc((S.floors.find(f=>f.id===fl(z))||{}).name||'')}</span>`:''}</div><span class="mono muted">${l.length} tables · ${l.reduce((a,t)=>a+t.seats,0)} seats</span></div>`}).join('')}</section>
 ${LIVE?notifyPanel()+linkPanel()+guestPanel():''}<section class="panel"><header><h2>Account</h2>${own?'':'<span class="pill">Owner only</span>'}</header>${own?`<div class="row"><div class="grow"><b>Plan</b><span class="dim" style="display:block;font-size:13px">${LIVE&&S.bill&&S.bill.status!=='free'?`${esc(S.bill.plan)} · ${money(S.bill.price)} a month · paid until ${dLong(S.bill.paid_until)}`:`One restaurant · ${STAFF.length} staff`}</span></div><span class="pill ${LIVE&&S.bill?(BST[S.bill.status]||BST.free)[1]:'p-available'}">${LIVE&&S.bill?(BST[S.bill.status]||BST.free)[0]:'Active'}</span></div><div class="row"><div class="grow"><b>Locations</b><span class="dim" style="display:block;font-size:13px">${esc(S.set.name)}</span></div><button class="btn quiet" disabled>Add a restaurant</button></div><div class="row"><div class="grow"><b>Ownership</b><span class="dim" style="display:block;font-size:13px">${esc((STAFF.find(x=>x.role==='Owner')||{name:''}).name)}</span></div><button class="btn quiet" disabled>Transfer</button></div>`:'<p class="muted" style="margin:0">Billing, extra locations and ownership can only be changed by the owner.</p>'}</section></div></div>`}
 
@@ -1068,16 +1087,16 @@ function netFail(e){if(e&&e.code==='PAUSED'&&S.role!=='admin'){showPaused();retu
   if(!S.offline){S.offline=true;softRender()}}
 function setStaff(l){if(!Array.isArray(l))return;const j=J(l);if(j===staffJ)return false;staffJ=j;STAFF.length=0;OLD.length=0;l.forEach(x=>(x.gone?OLD:STAFF).push(x));return true}
 function resetData(){S.tables=clone(DEFAULT_TABLES);S.fix=clone(DEFAULT_FIX);setZones();S.selZ=null;S.live={};S.orders=[];S.tx=[];S.res=[];S.paid=[];MENU.length=0;SYNCED=new Map();SINCE=null;REP={};
-  S.costs={};S.exp=[];S.stock={};PROF={};S.set={...clone(DEFAULT_SET),name:S.lobbyName||''};BASE.rev=BASE.orders=BASE.covers=0}
+  S.costs={};S.exp=[];S.stock={};S.look={};PROF={};S.set={...clone(DEFAULT_SET),name:S.lobbyName||''};BASE.rev=BASE.orders=BASE.covers=0}
 
 /* ---- documents ---- */
 function snapshot(){const m=new Map(),mg=S.role==='owner'||S.role==='manager',rk=S.role;
   m.set('set',J(S.set));m.set('layout',S.edit&&SYNCED.has('layout')?SYNCED.get('layout'):J(layoutDoc()));
   MENU.forEach(x=>m.set('menu:'+x.id,J(x)));
   Object.keys(S.live).forEach(id=>{const k='live:'+id,v=J(S.live[id]);if(SYNCED.has(k)||v!==LIVE0)m.set(k,v)});
-  S.orders.forEach(o=>m.set('order:'+o.id,J(o)));if(rk==='owner'){if(Object.keys(S.costs).length||SYNCED.has('costs'))m.set('costs',J(S.costs));S.exp.forEach(x=>m.set('exp:'+x.id,J(x)))}S.tx.forEach(x=>m.set('tx:'+x.id,J(x)));S.res.forEach(r=>{if(r.id)m.set('res:'+r.id,J(r))});
+  S.orders.forEach(o=>m.set('order:'+o.id,J(o)));if((rk==='owner'||rk==='admin')&&(Object.keys(S.look).length||SYNCED.has('look')))m.set('look',J(S.look));if(rk==='owner'){if(Object.keys(S.costs).length||SYNCED.has('costs'))m.set('costs',J(S.costs));S.exp.forEach(x=>m.set('exp:'+x.id,J(x)))}S.tx.forEach(x=>m.set('tx:'+x.id,J(x)));S.res.forEach(r=>{if(r.id)m.set('res:'+r.id,J(r))});
   /* what this role may not change is treated as already in step, so it is never sent */
-  const adm=rk==='admin',no=k=>{const kd=k.split(':')[0];return(!adm&&(kd==='set'||kd==='layout'))||(kd==='menu'&&!adm&&!mg)||(kd==='res'&&(rk==='kitchen'||rk==='cashier'||adm))||(kd==='tx'&&(rk==='kitchen'||adm))||(kd==='order'&&adm)};
+  const adm=rk==='admin',no=k=>{const kd=k.split(':')[0];return(kd==='look'&&!(adm||rk==='owner'))||(!adm&&(kd==='set'||kd==='layout'))||(kd==='menu'&&!adm&&!mg)||(kd==='res'&&(rk==='kitchen'||rk==='cashier'||adm))||(kd==='tx'&&(rk==='kitchen'||adm))||(kd==='order'&&adm)};
   [...m.keys()].forEach(k=>{if(no(k)){if(SYNCED.has(k))m.set(k,SYNCED.get(k));else m.delete(k)}});
   SYNCED.forEach((v,k)=>{if(!m.has(k)&&no(k))m.set(k,v)});
   return m}
@@ -1091,6 +1110,7 @@ function applyDoc(key,data,del){const i=key.indexOf(':'),kd=i<0?key:key.slice(0,
     if(!del&&TOKEN&&!o&&S.role==='kitchen'&&data.status==='new'&&SINCE){toast('New order'+(tb(data.table)?' · '+tb(data.table).name:''));ping('order','New order'+(tb(data.table)?' · '+tb(data.table).name:''))}
     up(S.orders,x=>String(x.id)===id)}
   else if(kd==='tx'){if(!del&&TOKEN&&SINCE&&isMgr()&&!S.tx.some(x=>String(x.id)===id)&&data.by!==S.user)toast('Payment '+gbp2(data.total)+(tb(data.table)?' · '+tb(data.table).name:''));up(S.tx,x=>String(x.id)===id)}
+  else if(kd==='look'){if(!del)S.look=data||{}}
   else if(kd==='costs'){if(!del)S.costs=data||{};PROF={}}
   else if(kd==='exp'){up(S.exp,x=>x.id===id);PROF={}}
   else if(kd==='stock'){if(del)delete S.stock[id];else S.stock[id]=data}
@@ -1156,8 +1176,6 @@ function linkPanel(){return`<section class="panel"><header><h2>Staff app link</h
 /* ---- opening screens ---- */
 let PROMO=(()=>{try{return JSON.parse(localStorage.getItem('zh-promo')||'{}')||{}}catch(_){return{}}})();
 const zpH=()=>PROMO.url?`<p class="zp"><a href="${esc(PROMO.url)}" target="_blank" rel="noopener">Powered by <b>Zema Production</b></a></p>`:'<p class="zp">Powered by <b>Zema Production</b></p>';
-function adH(place){const P=PROMO;if(!P.ad_on||!P.ad_title||(place==='guest'?P.ad_guest===false:!P.ad_app))return'';const tag=P.ad_url?'a':'div';
-  return`<${tag} class="zad"${P.ad_url?` href="${esc(P.ad_url)}" target="_blank" rel="noopener sponsored"`:''}><span class="zad-k">From Zema Production</span><b>${esc(P.ad_title)}</b>${P.ad_text?`<span class="zad-t">${esc(P.ad_text)}</span>`:''}${P.ad_url&&P.ad_btn?`<span class="zad-b">${esc(P.ad_btn)}</span>`:''}</${tag}>`}
 function loadPromo(){if(!SB_URL)return;rpc('h_promo').then(p=>{p=p||{};if(JSON.stringify(p)===JSON.stringify(PROMO))return;PROMO=p;try{localStorage.setItem('zh-promo',JSON.stringify(p))}catch(_){}if(GATES[S.page]||S.page==='signin')draw();else softRender()}).catch(()=>{})}
 const gate=inner=>`<div class="signin"><div class="si-card"><div class="brand" style="padding:0"><i>Z</i><div><b>Zema Hospitality</b><small>Restaurant management</small></div></div>${inner}</div></div>`;
 const GATES={
@@ -1217,7 +1235,7 @@ GATES.adminLogin=()=>gate(`<div><h2 style="font-size:28px">${S.aSetup?'Admin sig
 ${S.aSetup?'':'<div class="fld"><label class="eyebrow" for="apw2">Repeat the password</label><input id="apw2" type="password" autocomplete="new-password" maxlength="80"></div>'}
 <button class="btn pri big" data-a="aIn">${S.aSetup?'Sign in':'Save password and continue'}</button>`);
 GATES.adminHome=()=>{const l=S.aList||[];return`<div class="signin"><div class="si-card" style="max-width:760px;width:100%;margin:0 0 auto"><div style="display:flex;align-items:center;gap:12px"><div class="brand" style="padding:0;margin-right:auto"><i>Z</i><div><b>Zema Hospitality</b><small>Admin · ${l.length} restaurant${l.length===1?'':'s'}</small></div></div><button class="btn quiet" data-a="reloadApp">Reload</button><button class="btn quiet" data-a="aOut">Sign out</button></div>
-${adminLiveSummary()}${adminSummary()}${promoPanel()}
+${adminLiveSummary()}${adminSummary()}${adsPanel()}${promoPanel()}
 ${l.map(r=>`<section class="panel"><header><h2>${esc(r.name)}</h2><span class="dim">since ${new Date(r.created).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></header>
 ${adminLiveLine(r)}${adminBillUI(r)}<p class="muted" style="margin:0 0 14px">Owner ${esc(r.owner||'not set')} · ${r.email?esc(r.email):'no email yet'} · ${r.staff} staff · ${r.dishes} dishes</p>
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" data-aopen="${r.id}">Open and set up</button><button class="btn" data-alink="${r.code}">Copy staff app link</button><button class="btn" data-olink="1">Copy owner app link</button><button class="btn" data-a="aGm" data-c="${r.code}">Copy guest menu link</button><button class="btn" data-a="aQR" data-c="${r.code}" data-n="${esc(r.name)}">Guest menu QR code</button><button class="btn quiet" data-apin="${r.id}">Reset owner PIN</button><button class="btn quiet" data-aemail="${r.id}">${r.email?'Change':'Add'} owner email</button><button class="btn quiet" data-apay="${r.id}">Payment received</button><button class="btn quiet" data-abill="${r.id}">Billing</button><button class="btn quiet" data-adel="${r.id}" style="color:var(--s-bill)">Delete restaurant</button></div>${S.aDel===r.id?`<div class="note" style="margin-top:12px;border-color:var(--s-bill)"><b>Delete ${esc(r.name)} for good?</b> Its menu, photos, floor plan, staff, orders, payments and reports are all removed, and its device link stops working. This cannot be undone.<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="adc" placeholder="Type the restaurant name to confirm" aria-label="Type ${esc(r.name)} to confirm" autocomplete="off" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn" data-a="aDelGo" style="background:var(--s-bill);border-color:var(--s-bill);color:#fff">Delete</button><button class="btn quiet" data-adel="${r.id}">Cancel</button></div></div>`:''}${S.aEmail===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="aem" type="email" value="${esc(r.email||'')}" placeholder="owner@example.com" aria-label="Owner email for ${esc(r.name)}" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aEmailSave">Save email</button></div>`:''}
@@ -1385,7 +1403,7 @@ function enrich(arr){arr.forEach(m=>{const x=DEMO_X[m.name];if(x)Object.keys(x).
 enrich(MENU);enrich(DEMO_MENU);
 
 /* ---- the page ---- */
-function gmData(){if(S.gm&&S.gm.pub)return S.gm;return{name:S.set.name,set:S.set,items:MENU.filter(m=>!m.hidden),code:LIVE?CODE:null}}
+function gmData(){if(S.gm&&S.gm.pub)return S.gm;return{name:S.set.name,set:S.set,look:S.look,items:MENU.filter(m=>!m.hidden),code:LIVE?CODE:null}}
 function gmPhoto(m,cls){const big=BIG[m.id],p=big||phOf(m);return p?`<img class="${cls}" src="${p}" alt="" data-big="${m.big&&!big?m.id:''}">`:`<span class="${cls} gm-ph f-${esc(m.cat)}">${FOOD[m.name]||CATI[m.cat]||'🍽️'}</span>`}
 function gmTags(m,lang){const t=(m.tags||[]).filter(k=>TAGS.some(x=>x[0]===k));return(t.length||m.spice)?`<div class="gm-tags">${t.map(k=>`<span>${TAGS.find(x=>x[0]===k)[1]} ${esc(tl(k,lang))}</span>`).join('')}${m.spice?`<span title="${esc(tl('spice',lang))}">${'🌶'.repeat(Math.min(3,m.spice))}</span>`:''}</div>`:''}
 const TIBEB='<svg class="tibeb" viewBox="0 0 120 16" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="tb" width="24" height="16" patternUnits="userSpaceOnUse"><path d="M0 8 L6 2 L12 8 L6 14Z M12 8 L18 2 L24 8 L18 14Z" fill="none" stroke="currentColor" stroke-width="1"/><path d="M6 6v4M4 8h4M18 6v4M16 8h4" stroke="currentColor" stroke-width="1"/></pattern></defs><rect width="120" height="16" fill="url(#tb)"/></svg>';
@@ -1394,13 +1412,14 @@ GATES.guest=()=>{const d=gmData(),st=d.set||{},ms=st.menuStyle||{},lang=S.lang||
   if(!cats.some(c=>c.id===S.gcat))S.gcat=cats[0]&&cats[0].id;
   const list=d.items.filter(m=>inCat(m,S.gcat)),tag=tx(ms,'tagline',lang);
   const card=m=>`<button class="gm-card ${m.on===false?'out':''}" data-gd="${m.id}"><span class="gm-img">${gmPhoto(m,'gm-pic')}</span><span class="gm-txt"><b class="gm-name">${esc(tx(m,'name',lang))} <span class="gm-price">${gbp2(m.price)}</span></b>${lang!=='en'&&tx(m,'name',lang)!==m.name?`<span class="gm-alt">${esc(m.name)}</span>`:lang==='en'&&m.name_am?`<span class="gm-alt ge">${esc(m.name_am)}</span>`:''}${tx(m,'desc',lang)?`<span class="gm-desc">(${esc(tx(m,'desc',lang))})</span>`:''}${gmTags(m,lang)}${m.on===false?`<span class="gm-out">${esc(tl('soldout',lang))}</span>`:''}</span></button>`;
-  return`<div class="gm ${ms.pattern===false?'nopat':''}" lang="${lang}">${S.gm&&S.gm.pub?'':'<button class="gm-exit" data-a="gmExit">← Back to the app</button>'}
+  const L=lookOf(d),pat=L.pattern!==undefined?L.pattern:ms.pattern!==false,btw=adH('between');
+  return`<div class="gm lay-${esc(L.layout)} ${pat?'':'nopat'}" style="${themeVars(L.theme)}" lang="${lang}">${S.gm&&S.gm.pub?'':'<button class="gm-exit" data-a="gmExit">← Back to the app</button>'}
 <header class="gm-head">${TIBEB}<div class="gm-in"><div class="gm-lang" role="group" aria-label="Language">${LANGS.map(([k,l])=>`<button class="${lang===k?'on':''}" data-lang="${k}" lang="${k}">${l}</button>`).join('')}</div>
 <div class="gm-mark">✦</div><h1 class="gm-title">${esc(d.name||st.name||'')}</h1>${tag?`<p class="gm-sub">${esc(tag)}</p>`:`<p class="gm-sub">${esc(tl('menu',lang))}</p>`}</div></header>
-<nav class="gm-cats" aria-label="Menu sections">${cats.map(c=>`<button class="${c.id===S.gcat?'on':''}" data-gcat="${esc(c.id)}">${esc(c[lang]||c.en||c.id)}</button>`).join('')}</nav>
-<main class="gm-in gm-list"><h2 class="gm-sec">${esc((cats.find(c=>c.id===S.gcat)||{})[lang]||cLabel(S.gcat,'en',st))}</h2>${list.map(card).join('')||`<p class="gm-sub">${esc(tl('empty',lang))}</p>`}</main>
+${adH('top')?`<div class="gm-in ad-wrap">${adH('top')}</div>`:''}<nav class="gm-cats" aria-label="Menu sections">${cats.map(c=>`<button class="${c.id===S.gcat?'on':''}" data-gcat="${esc(c.id)}">${esc(c[lang]||c.en||c.id)}</button>`).join('')}</nav>
+<main class="gm-in gm-list"><h2 class="gm-sec">${esc((cats.find(c=>c.id===S.gcat)||{})[lang]||cLabel(S.gcat,'en',st))}</h2>${list.length?list.map((m,i)=>card(m)+(btw&&i===Math.min(2,list.length-1)?btw:'')).join(''):`<p class="gm-sub">${esc(tl('empty',lang))}</p>`}</main>
 <footer class="gm-foot">${TIBEB}<div class="gm-in"><p>${esc(tl('ask',lang))}</p>${st.address?`<p class="gm-small">${esc(st.address)}</p>`:''}${st.hours?`<p class="gm-small">${esc(st.hours)}</p>`:''}${st.service?`<p class="gm-small">${esc(st.service)}% service is added to the bill</p>`:''}</div></footer>
-${S.gd?gmDetail(d,lang):''}</div>`};
+${S.gd?gmDetail(d,lang):''}${adPopup()}</div>`};
 function gmDetail(d,lang){const m=d.items.find(x=>x.id===S.gd);if(!m)return'';const story=tx(m,'story',lang),al=tx(m,'allergens',lang);
   return`<div class="gm-det" role="dialog" aria-label="${esc(tx(m,'name',lang))}"><button class="gm-close" data-a="gmClose" aria-label="${esc(tl('back',lang))}">← ${esc(tl('back',lang))}</button>
 <div class="gm-hero">${gmPhoto(m,'gm-heroimg')}</div><div class="gm-in gm-detbody">${TIBEB}
@@ -1413,7 +1432,7 @@ function gmLoadBig(){const d=gmData();document.querySelectorAll('img[data-big]')
 function gmPump(code){if(!code||!SB_URL)return;while(BIGRUN<2&&BIGQ.length){const id=BIGQ.shift();if(BIG[id]!==undefined)continue;BIG[id]=null;BIGRUN++;
   rpc('h_menu_photo',{p_code:code,p_id:id}).then(src=>{if(typeof src==='string'&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(src)){BIG[id]=src;document.querySelectorAll(`img[data-big="${id}"]`).forEach(im=>{im.src=src;im.dataset.big=''})}}).catch(()=>{}).finally(()=>{BIGRUN--;gmPump(code)})}}
 async function menuStart(code){S.page='loading';S.gMsg='Opening the menu…';draw();
-  try{const r=await rpc('h_menu',{p_code:code});S.gm={pub:true,code,name:r.name,paused:r.paused,set:r.set||{},items:r.items||[]};S.page='guest';draw()}
+  try{const r=await rpc('h_menu',{p_code:code});S.gm={pub:true,code,name:r.name,paused:r.paused,set:r.set||{},look:r.look||{},items:r.items||[]};S.page='guest';draw()}
   catch(e){S.gMsg=e.code==='NOCODE'?'This menu link was not recognised.':'Could not load the menu. Check the internet connection.';S.gRetry=false;draw()}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-gd],[data-gcat],[data-lang]');if(!b||S.page!=='guest')return;e.stopPropagation();
   if(b.dataset.gd){S.gd=b.dataset.gd;draw();const h=$('.gm-det');if(h)h.scrollTop=0;return}
@@ -1645,26 +1664,108 @@ const tCount=r=>r.tables==null?DEFAULT_TABLES.length:+r.tables;
 function adminLiveLine(r){const n=tCount(r),b=+r.busy||0,on=+r.online||0;return`<div class="alive"><span class="pill ${b?'p-occupied':on?'p-available':'p-cleaning'}">${on||b?'Open now':'Quiet'}</span><span><b>${b}</b> of ${n} tables occupied</span><span>${+r.guests||0} guests</span>${+r.held?`<span>${r.held} reserved</span>`:''}<span>${+r.kitchen||0} in the kitchen</span><span>${on} staff online</span></div>`}
 function adminLiveSummary(){const l=S.aList||[];if(!l.length)return'';const n=l.reduce((a,r)=>a+tCount(r),0),b=l.reduce((a,r)=>a+(+r.busy||0),0),g=l.reduce((a,r)=>a+(+r.guests||0),0),open=l.filter(r=>+r.online||+r.busy).length,k=l.reduce((a,r)=>a+(+r.kitchen||0),0);
   return`<section class="panel"><header><h2>Right now</h2><span class="dim">updates every 20 seconds · ${hhmm(S.aAt||now())}</span></header><div class="grid g4" style="gap:0"><div class="kpi"><span class="eyebrow">Tables occupied</span><span class="num">${b}<span class="dim" style="font-size:18px"> / ${n}</span></span><small>${n?Math.round(b/n*100):0}% across all restaurants</small></div><div class="kpi"><span class="eyebrow">Guests seated</span><span class="num">${g}</span></div><div class="kpi"><span class="eyebrow">Restaurants open</span><span class="num">${open}<span class="dim" style="font-size:18px"> / ${l.length}</span></span><small>staff signed in or tables seated</small></div><div class="kpi"><span class="eyebrow">Kitchen tickets</span><span class="num">${k}</span><small>being made now</small></div></div></section>`}
-setInterval(async()=>{if(S.page!=='adminHome'||!ADM||document.hidden||S.busy||S.prOpen||S.aPay||S.aBill||S.aDel||S.aEmail||S.aPin)return;const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
+setInterval(async()=>{if(S.page!=='adminHome'||!ADM||document.hidden||S.busy||S.prOpen||S.adE||S.aPay||S.aBill||S.aDel||S.aEmail||S.aPin)return;const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
   try{S.aList=await rpc('h_admin_list',{p_token:ADM});S.aAt=now();if(S.page==='adminHome')draw()}catch(_){}},20000);
 
 /* ---------- Zema Hospitality admin: the "Powered by" link and the advert ---------- */
 function promoPanel(){const P=PROMO,IN='min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body);width:100%;text-transform:none;letter-spacing:0';
-  return`<details class="panel" ${S.prOpen?'open':''}><summary style="cursor:pointer;font-weight:600;font-size:17px" data-a="prTog">Powered by Zema Production · link and advert</summary>
-<p class="muted" style="margin:10px 0 0;font-size:14px">Every page shows “Powered by Zema Production”. Add your website and it becomes a link. The advert appears at the bottom of guest menus and, if you choose, in the restaurant apps.</p>
-<div class="prom"><label class="eyebrow wide">Your website (leave empty until it is ready)<input id="pu" value="${esc(P.url||'')}" placeholder="e.g. zemaproduction.com" style="${IN}"></label>
-<label class="gchk wide"><input type="checkbox" id="pa" ${P.ad_on?'checked':''}> Show the advert</label>
-<label class="eyebrow">Headline<input id="pt" maxlength="80" value="${esc(P.ad_title||'')}" placeholder="e.g. Wedding photography and film" style="${IN}"></label>
-<label class="eyebrow">Button text<input id="pb" maxlength="30" value="${esc(P.ad_btn||'')}" placeholder="e.g. See our work" style="${IN}"></label>
-<label class="eyebrow wide">One line about it<input id="px" maxlength="200" value="${esc(P.ad_text||'')}" placeholder="e.g. Ethiopian and Eritrean weddings across London and abroad" style="${IN}"></label>
-<label class="eyebrow wide">Where the advert goes when tapped<input id="pl" value="${esc(P.ad_url||'')}" placeholder="e.g. zemaproduction.com/weddings or an Instagram link" style="${IN}"></label>
-<label class="gchk"><input type="checkbox" id="pg" ${P.ad_guest===false?'':'checked'}> On guest menus</label><label class="gchk"><input type="checkbox" id="pp" ${P.ad_app?'checked':''}> In the restaurant apps (staff and owners)</label></div>
-<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn pri" data-a="prSave">Save</button></div>
-${P.ad_on&&P.ad_title?`<div class="eyebrow" style="margin-top:16px">How it looks</div>${adH('guest')||adH('app')}`:''}</details>`}
+  return`<details class="panel" ${S.prOpen?'open':''}><summary style="cursor:pointer;font-weight:600;font-size:17px" data-a="prTog">Powered by Zema Production · website link</summary>
+<p class="muted" style="margin:10px 0 0;font-size:14px">Every page shows “Powered by Zema Production”. Add your website and it becomes a link.</p>
+<div class="prom"><label class="eyebrow wide">Your website (leave empty until it is ready)<input id="pu" value="${esc(P.url||'')}" placeholder="e.g. zemaproduction.com" style="${IN}"></label></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn pri" data-a="prSave">Save</button></div></details>`}
 Object.assign(GACT,{prTog(){S.prOpen=!S.prOpen},
   async prSave(){const g=id=>($('#'+id)||{}).value||'',c=id=>!!($('#'+id)||{}).checked;
-    try{PROMO=await rpc('h_admin_promo',{p_token:ADM,p_promo:{url:g('pu'),ad_on:c('pa'),ad_title:g('pt'),ad_text:g('px'),ad_url:g('pl'),ad_btn:g('pb'),ad_guest:c('pg'),ad_app:c('pp')}})||{};
+    try{PROMO=await rpc('h_admin_promo',{p_token:ADM,p_promo:{url:g('pu')}})||{};
       lsSet('zh-promo',JSON.stringify(PROMO));S.prOpen=true;draw();toast('Saved. Every page picks it up the next time it opens.')}catch(e){admErr(e)}}});
+
+/* =====================================================================
+   Version 21: each restaurant's own look, and adverts in several places
+   ===================================================================== */
+const SERIF='"Fraunces","Noto Serif Ethiopic",Georgia,serif',SANS='"Hanken Grotesk","Noto Sans Ethiopic",system-ui,sans-serif',GROT='"Bricolage Grotesque","Noto Sans Ethiopic",system-ui,sans-serif';
+const THEMES={
+  habesha:{name:'Habesha Gold',app:'#D9BA78',v:{gold:'#D9BA78','gm-bg':'radial-gradient(ellipse at 50% -10%,#1d1812,#0b0a09 60%)','gm-base':'#0B0A09','gm-ink':'#F3EAD9','gm-ink2':'#D2C5AE','gm-mute':'#BFB29B','gm-on':'#1A1408','gm-bar':'rgba(11,10,9,.92)','gm-card':'#1a1612','gm-tibeb':'#8A6B32','gm-serif':SERIF,'gm-shadow':'rgba(0,0,0,.5)','gm-r':'10px'}},
+  ivory:{name:'Ivory',app:'#D9BA78',v:{gold:'#94632A','gm-bg':'linear-gradient(180deg,#FBF7F0,#F1E8DA)','gm-base':'#FBF7F0','gm-ink':'#2A211A','gm-ink2':'#5B4C3E','gm-mute':'#7D6E60','gm-on':'#FFF8EE','gm-bar':'rgba(251,247,240,.94)','gm-card':'#E9DFCF','gm-tibeb':'#B48A4A','gm-serif':SERIF,'gm-shadow':'rgba(80,55,20,.18)','gm-r':'12px'}},
+  coffee:{name:'Coffee Ceremony',app:'#D9975A',v:{gold:'#D9975A','gm-bg':'radial-gradient(ellipse at 50% -10%,#3a2618,#140d09 62%)','gm-base':'#140D09','gm-ink':'#F6E8D6','gm-ink2':'#DCC6AC','gm-mute':'#B79F86','gm-on':'#1B0F07','gm-bar':'rgba(20,13,9,.92)','gm-card':'#24170f','gm-tibeb':'#8C5A33','gm-serif':SERIF,'gm-shadow':'rgba(0,0,0,.55)','gm-r':'18px'}},
+  emerald:{name:'Emerald',app:'#C9A45C',v:{gold:'#C9A45C','gm-bg':'radial-gradient(ellipse at 50% -10%,#173a2e,#07130f 62%)','gm-base':'#07130F','gm-ink':'#EDF3EC','gm-ink2':'#C6D6CA','gm-mute':'#9FB4A7','gm-on':'#0F1510','gm-bar':'rgba(7,19,15,.92)','gm-card':'#0f2219','gm-tibeb':'#8A7440','gm-serif':SERIF,'gm-shadow':'rgba(0,0,0,.5)','gm-r':'10px'}},
+  berbere:{name:'Berbere',app:'#EBA542',v:{gold:'#EBA542','gm-bg':'radial-gradient(ellipse at 50% -10%,#4a1418,#1a0708 62%)','gm-base':'#1A0708','gm-ink':'#FBEFE6','gm-ink2':'#E9D2C6','gm-mute':'#C9AA9D','gm-on':'#2A0A05','gm-bar':'rgba(26,7,8,.92)','gm-card':'#2a0e10','gm-tibeb':'#A0522D','gm-serif':SERIF,'gm-shadow':'rgba(0,0,0,.55)','gm-r':'10px'}},
+  midnight:{name:'Midnight',app:'#B8C7DD',v:{gold:'#C9D5E6','gm-bg':'radial-gradient(ellipse at 50% -10%,#1b2540,#070b14 62%)','gm-base':'#070B14','gm-ink':'#EEF2F8','gm-ink2':'#C9D1DE','gm-mute':'#9AA7BA','gm-on':'#0B1020','gm-bar':'rgba(7,11,20,.92)','gm-card':'#111a2c','gm-tibeb':'#5F6F8C','gm-serif':GROT,'gm-shadow':'rgba(0,0,0,.55)','gm-r':'14px'}},
+  clean:{name:'Clean White',app:'#E9E4DA',v:{gold:'#1C1A17','gm-bg':'#FFFFFF','gm-base':'#FFFFFF','gm-ink':'#171513','gm-ink2':'#4A4640','gm-mute':'#77716A','gm-on':'#FFFFFF','gm-bar':'rgba(255,255,255,.95)','gm-card':'#F1EFEC','gm-tibeb':'#C9C2B7','gm-serif':SANS,'gm-shadow':'rgba(0,0,0,.08)','gm-r':'6px'}}};
+const LAYOUTS=[['side','Photo beside the dish'],['stack','Big photo on top'],['grid','Two per row'],['text','Text only, no photos']];
+const lookOf=d=>({theme:'habesha',layout:'side',...((d&&d.look)||{})});
+const themeVars=t=>Object.entries((THEMES[t]||THEMES.habesha).v).map(([k,v])=>`--${k}:${v}`).join(';');
+/* the restaurant's colour also tints its staff and owner app */
+function appTint(){const el=$('#app');if(!el)return;const t=LIVE&&S.look&&S.look.theme&&THEMES[S.look.theme];
+  if(t&&!GATES[S.page]&&S.page!=='signin'){el.style.setProperty('--accent',t.app);el.style.setProperty('--accent-soft',`color-mix(in srgb,${t.app} 16%,#141210)`)}else{el.style.removeProperty('--accent');el.style.removeProperty('--accent-soft')}}
+function lookPanel(){if(!(S.role==='owner'||S.role==='admin'))return'';const L=lookOf({look:S.look}),pat=L.pattern!==false;
+  return`<section class="panel"><header><h2>Guest menu look</h2><button class="btn quiet" data-a="gmOpen">Preview</button></header><p class="muted" style="margin:0 0 12px;font-size:14px">Choose how your menu looks to guests. The colour also tints your staff app.</p>
+<div class="thgrid">${Object.entries(THEMES).map(([k,t])=>`<button class="thcard ${L.theme===k?'on':''}" data-a="lkTheme" data-t="${k}" aria-pressed="${L.theme===k}" style="${themeVars(k)}"><span class="thprev"><span class="thtitle">${esc(S.set.name||'Restaurant')}</span><span class="throw"><span class="thimg"></span><span class="thlines"><i></i><i></i></span></span></span><span class="thname">${t.name}</span></button>`).join('')}</div>
+<div class="eyebrow" style="margin:16px 0 8px">Dish layout</div><div class="chips">${LAYOUTS.map(([k,l])=>`<button class="chip ${L.layout===k?'on':''}" data-a="lkLay" data-l="${k}">${l}</button>`).join('')}</div>
+<label class="gchk" style="margin-top:12px"><input type="checkbox" data-a="lkPat" ${pat?'checked':''}> Traditional tibeb border</label></section>`}
+Object.assign(GACT,{
+  lkTheme(d){S.look={...lookOf({look:S.look}),theme:d.t};toast(THEMES[d.t].name+' chosen');render()},
+  lkLay(d){S.look={...lookOf({look:S.look}),layout:d.l};render()},
+  lkPat(d,el){S.look={...lookOf({look:S.look}),pattern:el.checked};render()}});
+
+/* ---------- adverts ---------- */
+const ADPL=[['top','Top of the menu'],['between','Between the dishes'],['bottom','Bottom of the menu'],['popup','Pop-up on the menu'],['app','Restaurant apps (staff and owners)']];
+let ADS={},ADPICK={},ADSEEN=new Set(),ADPOP=null;
+function adCode(){return S.page==='guest'?((S.gm&&S.gm.code)||(LIVE?CODE:null)):(LIVE?CODE:null)}
+function loadAds(code){if(!SB_URL)return;const k=code||'-';if(ADS[k]&&now()-ADS[k].t<300000)return;ADS[k]={t:now(),list:(ADS[k]||{}).list||[]};
+  rpc('h_ads_for',{p_code:code||null}).then(l=>{ADS[k]={t:now(),list:Array.isArray(l)?l:[]};if(GATES[S.page]||S.page==='signin')draw();else softRender();adPopupArm()}).catch(()=>{})}
+function adsHere(place){const k=adCode()||'-',l=(ADS[k]&&ADS[k].list)||[];return l.filter(a=>(a.places||[]).includes(place))}
+function adPick(place){const l=adsHere(place);if(!l.length)return null;const key=(adCode()||'-')+place;let a=l.find(x=>x.id===ADPICK[key]);if(!a){a=l[Math.floor(Math.random()*l.length)];ADPICK[key]=a.id}return a}
+function adSeen(a){const k=a.id+'|'+adCode();if(ADSEEN.has(k)||!adCode())return;ADSEEN.add(k);rpc('h_ad_hit',{p_code:adCode(),p_ad:a.id,p_kind:'view'}).catch(()=>{})}
+function adCard(a,cls){if(!a)return'';setTimeout(()=>adSeen(a),0);const tag=a.url?'a':'div';
+  return`<${tag} class="zad ${cls||''}"${a.url?` href="${esc(a.url)}" target="_blank" rel="noopener sponsored" data-adclick="${a.id}"`:''}>${a.image?`<img class="zad-img" src="${a.image}" alt="">`:''}<span class="zad-k">Sponsored${a.advertiser?' · '+esc(a.advertiser):''}</span><b>${esc(a.title)}</b>${a.body?`<span class="zad-t">${esc(a.body)}</span>`:''}${a.url&&a.btn?`<span class="zad-b">${esc(a.btn)}</span>`:''}</${tag}>`}
+function adH(place){if(place==='guest')place='bottom';return adCard(adPick(place),'ad-'+place)}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-adclick]');if(!a||!adCode())return;rpc('h_ad_hit',{p_code:adCode(),p_ad:a.dataset.adclick,p_kind:'click'}).catch(()=>{});if(a.closest('.adpop')){ADPOP=null;setTimeout(draw,50)}},true);
+/* the pop-up: once per visit, a few seconds after the menu opens, never on top of a dish page */
+let ADPT=0;
+function adPopupArm(){if(S.page!=='guest'||ADPOP||ADPT)return;const a=adPick('popup');if(!a)return;let shown=false;try{shown=sessionStorage.getItem('zh-pop-'+a.id)}catch(_){}if(shown)return;
+  ADPT=setTimeout(function tick(){ADPT=0;if(S.page!=='guest')return;if(S.gd){ADPT=setTimeout(tick,4000);return}ADPOP=a;try{sessionStorage.setItem('zh-pop-'+a.id,'1')}catch(_){}draw()},Math.max(0,+a.popup_delay||0)*1000)}
+function adPopup(){if(!ADPOP)return'';return`<div class="adpop" role="dialog" aria-label="Advert"><div class="adpop-in"><button class="adpop-x" data-a="adClose" aria-label="Close">×</button>${adCard(ADPOP,'big')}</div></div>`}
+Object.assign(GACT,{adClose(){ADPOP=null;draw()}});
+
+/* ---------- Zema Hospitality admin: the adverts ---------- */
+let ADMADS=null;
+function admAdsLoad(){rpc('h_admin_ads',{p_token:ADM}).then(l=>{ADMADS=l||[];if(S.page==='adminHome')draw()}).catch(admErr)}
+const adState=a=>{const t=new Date().toISOString().slice(0,10);return!a.active?['Paused','p-cleaning']:a.starts&&a.starts>t?['Scheduled','p-ordering']:a.ends&&a.ends<t?['Ended','p-bill']:['Running','p-available']};
+function adsPanel(){const IN='min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body);width:100%;text-transform:none;letter-spacing:0';
+  if(S.adsOpen&&ADMADS===null)admAdsLoad();const l=ADMADS||[],e=S.adE&&S.adE!=='new'?l.find(x=>x.id===S.adE):null,f=S.adDraft||e||{places:['bottom'],rests:[],active:true,popup_delay:4},rs=S.aList||[];
+  const form=S.adE?`<div class="adform"><div class="eyebrow" style="margin-bottom:8px">${e?'Edit advert':'New advert'}</div><div class="prom">
+<label class="eyebrow">Advertiser<input id="adv" maxlength="80" value="${esc(f.advertiser||'')}" placeholder="e.g. Zema Production, or a business that pays you" style="${IN}"></label>
+<label class="eyebrow">Headline<input id="adt" maxlength="80" value="${esc(f.title||'')}" placeholder="e.g. Wedding photography and film" style="${IN}"></label>
+<label class="eyebrow wide">One line about it<input id="adb" maxlength="220" value="${esc(f.body||'')}" placeholder="e.g. Ethiopian and Eritrean weddings across London and abroad" style="${IN}"></label>
+<label class="eyebrow">Link when tapped<input id="adu" value="${esc(f.url||'')}" placeholder="website, Instagram or WhatsApp link" style="${IN}"></label>
+<label class="eyebrow">Button text<input id="adn" maxlength="30" value="${esc(f.btn||'')}" placeholder="e.g. See our work" style="${IN}"></label>
+<div class="wide"><span class="eyebrow">Picture (optional)</span><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px">${(S.adImg!==undefined?S.adImg:f.image)?`<img src="${S.adImg!==undefined?S.adImg:f.image}" alt="" style="width:120px;height:68px;object-fit:cover;border-radius:8px">`:''}<label class="btn filebtn">Choose picture<input type="file" id="adimg" accept="image/*"></label>${(S.adImg!==undefined?S.adImg:f.image)?'<button class="btn quiet" data-a="adNoImg">Remove picture</button>':''}</div></div>
+<div class="wide"><span class="eyebrow">Where it shows</span><div class="chips" style="margin-top:6px">${ADPL.map(([k,lb])=>`<label class="gchk"><input type="checkbox" data-adpl="${k}" ${(f.places||[]).includes(k)?'checked':''}> ${lb}</label>`).join('')}</div></div>
+<label class="eyebrow">Pop-up appears after (seconds)<input id="add" type="number" min="0" max="60" value="${+f.popup_delay||0}" style="${IN}"></label>
+<div class="wide"><span class="eyebrow">Which restaurants</span><div class="chips" style="margin-top:6px"><label class="gchk"><input type="checkbox" id="adall" ${!(f.rests||[]).length?'checked':''}> All restaurants</label>${rs.map(r=>`<label class="gchk"><input type="checkbox" data-adr="${r.id}" ${(f.rests||[]).includes(r.id)?'checked':''}> ${esc(r.name)}</label>`).join('')}</div></div>
+<label class="eyebrow">Starts<input id="ads" type="date" value="${f.starts||''}" style="${IN}"></label><label class="eyebrow">Ends<input id="ade" type="date" value="${f.ends||''}" style="${IN}"></label>
+<label class="eyebrow wide">Deal notes (only you see this)<input id="ado" maxlength="400" value="${esc(f.note||'')}" placeholder="e.g. £60 a month, paid until 30 Nov" style="${IN}"></label>
+<label class="gchk wide"><input type="checkbox" id="ada" ${f.active!==false?'checked':''}> Running (untick to pause)</label></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn pri" data-a="adSave">Save advert</button><button class="btn quiet" data-a="adCancel">Cancel</button>${e?`<button class="btn quiet" data-a="adDel" style="color:var(--s-bill)">Delete</button>`:''}</div></div>`:'';
+  return`<details class="panel" ${S.adsOpen?'open':''}><summary style="cursor:pointer;font-weight:600;font-size:17px" data-a="adsTog">Adverts${l.length?` · ${l.filter(a=>adState(a)[0]==='Running').length} running`:''}</summary>
+<p class="muted" style="margin:10px 0 12px;font-size:14px">Run your own adverts or sell space to other businesses. Choose where each one shows and on which restaurants. Views and taps are counted so you can show advertisers the results.</p>
+${l.map(a=>{const st=adState(a),ctr=a.views?Math.round(a.clicks/a.views*1000)/10:0;return`<div class="row" style="flex-wrap:wrap">${a.image?`<img src="${a.image}" alt="" style="width:64px;height:40px;object-fit:cover;border-radius:6px">`:''}<div class="grow" style="min-width:200px"><b class="ell">${esc(a.title)}</b><span class="dim" style="font-size:13px;display:block">${esc(a.advertiser||'Zema Production')} · ${(a.places||[]).map(p=>(ADPL.find(x=>x[0]===p)||['',p])[1]).join(', ')} · ${(a.rests||[]).length?(a.rests.length+' restaurant'+(a.rests.length>1?'s':'')):'all restaurants'}${a.ends?' · until '+new Date(a.ends+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):''}</span><span class="dim" style="font-size:13px;display:block">${(+a.views).toLocaleString('en-GB')} views · ${(+a.clicks).toLocaleString('en-GB')} taps · ${ctr}% · last 30 days ${(+a.views30).toLocaleString('en-GB')} / ${(+a.clicks30).toLocaleString('en-GB')}${a.note?' · '+esc(a.note):''}</span></div><span class="pill ${st[1]}">${st[0]}</span><button class="btn quiet" data-a="adEdit" data-id="${a.id}">Edit</button></div>`}).join('')||(ADMADS===null?'<div class="empty">Loading…</div>':'<div class="empty">No adverts yet.</div>')}
+${S.adE?form:'<button class="btn pri" data-a="adNew" style="margin-top:12px">New advert</button>'}</details>`}
+function adFormRead(){const g=id=>($('#'+id)||{}).value||'',all=($('#adall')||{}).checked;
+  const o={advertiser:g('adv').trim(),title:g('adt').trim(),body:g('adb').trim(),url:g('adu').trim(),btn:g('adn').trim(),places:[...document.querySelectorAll('[data-adpl]')].filter(x=>x.checked).map(x=>x.dataset.adpl),
+    rests:all?[]:[...document.querySelectorAll('[data-adr]')].filter(x=>x.checked).map(x=>x.dataset.adr),starts:g('ads'),ends:g('ade'),note:g('ado'),active:($('#ada')||{}).checked,popup_delay:+g('add')||0};
+  if(S.adE!=='new')o.id=S.adE;if(S.adImg!==undefined)o.image=S.adImg;return o}
+Object.assign(GACT,{
+  adsTog(){S.adsOpen=!S.adsOpen;if(S.adsOpen)admAdsLoad()},
+  adNew(){S.adE='new';S.adImg=undefined;S.adDraft=null;draw()},adEdit(d){S.adE=d.id;S.adImg=undefined;S.adDraft=null;draw()},adCancel(){S.adE=null;S.adImg=undefined;S.adDraft=null;draw()},adNoImg(){S.adDraft=adFormRead();S.adImg=null;draw()},
+  async adSave(){const o=adFormRead();if(o.title.length<2)return toast('Add a headline');if(!o.places.length)return toast('Choose where it shows');
+    try{await rpc('h_admin_ad_save',{p_token:ADM,p_ad:o});S.adE=null;S.adImg=undefined;S.adDraft=null;ADMADS=null;admAdsLoad();toast('Advert saved')}catch(e){toast(e.code==='IMAGE'?'That picture is too large':errMsg(e))}},
+  async adDel(){if(!confirm('Delete this advert and its figures?'))return;try{await rpc('h_admin_ad_del',{p_token:ADM,p_id:S.adE});S.adE=null;ADMADS=null;admAdsLoad();toast('Advert deleted')}catch(e){admErr(e)}}});
+document.addEventListener('change',e=>{if(e.target.id==='adall'&&e.target.checked)document.querySelectorAll('[data-adr]').forEach(x=>{x.checked=false});if(e.target.dataset&&e.target.dataset.adr&&e.target.checked){const a=$('#adall');if(a)a.checked=false}
+  if(e.target.id!=='adimg')return;const f=e.target.files&&e.target.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);
+  img.onload=()=>{const W=1080,k=Math.min(1,W/img.width),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);
+    let q=.82,out=c.toDataURL('image/jpeg',q);while(out.length>380000&&q>.35){q-=.07;out=c.toDataURL('image/jpeg',q)}if(out.length>400000)return toast('That picture is too large');
+    S.adDraft=adFormRead();S.adImg=out;draw()};
+  img.onerror=()=>{URL.revokeObjectURL(u);toast('That file is not a picture this device can read')};img.src=u});
 
 boot();
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())render()},30000);

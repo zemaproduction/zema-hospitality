@@ -738,7 +738,7 @@ ${u?`<div style="text-align:center"><span class="ava" style="width:64px;height:6
 <div class="dots" aria-label="${S.pin.length} of 4 digits entered">${[0,1,2,3].map(i=>`<i class="${i<S.pin.length?'on':''}"></i>`).join('')}</div>
 <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-pin="${n}">${n}</button>`).join('')}<button data-a="signBack" style="font-size:14px">Back</button><button data-pin="0">0</button><button data-pin="x" aria-label="Delete">⌫</button></div>
 <p class="dim" style="text-align:center;margin:0;font-size:13px">${LIVE?esc(S.pinMsg||'Enter your 4-digit PIN.'):'Prototype: any four digits sign you in.'}</p>`
-:`<div><h2 style="font-size:28px">Who is signing in?</h2><p class="muted" style="margin:6px 0 0">Each person sees only what their role needs.</p></div>
+:`<div><h2 style="font-size:28px">Who is signing in?</h2><p class="muted" style="margin:6px 0 0">Each person sees only what their role needs.</p>${LIVE?'<button class="btn quiet" data-a="oIn" style="margin-top:12px">Owner? Sign in with email to switch restaurant</button>':''}</div>
 ${groups.filter(([g,rs])=>STAFF.some(x=>rs.includes(x.role))).map(([g,rs])=>`<div><div class="eyebrow" style="margin-bottom:8px">${g}</div><div class="people">${STAFF.filter(x=>rs.includes(x.role)).map(x=>`<button class="person" data-who="${x.id}"><span class="ava">${ini(x.name)}</span><span><b class="ell">${esc(x.name.replace(/^Chef /,''))}</b><small>${x.role}${x.on?'':' · off today'}</small></span></button>`).join('')}</div></div>`).join('')}
 ${LIVE&&!TOKEN?'':'<button class="btn quiet" data-a="signBack">Cancel</button>'}`}</div></div>`}
 
@@ -799,7 +799,7 @@ function txPage(){
 /* ---------- actions ---------- */
 function go(page){S.page=page;S.rcpt=null;S.sel=null;S.edit=false;S.mod=null;render();const v=$('#view');if(v)v.scrollTop=0}
 document.addEventListener('click',e=>{
-  const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin],[data-floor],[data-col]');if(!el)return;const d=el.dataset;
+  const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin],[data-floor],[data-col],[data-aemail],[data-oopen]');if(!el)return;const d=el.dataset;
   if(d.go)return go(d.go);
   if(d.who){S.pick=d.who;S.pin='';return render()}
   if(d.pin!=null){if(d.pin==='x')S.pin=S.pin.slice(0,-1);else if(S.pin.length<4)S.pin+=d.pin;if(S.pin.length===4){if(LIVE){liveSignin();return draw()}const u=staff(S.pick);S.user=u.id;S.role=ROLEKEY[u.role];if(S.role==='waiter')ME=u.id;S.pick=null;S.pin='';toast('Signed in as '+u.name.replace(/^Chef /,''));return go(NAV[S.role][0][0])}return render()}
@@ -817,6 +817,8 @@ document.addEventListener('click',e=>{
   if(d.avail){const m=item(d.avail);if(m.hidden){m.hidden=false;m.on=true}else if(m.on)m.on=false;else m.hidden=true;toast(m.name+(m.hidden?' is hidden from the order screen':m.on?' is available':' marked sold out'));return render()}
   if(d.hold!=null){const r=S.res[+d.hold];Object.assign(lv(r.table),{status:'reserved',note:r.t+' · '+r.name});toast(`${r.table} held for ${r.name}`);return render()}
   if(d.aopen)return adminOpen(d.aopen);
+  if(d.oopen)return ownerOpen(d.oopen);
+  if(d.aemail){S.aEmail=S.aEmail===d.aemail?null:d.aemail;return draw()}
   if(d.alink){const u=location.origin+location.pathname+'?r='+d.alink;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Device link copied')).catch(()=>window.prompt('Copy this device link',u));return}
   if(d.apin){S.aPin=S.aPin===d.apin?null:d.apin;return draw()}
   if(d.rc){S.rcpt={tx:d.rc};return render()}
@@ -926,7 +928,7 @@ const sortK=o=>Array.isArray(o)?o.map(sortK):o&&typeof o==='object'?Object.keys(
 const LIVE0=J({status:'available',guests:0,waiter:null,seated:null,note:''});
 async function rpc(fn,args){const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
   const j=await r.json().catch(()=>null);if(!r.ok){const e=new Error((j&&j.message)||'ERR');e.code=(j&&j.message)||'ERR';throw e}return j}
-const errMsg=e=>({DENIED:'You are not allowed to do that',PIN:'PINs are 4 digits',NAME:'Add a name first',BUSY:'Too many at once. Try again later.'}[e&&e.code]||'No connection. Try again.');
+const errMsg=e=>({EMAIL:'That email does not look right',DENIED:'You are not allowed to do that',PIN:'PINs are 4 digits',NAME:'Add a name first',BUSY:'Too many at once. Try again later.'}[e&&e.code]||'No connection. Try again.');
 let DIRTY=0;document.addEventListener('input',()=>{DIRTY=Date.now()});
 const safe=()=>{const a=document.activeElement;return!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))&&!S.edit&&Date.now()-DIRTY>120000&&!GATES[S.page]};
 function softRender(){if(safe())draw()}
@@ -1025,6 +1027,7 @@ const gate=inner=>`<div class="signin"><div class="si-card"><div class="brand" s
 const GATES={
   welcome:()=>gate(`<div><h2 style="font-size:28px">Welcome</h2><p class="muted" style="margin:6px 0 0">${esc(S.gMsg||'Restaurants are set up by Zema Hospitality. Paste the device link you were given to open yours.')}</p></div>
 <div class="fld"><label class="eyebrow" for="gcode">Already set up? Paste your device link</label><input id="gcode" placeholder="https://…?r=…" autocomplete="off"></div><button class="btn big" data-a="gOpen">Open my restaurant</button>
+<button class="btn big" data-a="oIn">Owner sign-in with email</button>
 <button class="btn quiet" data-a="gDemo">Look around the demo first</button>`),
   create:()=>gate(`<div><h2 style="font-size:28px">Create your restaurant</h2><p class="muted" style="margin:6px 0 0">You become the owner. You can add your team afterwards.</p></div>
 <div class="fld"><label class="eyebrow" for="cn">Restaurant name</label><input id="cn" maxlength="80" placeholder="e.g. Zema Kitchen"></div>
@@ -1061,6 +1064,7 @@ function liveOut(){if(S.role==='admin')return adminBack();const t=TOKEN;TOKEN=nu
 function boot(){const q=new URLSearchParams(location.search);S.v3=lsGet('zh-3d')==='1';
   if(!SB_URL||q.has('demo')){seed();return render()}
   if(q.has('admin'))return adminStart();
+  {const ln=ownerFromLink();if(ln==='recovery'){S.page='ownerReset';return draw()}if(ln||q.has('owner'))return ownerStart()}
   const c=((q.get('r')||lsGet('zh-code')||'').match(/[0-9a-f]{24}/)||[])[0];
   if(!c){S.page='welcome';return draw()}
   startLive(c)}
@@ -1074,10 +1078,10 @@ ${S.aSetup?'':'<div class="fld"><label class="eyebrow" for="apw2">Repeat the pas
 <button class="btn pri big" data-a="aIn">${S.aSetup?'Sign in':'Save password and continue'}</button>`);
 GATES.adminHome=()=>{const l=S.aList||[];return`<div class="signin" style="align-items:flex-start"><div class="si-card" style="max-width:760px;width:100%"><div style="display:flex;align-items:center;gap:12px"><div class="brand" style="padding:0;margin-right:auto"><i>Z</i><div><b>Zema Hospitality</b><small>Admin · ${l.length} restaurant${l.length===1?'':'s'}</small></div></div><button class="btn quiet" data-a="aOut">Sign out</button></div>
 ${l.map(r=>`<section class="panel"><header><h2>${esc(r.name)}</h2><span class="dim">since ${new Date(r.created).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></header>
-<p class="muted" style="margin:0 0 14px">Owner ${esc(r.owner||'not set')} · ${r.staff} staff · ${r.dishes} dishes</p>
-<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" data-aopen="${r.id}">Open and set up</button><button class="btn" data-alink="${r.code}">Copy device link</button><button class="btn quiet" data-apin="${r.id}">Reset owner PIN</button></div>
+<p class="muted" style="margin:0 0 14px">Owner ${esc(r.owner||'not set')} · ${r.email?esc(r.email):'no email yet'} · ${r.staff} staff · ${r.dishes} dishes</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" data-aopen="${r.id}">Open and set up</button><button class="btn" data-alink="${r.code}">Copy device link</button><button class="btn quiet" data-apin="${r.id}">Reset owner PIN</button><button class="btn quiet" data-aemail="${r.id}">${r.email?'Change':'Add'} owner email</button></div>${S.aEmail===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="aem" type="email" value="${esc(r.email||'')}" placeholder="owner@example.com" aria-label="Owner email for ${esc(r.name)}" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aEmailSave">Save email</button></div>`:''}
 ${S.aPin===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="apin" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="New 4-digit PIN" aria-label="New PIN for ${esc(r.owner||'the owner')}" style="flex:1;min-width:150px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aPinSave">Save PIN</button></div>`:''}</section>`).join('')||'<div class="empty">No restaurants yet. Create the first one below.</div>'}
-<section class="panel"><header><h2>Create a restaurant</h2><span class="dim">or a second location</span></header><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px"><div class="fld"><label class="eyebrow" for="an">Restaurant name</label><input id="an" maxlength="80" placeholder="e.g. Zema Kitchen Soho"></div><div class="fld"><label class="eyebrow" for="ao">Owner's name</label><input id="ao" maxlength="60" placeholder="First and last name"></div><div class="fld"><label class="eyebrow" for="ap">Owner's PIN (4 digits)</label><input id="ap" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="They can change it later"></div></div>
+<section class="panel"><header><h2>Create a restaurant</h2><span class="dim">or a second location</span></header><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px"><div class="fld"><label class="eyebrow" for="an">Restaurant name</label><input id="an" maxlength="80" placeholder="e.g. Zema Kitchen Soho"></div><div class="fld"><label class="eyebrow" for="ao">Owner's name</label><input id="ao" maxlength="60" placeholder="First and last name"></div><div class="fld"><label class="eyebrow" for="ae">Owner's email</label><input id="ae" type="email" maxlength="120" placeholder="For their owner sign-in"></div><div class="fld"><label class="eyebrow" for="ap">Owner's PIN (4 digits)</label><input id="ap" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="They can change it later"></div></div>
 <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;margin-top:14px"><input type="checkbox" id="ad" style="width:20px;height:20px;margin-top:2px;accent-color:var(--accent)"><span>Start from the sample menu of 31 dishes</span></label>
 <button class="btn pri" data-a="aMake" style="margin-top:14px">${S.busy?'Creating…':'Create restaurant'}</button></section></div></div>`};
 async function adminStart(){S.page='loading';S.gMsg='Opening admin…';S.gRetry=false;draw();
@@ -1102,12 +1106,58 @@ Object.assign(GACT,{
   aOut(){rpc('h_admin_signout',{p_token:ADM}).catch(()=>{});ADM=null;lsDel('zh-adm');S.gMsg='';S.page='adminLogin';draw()},
   async aMake(){if(S.busy)return;const nm=$('#an').value.trim(),ow=$('#ao').value.trim(),pn=$('#ap').value,dm=$('#ad').checked;
     if(nm.length<2){$('#an').focus();return toast('Add the restaurant name')}if(ow.length<2){$('#ao').focus();return toast("Add the owner's name")}if(!/^\d{4}$/.test(pn)){$('#ap').focus();return toast('Give the owner a 4-digit PIN')}
-    S.busy=true;try{const r=await rpc('h_admin_create',{p_token:ADM,p_name:nm,p_owner:ow,p_pin:pn});S.busy=false;S.aSeed=dm?r.id:null;await adminOpen(r.id,'settings');toast(nm+' created. Add its details, then copy the device link.')}
+    S.busy=true;try{const r=await rpc('h_admin_create',{p_token:ADM,p_name:nm,p_owner:ow,p_pin:pn,p_email:($('#ae').value||'').trim()||null});S.busy=false;S.aSeed=dm?r.id:null;await adminOpen(r.id,'settings');toast(nm+' created. Add its details, then copy the device link.')}
     catch(e){S.busy=false;admErr(e)}},
   async aPinSave(){const pn=$('#apin').value,r=(S.aList||[]).find(x=>x.id===S.aPin);if(!/^\d{4}$/.test(pn)){$('#apin').focus();return toast('PINs are 4 digits')}if(!r||!r.owner_id)return toast('This restaurant has no owner yet');
     try{const o=await rpc('h_admin_open',{p_token:ADM,p_rid:r.id});await rpc('h_staff_update',{p_token:o.token,p_id:r.owner_id,p_patch:{pin:pn}});rpc('h_signout',{p_token:o.token}).catch(()=>{});S.aPin=null;draw();toast('New PIN saved for '+r.owner)}
     catch(e){admErr(e)}}});
 
+/* ---- Owner accounts: email and password through Supabase Auth, linked to restaurants by the owner's email ---- */
+let OWN=null;try{OWN=JSON.parse(lsGet('zh-own')||'null')}catch(_){}
+const ownSave=o=>{OWN=o;if(o)lsSet('zh-own',JSON.stringify(o));else lsDel('zh-own')};
+const appUrl=()=>location.origin+location.pathname;
+async function authCall(path,body,method,bearer){const r=await fetch(SB_URL+'/auth/v1/'+path,{method:method||'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+(bearer||SB_KEY),'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+  const j=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(j.error_code||j.code||j.msg||j.error_description||'ERR');e.code=String(j.error_code||j.error||'').toLowerCase();e.msg=j.msg||j.error_description||j.message||'';throw e}return j}
+const ownKeep=j=>ownSave({at:j.access_token,rt:j.refresh_token,exp:Date.now()+((j.expires_in||3600)-60)*1000,email:(j.user&&j.user.email)||(OWN&&OWN.email)||''});
+async function ownJWT(){if(!OWN)throw Object.assign(new Error('AUTH'),{code:'AUTH'});if(Date.now()>OWN.exp){try{ownKeep(await authCall('token?grant_type=refresh_token',{refresh_token:OWN.rt}))}catch(e){ownSave(null);throw Object.assign(new Error('AUTH'),{code:'AUTH'})}}return OWN.at}
+async function rpcOwn(fn,args){const at=await ownJWT();const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+at,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
+  const j=await r.json().catch(()=>null);if(!r.ok){const e=new Error((j&&j.message)||'ERR');e.code=(j&&j.message)||'ERR';throw e}return j}
+const authMsg=e=>/invalid_credentials|invalid login/i.test(e.code+' '+e.msg)?'That email and password do not match.':/email_not_confirmed|not confirmed/i.test(e.code+' '+e.msg)?'Please confirm your email first: tap the link we sent you.':/user_already_exists|already registered/i.test(e.code+' '+e.msg)?'That email already has an account. Sign in instead.':/weak_password|password/i.test(e.code)?'Choose a longer password (at least 8 characters).':/rate|429/i.test(e.code+' '+e.msg)?'Too many emails sent. Please wait a while and try again.':'Something went wrong. Check the internet connection and try again.';
+const fIn=(id,lab,type,ac)=>`<div class="fld"><label class="eyebrow" for="${id}">${lab}</label><input id="${id}" type="${type}" autocomplete="${ac}" maxlength="120"></div>`;
+const oHead=(t,sub)=>`<div><h2 style="font-size:28px">${t}</h2><p class="muted" style="margin:6px 0 0">${esc(S.gMsg||sub)}</p></div>`;
+Object.assign(GATES,{
+  ownerLogin:()=>gate(oHead('Owner sign-in','Sign in with the email and password of your owner account.')+fIn('oe','Email','email','email')+fIn('op','Password','password','current-password')+`<button class="btn pri big" data-a="oLogin">${S.busy?'Signing in…':'Sign in'}</button><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn quiet" data-a="oNew" style="flex:1">Create owner account</button><button class="btn quiet" data-a="oForgot" style="flex:1">Forgot password</button></div><button class="btn quiet" data-a="oBack">Back</button>`),
+  ownerSignup:()=>gate(oHead('Create your owner account','Use the email address Zema Hospitality has on file for you. Your restaurants appear once you confirm it.')+fIn('oe','Email','email','email')+fIn('op','Choose a password','password','new-password')+fIn('op2','Repeat the password','password','new-password')+`<button class="btn pri big" data-a="oSignup">${S.busy?'Creating…':'Create account'}</button><button class="btn quiet" data-a="oIn">I already have an account</button>`),
+  ownerForgot:()=>gate(oHead('Reset your password','We will email you a link to choose a new password.')+fIn('oe','Email','email','email')+`<button class="btn pri big" data-a="oSendReset">${S.busy?'Sending…':'Email me a reset link'}</button><button class="btn quiet" data-a="oIn">Back to sign-in</button>`),
+  ownerReset:()=>gate(oHead('Choose a new password','At least 8 characters.')+fIn('op','New password','password','new-password')+fIn('op2','Repeat the new password','password','new-password')+`<button class="btn pri big" data-a="oSetPw">Save new password</button>`),
+  ownerHome:()=>{const l=S.oList||[];return gate(`<div><h2 style="font-size:28px">Your restaurants</h2><p class="muted" style="margin:6px 0 0">${esc(OWN?OWN.email:'')}</p></div>
+${l.map(r=>`<button class="person" data-oopen="${r.id}"><span class="ava">${ini(r.name)}</span><span><b class="ell">${esc(r.name)}</b><small>Open as ${esc(r.owner)}</small></span></button>`).join('')||'<div class="empty">No restaurant is linked to this email yet. Ask Zema Hospitality to add your email to your restaurant.</div>'}
+<button class="btn quiet" data-a="oOut">Sign out of owner account</button>`)}});
+async function ownerStart(){if(!OWN){S.page='ownerLogin';return draw()}S.page='loading';S.gMsg='Opening your restaurants…';S.gRetry=false;draw();
+  try{const h=await rpcOwn('h_owner_home');S.oList=h.restaurants;S.gMsg='';S.page='ownerHome';draw()}
+  catch(e){S.gMsg=e.code==='UNCONFIRMED'?'Please confirm your email first: tap the link we sent you.':e.code==='AUTH'?'Please sign in again.':'Could not reach the server. Check the internet connection.';if(e.code==='AUTH'||e.code==='UNCONFIRMED')ownSave(null);S.page='ownerLogin';draw()}}
+Object.assign(GACT,{
+  oIn(){S.gMsg='';ownerStart()},oBack(){S.gMsg='';S.page=CODE&&LIVE?'signin':'welcome';draw()},oNew(){S.gMsg='';S.page='ownerSignup';draw()},oForgot(){S.gMsg='';S.page='ownerForgot';draw()},
+  async oLogin(){if(S.busy)return;const em=$('#oe').value.trim(),pw=$('#op').value;if(!em||!pw)return toast('Enter your email and password');S.busy=true;draw();
+    try{ownKeep(await authCall('token?grant_type=password',{email:em,password:pw}));S.busy=false;S.gMsg='';ownerStart()}catch(e){S.busy=false;S.gMsg=authMsg(e);draw()}},
+  async oSignup(){if(S.busy)return;const em=$('#oe').value.trim(),pw=$('#op').value;if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return toast('Enter a valid email');if(pw.length<8)return toast('Use at least 8 characters');if(pw!==$('#op2').value)return toast('The two passwords do not match');
+    S.busy=true;draw();try{const j=await authCall('signup?redirect_to='+encodeURIComponent(appUrl()+'?owner'),{email:em,password:pw});S.busy=false;
+      if(j.access_token){ownKeep(j);return ownerStart()}S.gMsg='Almost done: we have emailed '+em+'. Tap the link in that email to confirm, then sign in here.';S.page='ownerLogin';draw()}
+    catch(e){S.busy=false;S.gMsg=authMsg(e);draw()}},
+  async oSendReset(){if(S.busy)return;const em=$('#oe').value.trim();if(!em)return toast('Enter your email');S.busy=true;draw();
+    try{await authCall('recover?redirect_to='+encodeURIComponent(appUrl()+'?owner'),{email:em});S.busy=false;S.gMsg='If that email has an account, a reset link is on its way. Open it on this device.';S.page='ownerLogin';draw()}
+    catch(e){S.busy=false;S.gMsg=authMsg(e);draw()}},
+  async oSetPw(){const pw=$('#op').value;if(pw.length<8)return toast('Use at least 8 characters');if(pw!==$('#op2').value)return toast('The two passwords do not match');
+    try{await authCall('user',{password:pw},'PUT',await ownJWT());toast('New password saved');ownerStart()}catch(e){S.gMsg=authMsg(e);draw()}},
+  oOut(){if(OWN)authCall('logout',null,'POST',OWN.at).catch(()=>{});ownSave(null);S.oList=null;S.gMsg='';S.page=CODE&&LIVE?'signin':'welcome';draw()}});
+async function ownerOpen(rid){try{const r=await rpcOwn('h_owner_open',{p_rid:rid});CODE=r.code;LIVE=true;lsSet('zh-code',CODE);S.lobbyName=r.name;TOKEN=r.token;lsSet('zh-tok',JSON.stringify({c:CODE,t:TOKEN,u:r.staff_id}));
+    history.replaceState(null,'','?r='+CODE);STAFF.length=0;staffJ='';await enter(r.staff_id);render();toast('Opened '+r.name)}
+  catch(e){toast(e.code==='DENIED'?'This restaurant is not linked to your email':errMsg(e))}}
+/* links in confirmation and reset emails come back with the session in the address */
+function ownerFromLink(){const h=new URLSearchParams(location.hash.replace(/^#/,''));if(!h.get('access_token'))return null;
+  ownKeep({access_token:h.get('access_token'),refresh_token:h.get('refresh_token'),expires_in:+h.get('expires_in')||3600});history.replaceState(null,'',location.pathname+location.search);return h.get('type')||'signup'}
+
+Object.assign(GACT,{async aEmailSave(){const em=$('#aem').value.trim();try{await rpc('h_admin_set_email',{p_token:ADM,p_rid:S.aEmail,p_email:em||null});S.aEmail=null;await admList();draw();toast(em?'Owner email saved':'Owner email removed')}catch(e){toast(e.code==='EMAIL'?'That email does not look right':errMsg(e))}}});
 boot();
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())render()},30000);
 </script>

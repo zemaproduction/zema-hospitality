@@ -1119,7 +1119,7 @@ async function liveSignin(){const id=S.pick,pin=S.pin;S.pinMsg='Checking…';
   catch(e){S.pin='';TOKEN=null;S.pinMsg='No connection. Try again.';S.page='signin';draw()}}
 function liveOut(){if(S.role==='admin')return adminBack();const t=TOKEN;TOKEN=null;lsDel('zh-tok');rpc('h_signout',{p_token:t}).catch(()=>{});S.pick=null;S.pin='';S.pinMsg='';S.sel=null;S.mod=null;S.edit=false;S.page='signin';draw();
   rpc('h_lobby',{p_code:CODE}).then(r=>{if(setStaff(r.staff)&&S.page==='signin'&&!S.pick)draw()}).catch(()=>{})}
-function boot(){const q=new URLSearchParams(location.search);S.v3=lsGet('zh-3d')==='1';S.fz=+lsGet('zh-fz')||(innerWidth<760?2:1);
+function boot(){try{appMeta()}catch(_){}const q=new URLSearchParams(location.search);S.v3=lsGet('zh-3d')==='1';S.fz=+lsGet('zh-fz')||(innerWidth<760?2:1);
   if(!SB_URL||q.has('demo')){seed();return render()}
   if(q.has('admin'))return adminStart();
   {const ln=ownerFromLink();if(ln==='recovery'){S.page='ownerReset';return draw()}if(ln||q.has('owner'))return ownerStart()}
@@ -1251,8 +1251,9 @@ Object.assign(GACT,{async aDelGo(){const r=(S.aList||[]).find(x=>x.id===S.aDel),
 const STANDALONE=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 let APPKEY='',BIP=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();BIP=e;installHint()});
-function appMeta(){const adm=S.page==='adminLogin'||S.page==='adminHome'||(LIVE&&S.role==='admin'),own=!adm&&/^owner/.test(S.page),
-  start=appUrl()+(adm?'?admin':CODE&&LIVE&&!own?'?r='+CODE:'?owner'),name=adm?'Zema Admin':CODE&&LIVE&&!own&&S.lobbyName?S.lobbyName:'Zema Hospitality',key=start+'|'+name;
+function appMeta(){/* the app's identity comes from the address it was opened with, never from whatever screen is showing */
+  const q=new URLSearchParams(location.search),adm=q.has('admin'),code=((q.get('r')||'').match(/[0-9a-f]{24}/)||[])[0],
+  start=appUrl()+(adm?'?admin':code?'?r='+code:q.has('owner')?'?owner':''),name=adm?'Zema Admin':code&&S.lobbyName?S.lobbyName:'Zema Hospitality',key=start+'|'+name;
   if(key===APPKEY)return;APPKEY=key;const base=appUrl(),ic=adm?'admin-':'';
   const link=(rel,href)=>{let l=document.querySelector(`link[rel="${rel}"]`);if(!l){l=document.createElement('link');l.rel=rel;document.head.appendChild(l)}l.href=href};
   link('apple-touch-icon',base+ic+'apple-touch-icon.png');

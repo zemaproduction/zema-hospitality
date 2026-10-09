@@ -458,6 +458,9 @@ button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select
 .adpop-x.wait{background:color-mix(in srgb,var(--gm-ink,#fff) 30%,transparent);color:var(--gm-ink,#fff);font:600 17px var(--mono,monospace);cursor:default;border:2px solid color-mix(in srgb,var(--gm-ink,#fff) 55%,transparent)}
 .adgrp{border-top:1px solid var(--line2);padding-top:12px;margin-top:12px}.adgrp-h{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;margin-bottom:4px}.adgrp-h .btn{margin-left:auto}
 .radv{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;margin:-4px 0 12px;font-size:14px}.radv .btn{margin-left:auto;min-height:38px}.radv .lnk{padding:4px 0}
+
+.utab{margin-top:14px;border-top:1px solid var(--line2)}.urow{display:grid;grid-template-columns:minmax(0,2fr) 1.2fr 1.2fr .9fr .8fr .8fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line2);font-size:14px}.urow.uh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+@media (max-width:640px){.urow{display:flex;flex-wrap:wrap;gap:4px 12px}.urow.uh{display:none}.urow>b{flex:1 1 60%}.urow>span:nth-child(n+3){font-size:13px;color:var(--ink2)}.urow>span:nth-child(3){flex-basis:100%;order:3}.urow>span:nth-child(n+4){order:4}.urow>span:nth-child(4)::before{content:"Days used "}.urow>span:nth-child(5)::before{content:"· Sign-ins "}.urow>span:nth-child(6)::before{content:"· Orders "}.urow>span:nth-child(3)::before{content:"Last used "}}
 </style>
 </head>
 <body>
@@ -1258,7 +1261,7 @@ GATES.adminLogin=()=>gate(`<div><h2 style="font-size:28px">${S.aSetup?'Admin sig
 ${S.aSetup?'':'<div class="fld"><label class="eyebrow" for="apw2">Repeat the password</label><input id="apw2" type="password" autocomplete="new-password" maxlength="80"></div>'}
 <button class="btn pri big" data-a="aIn">${S.aSetup?'Sign in':'Save password and continue'}</button>`);
 GATES.adminHome=()=>{const l=S.aList||[];return`<div class="signin"><div class="si-card" style="max-width:760px;width:100%;margin:0 0 auto"><div style="display:flex;align-items:center;gap:12px"><div class="brand" style="padding:0;margin-right:auto"><i>Z</i><div><b>Zema Hospitality</b><small>Admin · ${l.length} restaurant${l.length===1?'':'s'}</small></div></div><button class="btn quiet" data-a="reloadApp">Reload</button><button class="btn quiet" data-a="aOut">Sign out</button></div>
-${adminLiveSummary()}${adminSummary()}${adsPanel()}${promoPanel()}
+${adminLiveSummary()}${usagePanel()}${adminSummary()}${adsPanel()}${promoPanel()}
 ${l.map(r=>`<section class="panel"><header><h2>${esc(r.name)}</h2><span class="dim">since ${new Date(r.created).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></header>
 ${adminLiveLine(r)}${adminRestAds(r)}${adminBillUI(r)}<p class="muted" style="margin:0 0 14px">Owner ${esc(r.owner||'not set')} · ${r.email?esc(r.email):'no email yet'} · ${r.staff} staff · ${r.dishes} dishes</p>
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" data-aopen="${r.id}">Open and set up</button><button class="btn" data-alink="${r.code}">Copy staff app link</button><button class="btn" data-olink="1">Copy owner app link</button><button class="btn" data-a="aGm" data-c="${r.code}">Copy guest menu link</button><button class="btn" data-a="aQR" data-c="${r.code}" data-n="${esc(r.name)}">Guest menu QR code</button><button class="btn quiet" data-apin="${r.id}">Reset owner PIN</button><button class="btn quiet" data-aemail="${r.id}">${r.email?'Change':'Add'} owner email</button><button class="btn quiet" data-apay="${r.id}">Payment received</button><button class="btn quiet" data-abill="${r.id}">Billing</button><button class="btn quiet" data-adel="${r.id}" style="color:var(--s-bill)">Delete restaurant</button></div>${S.aDel===r.id?`<div class="note" style="margin-top:12px;border-color:var(--s-bill)"><b>Delete ${esc(r.name)} for good?</b> Its menu, photos, floor plan, staff, orders, payments and reports are all removed, and its device link stops working. This cannot be undone.<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="adc" placeholder="Type the restaurant name to confirm" aria-label="Type ${esc(r.name)} to confirm" autocomplete="off" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn" data-a="aDelGo" style="background:var(--s-bill);border-color:var(--s-bill);color:#fff">Delete</button><button class="btn quiet" data-adel="${r.id}">Cancel</button></div></div>`:''}${S.aEmail===r.id?`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><input id="aem" type="email" value="${esc(r.email||'')}" placeholder="owner@example.com" aria-label="Owner email for ${esc(r.name)}" style="flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><button class="btn pri" data-a="aEmailSave">Save email</button></div>`:''}
@@ -1745,8 +1748,9 @@ function adH(place){if(place==='guest')place='bottom';return adCard(adPick(place
 document.addEventListener('click',e=>{const a=e.target.closest('[data-adclick]');if(!a||!adCode())return;rpc('h_ad_hit',{p_code:adCode(),p_ad:a.dataset.adclick,p_kind:'click'}).catch(()=>{});if(a.closest('.adpop')){ADPOP=null;ADPOPAT=0;setTimeout(draw,50)}},true);
 /* the pop-up: once per visit, a few seconds after the menu opens, never on top of a dish page */
 let ADPT=0;
-function adPopupArm(){if(S.page!=='guest'||ADPOP||ADPT)return;const a=adPick('popup');if(!a)return;let shown=false;try{shown=sessionStorage.getItem('zh-pop-'+a.id)}catch(_){}if(shown)return;
-  ADPT=setTimeout(function tick(){ADPT=0;if(S.page!=='guest')return;if(S.gd){ADPT=setTimeout(tick,4000);return}ADPOP=a;try{sessionStorage.setItem('zh-pop-'+a.id,'1')}catch(_){}draw()},Math.max(0,+a.popup_delay||0)*1000)}
+const ADSHOWN=new Set();/* shown once each time the menu is opened or refreshed */
+function adPopupArm(){if(S.page!=='guest'||ADPOP||ADPT)return;const a=adPick('popup');if(!a||ADSHOWN.has(a.id))return;
+  ADPT=setTimeout(function tick(){ADPT=0;if(S.page!=='guest')return;if(S.gd){ADPT=setTimeout(tick,4000);return}ADPOP=a;ADSHOWN.add(a.id);draw()},Math.max(0,+a.popup_delay||0)*1000)}
 let ADPOPAT=0,ADTICK=0;
 function adLeft(){return ADPOP?Math.max(0,Math.ceil((+ADPOP.close_after||0)-(now()-ADPOPAT)/1000)):0}
 function adPopup(){if(!ADPOP)return'';if(!ADPOPAT){ADPOPAT=now();clearInterval(ADTICK);ADTICK=setInterval(()=>{const x=$('.adpop-x');if(!ADPOP||!x){clearInterval(ADTICK);return}const n=adLeft();x.textContent=n?n:'×';x.disabled=!!n;x.classList.toggle('wait',!!n);x.setAttribute('aria-label',n?'You can close this in '+n+' seconds':'Close');if(!n)clearInterval(ADTICK)},250)}
@@ -1824,6 +1828,17 @@ Object.assign(GACT,{
   svcTog(){const l=lv(S.sel);if(l.parts)return;l.nosvc=!l.nosvc;toast(l.nosvc?'Service charge removed':'Service charge added back');render()},
   voidAsk(d){S.voidQ={o:d.o,i:+d.i};render()},voidNo(){S.voidQ=null;render()},
   cancelAsk(d){S.cancelQ=d.o;render()},cancelNo(){S.cancelQ=null;render()}});
+
+/* ---------- Zema Admin: who is actually using the system ---------- */
+const agoTxt=t=>{if(!t)return'never';const m=Math.round((Date.now()-new Date(t))/60000);if(m<2)return'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' hour'+(h>1?'s':'')+' ago';const d=Math.round(h/24);return d===1?'yesterday':d+' days ago'};
+function useState(r){const lu=r.last_used?Date.now()-new Date(r.last_used):Infinity,day=864e5;
+  return +r.online||+r.busy?['Live now','p-available',0]:lu<day?['Used today','p-available',1]:lu<7*day?['This week','p-ordering',2]:lu<30*day?['Quiet','p-cleaning',3]:r.last_used?['Not using','p-bill',4]:['Not used yet','p-bill',5]}
+function usagePanel(){const l=(S.aList||[]).slice();if(!l.length)return'';const st=l.map(r=>[r,useState(r)]).sort((a,b)=>a[1][2]-b[1][2]||(new Date(b[0].last_used||0)-new Date(a[0].last_used||0)));
+  const c=k=>st.filter(x=>x[1][2]===k).length,week=st.filter(x=>x[1][2]<=2).length,idle=st.filter(x=>x[1][2]>=3).length;
+  return`<section class="panel"><header><h2>Who is using it</h2><span class="dim">last 30 days</span></header>
+<div class="grid g4" style="gap:0"><div class="kpi"><span class="eyebrow">Restaurants</span><span class="num">${l.length}</span></div><div class="kpi"><span class="eyebrow">Live now</span><span class="num" style="color:var(--s-available)">${c(0)}</span></div><div class="kpi"><span class="eyebrow">Used this week</span><span class="num">${week}</span></div><div class="kpi"><span class="eyebrow">Not using it</span><span class="num" ${idle?'style="color:var(--s-bill)"':''}>${idle}</span><small>quiet 7+ days or never</small></div></div>
+<div class="utab" role="table"><div class="urow uh" role="row"><span>Restaurant</span><span>Status</span><span>Last used</span><span>Days used</span><span>Sign-ins</span><span>Orders</span></div>
+${st.map(([r,s])=>`<div class="urow" role="row"><b class="ell">${esc(r.name)}</b><span><span class="pill ${s[1]}">${s[0]}</span></span><span>${agoTxt(r.last_used)}</span><span>${+r.days30||0} <span class="dim">of 30</span></span><span>${+r.signins30||0}</span><span>${+r.orders30||0}</span></div>`).join('')}</div></section>`}
 
 boot();
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())softRender()},30000);

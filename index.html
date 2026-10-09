@@ -466,6 +466,7 @@ button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select
 .tabchip{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 14px;border-radius:12px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);font-size:14px}.tabchip .mono{font-size:13px;color:var(--ink2)}
 .tabnew{display:flex;gap:8px}.tabnew input{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)}
 .step.sm button{width:32px;height:32px;font-size:16px}.step.sm span{min-width:26px;text-align:center}.till .line{align-items:center}
+.kam{display:block;font-size:.82em;opacity:.8;margin-top:1px}.kbar .seg button{font-size:13px}
 </style>
 </head>
 <body>
@@ -877,8 +878,13 @@ ${a.length?`<div><div class="eyebrow" style="margin-bottom:8px">Preferences</div
 <footer><button class="btn pri big" data-a="modAdd">Add ${S.mod.qty} · ${gbp2(m.price*S.mod.qty)}</button></footer></aside></div>`}
 
 /* ---------- kitchen ---------- */
-function kitchenPage(){const col=(s,next,label)=>{const l=S.orders.filter(o=>o.status===s&&!o.closed).sort((a,b)=>a.at-b.at);return`<div class="kcol"><header><h2>${OSTATE[s]}</h2><span class="count">${l.length}</span></header>${l.map(o=>{const m=Math.round((now()-o.at)/60000),late=m>=15&&s!=='ready';return`<article class="tk ${s} ${late?'late':''}"><header><span class="tn">${esc(tb(o.table).name)}</span><span class="on">#${o.id} · ${hhmm(o.at)}</span></header><ul>${o.lines.map(x=>`<li class="${x.void?'void':''}">${x.void?`<s>${x.qty} × ${esc(ln(x))}</s> <b class="vtag">Cancelled</b>`:`${x.qty} × ${esc(ln(x))}`}${x.note?`<small>${esc(x.note)}</small>`:''}</li>`).join('')}</ul><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="el">${m} min${late?' · running late':''}</span><button class="btn ${s==='ready'?'':'pri'}" data-bump="${o.id}" data-next="${next}">${label}</button></div></article>`}).join('')||'<div class="empty">Nothing here.</div>'}</div>`};
-  return kitchenBar()+`<div class="kds">${col('new','preparing','Start')}${col('preparing','ready','Ready')}${col('ready','served','Served')}</div>`}
+const KUI={en:{new:'New',preparing:'Preparing',ready:'Ready',start:'Start',readyb:'Ready',served:'Served',min:'min',late:'running late',cancelled:'Cancelled',nothing:'Nothing here.'},
+ am:{new:'አዲስ',preparing:'በዝግጅት ላይ',ready:'ዝግጁ',start:'ጀምር',readyb:'ዝግጁ ነው',served:'ቀርቧል',min:'ደቂቃ',late:'ዘግይቷል',cancelled:'ተሰርዟል',nothing:'ምንም የለም'},
+ ti:{new:'ሓድሽ',preparing:'ይዳሎ ኣሎ',ready:'ድሉው',start:'ጀምር',readyb:'ድሉው እዩ',served:'ቀሪቡ',min:'ደቒቕ',late:'ደንጒዩ',cancelled:'ተሰሪዙ',nothing:'ዋላ ሓደ የለን'}};
+const kLang=()=>lsGet('zh-klang')||'en';
+function kName(x){const m=item(x.item),en=ln(x),k=kLang();if(k==='both'){const am=m.name_am||'';return esc(en)+(am?`<span class="ge kam">${esc(am)}</span>`:'')}if(k==='en')return esc(en);const t=m['name_'+k];return t?`<span class="ge">${esc(t)}</span>`:esc(en)}
+function kitchenPage(){const kl=kLang(),T=KUI[kl==='both'?'en':kl]||KUI.en,col=(s,next,label)=>{const l=S.orders.filter(o=>o.status===s&&!o.closed).sort((a,b)=>a.at-b.at);return`<div class="kcol"><header><h2 class="${kl==='am'||kl==='ti'?'ge':''}">${T[s]}</h2><span class="count">${l.length}</span></header>${l.map(o=>{const m=Math.round((now()-o.at)/60000),late=m>=15&&s!=='ready';return`<article class="tk ${s} ${late?'late':''}"><header><span class="tn">${esc(placeName(o.table))}</span><span class="on">#${o.id} · ${hhmm(o.at)}</span></header><ul>${o.lines.map(x=>`<li class="${x.void?'void':''}">${x.void?`<s>${x.qty} × ${kName(x)}</s> <b class="vtag">${T.cancelled}</b>`:`${x.qty} × ${kName(x)}`}${x.note?`<small>${esc(x.note)}</small>`:''}</li>`).join('')}</ul><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="el">${m} ${T.min}${late?' · '+T.late:''}</span><button class="btn ${s==='ready'?'':'pri'}" data-bump="${o.id}" data-next="${next}">${label}</button></div></article>`}).join('')||`<div class="empty">${T.nothing}</div>`}</div>`};
+  return kitchenBar()+`<div class="kds">${col('new','preparing',T.start)}${col('preparing','ready',T.readyb)}${col('ready','served',T.served)}</div>`}
 
 /* ---------- reservations, menu, next phase ---------- */
 function resPage(){return`<section class="panel"><header><h2>Tonight</h2><span class="dim">${S.res.length} bookings · ${S.res.reduce((a,r)=>a+r.guests,0)} guests</span></header>${S.res.map((r,i)=>{const l=lv(r.table);return`<div class="row"><span class="t">${r.t}</span><div class="grow"><b class="ell">${esc(r.name)}</b><span class="dim" style="font-size:13px">${r.guests} guests${r.note?' · '+esc(r.note):''}</span></div><span class="pill p-${l.status}">${esc(tb(r.table)?tb(r.table).name:r.table)} · ${STATUS[l.status]}</span>${l.status==='available'?`<button class="btn quiet" data-hold="${i}">Hold table</button>`:`<button class="btn quiet" data-open="${r.table}">Open</button>`}<button class="x" data-resrm="${i}" aria-label="Remove booking for ${esc(r.name)}" style="flex:none">×</button></div>`}).join('')||'<div class="empty">No bookings yet.</div>'}</section>${resForm()}
@@ -1421,6 +1427,7 @@ const TAGS=[['fast','🌿'],['veg','🥬'],['vegan','🌱'],['gf','🌾'],['chef
 const DEFAULT_CATS=[{id:'Starters',en:'Starters',am:'መጀመሪያ ምግቦች'},{id:'Mains',en:'Mains',am:'ዋና ምግቦች'},{id:'Sides',en:'Sides',am:'ተጨማሪ ምግቦች'},{id:'Desserts',en:'Desserts',am:'ጣፋጭ ምግቦች'},{id:'Drinks',en:'Drinks',am:'መጠጦች'},{id:'Coffee',en:'Coffee',am:'ቡና'},{id:'Specials',en:'Specials',am:'ልዩ ምግቦች'}];
 const catList=src=>{const c=(src||S.set).cats;return Array.isArray(c)&&c.length?c:DEFAULT_CATS},CID=()=>catList().map(c=>c.id);
 const cLabel=(id,lang,src)=>{const c=catList(src).find(x=>x.id===id);return c?(c[lang||'en']||c.en||id):id};
+const gmLangs=d=>{const L=(d&&d.look)||{},l=Array.isArray(L.langs)?L.langs.filter(x=>['en','am','ti'].includes(x)):[];return l.length?l:['en','am','ti']};
 const tx=(m,f,lang)=>(lang&&lang!=='en'&&m[f+'_'+lang])||m[f]||'';
 const tl=(k,lang)=>(UI[lang]||UI.en)[k]||UI.en[k];
 const BIG={};let BIGQ=[],BIGRUN=0;
@@ -1440,14 +1447,14 @@ function gmData(){if(S.gm&&S.gm.pub)return S.gm;return{name:S.set.name,set:S.set
 function gmPhoto(m,cls){const big=BIG[m.id],p=big||phOf(m);return p?`<img class="${cls}" src="${p}" alt="" data-big="${m.big&&!big?m.id:''}">`:`<span class="${cls} gm-ph f-${esc(m.cat)}">${FOOD[m.name]||CATI[m.cat]||'🍽️'}</span>`}
 function gmTags(m,lang){const t=(m.tags||[]).filter(k=>TAGS.some(x=>x[0]===k));return(t.length||m.spice)?`<div class="gm-tags">${t.map(k=>`<span>${TAGS.find(x=>x[0]===k)[1]} ${esc(tl(k,lang))}</span>`).join('')}${m.spice?`<span title="${esc(tl('spice',lang))}">${'🌶'.repeat(Math.min(3,m.spice))}</span>`:''}</div>`:''}
 const TIBEB='<svg class="tibeb" viewBox="0 0 120 16" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="tb" width="24" height="16" patternUnits="userSpaceOnUse"><path d="M0 8 L6 2 L12 8 L6 14Z M12 8 L18 2 L24 8 L18 14Z" fill="none" stroke="currentColor" stroke-width="1"/><path d="M6 6v4M4 8h4M18 6v4M16 8h4" stroke="currentColor" stroke-width="1"/></pattern></defs><rect width="120" height="16" fill="url(#tb)"/></svg>';
-GATES.guest=()=>{const d=gmData(),st=d.set||{},ms=st.menuStyle||{},lang=S.lang||'en',cats=catList(st).filter(c=>d.items.some(m=>inCat(m,c.id)));
+GATES.guest=()=>{const d=gmData(),st=d.set||{},ms=st.menuStyle||{},gl=gmLangs(d),lang=gl.includes(S.lang)?S.lang:gl[0],cats=catList(st).filter(c=>d.items.some(m=>inCat(m,c.id)));
   if(d.paused)return`<div class="gm"><div class="gm-in"><h1 class="gm-title">${esc(d.name)}</h1><p class="gm-sub">${esc(tl('paused',lang))}</p></div></div>`;
   if(!cats.some(c=>c.id===S.gcat))S.gcat=cats[0]&&cats[0].id;
   const list=d.items.filter(m=>inCat(m,S.gcat)),tag=tx(ms,'tagline',lang);
   const card=m=>`<button class="gm-card ${m.on===false?'out':''}" data-gd="${m.id}"><span class="gm-img">${gmPhoto(m,'gm-pic')}</span><span class="gm-txt"><b class="gm-name">${esc(tx(m,'name',lang))} <span class="gm-price">${gbp2(m.price)}</span></b>${lang!=='en'&&tx(m,'name',lang)!==m.name?`<span class="gm-alt">${esc(m.name)}</span>`:lang==='en'&&m.name_am?`<span class="gm-alt ge">${esc(m.name_am)}</span>`:''}${tx(m,'desc',lang)?`<span class="gm-desc">(${esc(tx(m,'desc',lang))})</span>`:''}${gmTags(m,lang)}${m.on===false?`<span class="gm-out">${esc(tl('soldout',lang))}</span>`:''}</span></button>`;
   const L=lookOf(d),pat=L.pattern!==undefined?L.pattern:ms.pattern!==false,btw=adH('between');
   return`<div class="gm lay-${esc(L.layout)} ${pat?'':'nopat'}" style="${themeVars(L.theme)}" lang="${lang}">${S.gm&&S.gm.pub?'':'<button class="gm-exit" data-a="gmExit">← Back to the app</button>'}
-<header class="gm-head">${TIBEB}<div class="gm-in"><div class="gm-lang" role="group" aria-label="Language">${LANGS.map(([k,l])=>`<button class="${lang===k?'on':''}" data-lang="${k}" lang="${k}">${l}</button>`).join('')}</div>
+<header class="gm-head">${TIBEB}<div class="gm-in">${gl.length>1?`<div class="gm-lang" role="group" aria-label="Language">${LANGS.filter(x=>gl.includes(x[0])).map(([k,l])=>`<button class="${lang===k?'on':''}" data-lang="${k}" lang="${k}">${l}</button>`).join('')}</div>`:'<div style="height:14px"></div>'}
 <div class="gm-mark">✦</div><h1 class="gm-title">${esc(d.name||st.name||'')}</h1>${tag?`<p class="gm-sub">${esc(tag)}</p>`:`<p class="gm-sub">${esc(tl('menu',lang))}</p>`}</div></header>
 ${adH('top')?`<div class="gm-in ad-wrap">${adH('top')}</div>`:''}<nav class="gm-cats" aria-label="Menu sections">${cats.map(c=>`<button class="${c.id===S.gcat?'on':''}" data-gcat="${esc(c.id)}">${esc(c[lang]||c.en||c.id)}</button>`).join('')}</nav>
 <main class="gm-in gm-list"><h2 class="gm-sec">${esc((cats.find(c=>c.id===S.gcat)||{})[lang]||cLabel(S.gcat,'en',st))}</h2>${list.length?list.map((m,i)=>card(m)+(btw&&i===Math.min(2,list.length-1)?btw:'')).join(''):`<p class="gm-sub">${esc(tl('empty',lang))}</p>`}</main>
@@ -1647,8 +1654,8 @@ function ping(kind,msg){if(soundOn()){try{AC=AC||new(window.AudioContext||window
 window.addEventListener('focus',()=>{document.title=TITLE0});
 function keepAwake(){const want=LIVE&&S.page==='kitchen'&&!document.hidden;if(want&&!WL&&navigator.wakeLock){navigator.wakeLock.request('screen').then(w=>{WL=w;w.addEventListener('release',()=>{WL=null});softRender()}).catch(()=>{})}else if(!want&&WL){WL.release().catch(()=>{});WL=null}}
 document.addEventListener('visibilitychange',()=>{try{keepAwake()}catch(_){}});
-function kitchenBar(){return`<div class="kbar"><button class="chip ${soundOn()?'on':''}" data-a="sndTog" aria-pressed="${soundOn()}">${soundOn()?'🔔 Sound on':'🔕 Sound off'}</button>${LIVE&&navigator.wakeLock?`<span class="dim" style="font-size:13px">${WL?'Screen stays on while this page is open':'Tap anywhere to keep the screen on'}</span>`:''}<span style="margin-left:auto"></span>${notifyPanel(true)}</div>`}
-Object.assign(GACT,{sndTog(){lsSet('zh-snd',soundOn()?'0':'1');if(soundOn())ping('order');render()}});
+function kitchenBar(){const kl=kLang();return`<div class="kbar"><div class="seg" role="group" aria-label="Kitchen language">${[['en','English'],['am','አማርኛ'],['ti','ትግርኛ'],['both','English + አማርኛ']].map(([k,l])=>`<button class="${kl===k?'on':''}" data-a="kLang" data-l="${k}">${l}</button>`).join('')}</div><button class="chip ${soundOn()?'on':''}" data-a="sndTog" aria-pressed="${soundOn()}">${soundOn()?'🔔 Sound on':'🔕 Sound off'}</button>${LIVE&&navigator.wakeLock?`<span class="dim" style="font-size:13px">${WL?'Screen stays on while this page is open':'Tap anywhere to keep the screen on'}</span>`:''}<span style="margin-left:auto"></span>${notifyPanel(true)}</div>`}
+Object.assign(GACT,{kLang(d){lsSet('zh-klang',d.l);render()},sndTog(){lsSet('zh-snd',soundOn()?'0':'1');if(soundOn())ping('order');render()}});
 
 /* ---------- notifications on the phone, even when the app is closed (Web Push) ---------- */
 const VAPID='BMR0Zdz74YUPIWdKPKVsigdlLOPkLqhMbwI1rShaF5SPiDR_I0u5_r8gVutcjE8YVKCp3iORgfFgXBc7TShVJrU';
@@ -1734,11 +1741,13 @@ function lookPanel(){if(!(S.role==='owner'||S.role==='admin'))return'';const L=l
   return`<section class="panel"><header><h2>Guest menu look</h2><button class="btn quiet" data-a="gmOpen">Preview</button></header><p class="muted" style="margin:0 0 12px;font-size:14px">Choose how your menu looks to guests. The colour also tints your staff app.</p>
 <div class="thgrid">${Object.entries(THEMES).map(([k,t])=>`<button class="thcard ${L.theme===k?'on':''}" data-a="lkTheme" data-t="${k}" aria-pressed="${L.theme===k}" style="${themeVars(k)}"><span class="thprev"><span class="thtitle">${esc(S.set.name||'Restaurant')}</span><span class="throw"><span class="thimg"></span><span class="thlines"><i></i><i></i></span></span></span><span class="thname">${t.name}</span></button>`).join('')}</div>
 <div class="eyebrow" style="margin:16px 0 8px">Dish layout</div><div class="chips">${LAYOUTS.map(([k,l])=>`<button class="chip ${L.layout===k?'on':''}" data-a="lkLay" data-l="${k}">${l}</button>`).join('')}</div>
-<label class="gchk" style="margin-top:12px"><input type="checkbox" data-a="lkPat" ${pat?'checked':''}> Traditional tibeb border</label></section>`}
+<label class="gchk" style="margin-top:12px"><input type="checkbox" data-a="lkPat" ${pat?'checked':''}> Traditional tibeb border</label>
+<div class="eyebrow" style="margin:16px 0 8px">Languages on the menu</div><div class="chips">${LANGS.map(([k,l])=>`<label class="gchk"><input type="checkbox" data-a="lkLang" data-l="${k}" ${gmLangs({look:S.look}).includes(k)?'checked':''}> ${l}</label>`).join('')}</div><span class="dim" style="font-size:13px">Guests only see the languages you tick. With one language, the language buttons are hidden.</span></section>`}
 Object.assign(GACT,{
   lkTheme(d){S.look={...lookOf({look:S.look}),theme:d.t};toast(THEMES[d.t].name+' chosen');render()},
   lkLay(d){S.look={...lookOf({look:S.look}),layout:d.l};render()},
-  lkPat(d,el){S.look={...lookOf({look:S.look}),pattern:el.checked};render()}});
+  lkPat(d,el){S.look={...lookOf({look:S.look}),pattern:el.checked};render()},
+  lkLang(d,el){let l=gmLangs({look:S.look}).filter(x=>x!==d.l);if(el.checked)l.push(d.l);l=['en','am','ti'].filter(x=>l.includes(x));if(!l.length){el.checked=true;return toast('Keep at least one language')}S.look={...lookOf({look:S.look}),langs:l};render()}});
 
 /* ---------- adverts ---------- */
 const ADPL=[['top','Top of the menu'],['between','Between the dishes'],['bottom','Bottom of the menu'],['popup','Pop-up on the menu'],['app','Restaurant apps (staff and owners)']];

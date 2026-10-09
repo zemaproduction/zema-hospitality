@@ -461,6 +461,11 @@ button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select
 
 .utab{margin-top:14px;border-top:1px solid var(--line2)}.urow{display:grid;grid-template-columns:minmax(0,2fr) 1.2fr 1.2fr .9fr .8fr .8fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line2);font-size:14px}.urow.uh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
 @media (max-width:640px){.urow{display:flex;flex-wrap:wrap;gap:4px 12px}.urow.uh{display:none}.urow>b{flex:1 1 60%}.urow>span:nth-child(n+3){font-size:13px;color:var(--ink2)}.urow>span:nth-child(3){flex-basis:100%;order:3}.urow>span:nth-child(n+4){order:4}.urow>span:nth-child(4)::before{content:"Days used "}.urow>span:nth-child(5)::before{content:"· Sign-ins "}.urow>span:nth-child(6)::before{content:"· Orders "}.urow>span:nth-child(3)::before{content:"Last used "}}
+
+.tabstrip{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.tabstrip .eyebrow{flex:none}
+.tabchip{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 14px;border-radius:12px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);font-size:14px}.tabchip .mono{font-size:13px;color:var(--ink2)}
+.tabnew{display:flex;gap:8px}.tabnew input{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)}
+.step.sm button{width:32px;height:32px;font-size:16px}.step.sm span{min-width:26px;text-align:center}.till .line{align-items:center}
 </style>
 </head>
 <body>
@@ -582,12 +587,12 @@ function toast(m){S.toast=m;clearTimeout(toast.t);toast.t=setTimeout(()=>{S.toas
 const I={dashboard:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 7h6V4h-6z"/>',floor:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><circle cx="17" cy="6.5" r="3.5"/><rect x="3" y="14" width="18" height="7" rx="1.5"/>',
  res:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',menu:'<path d="M5 4h14v17H5zM9 9h6M9 13h6M9 17h3"/>',staff:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 20a6.5 6.5 0 0 0-2-4.6"/>',
  reports:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2l.4 2.6h4l.4-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/>',
- stock:'<path d="M4 8l8-4 8 4v9l-8 4-8-4zM4 8l8 4 8-4M12 12v9"/>',profit:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',tables:'<path d="M3 9h18M6 9v10M18 9v10M3 9l2-4h14l2 4"/>',bills:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',tx:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>',orders:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',kitchen:'<path d="M6 14a4 4 0 1 1 1.5-7.7 5 5 0 0 1 9 0A4 4 0 1 1 18 14zM6 14v6h12v-6"/>'};
+ till:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M7 9V5h10v4M7 14h4M15 14h2M7 17h10"/>',stock:'<path d="M4 8l8-4 8 4v9l-8 4-8-4zM4 8l8 4 8-4M12 12v9"/>',profit:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',tables:'<path d="M3 9h18M6 9v10M18 9v10M3 9l2-4h14l2 4"/>',bills:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',tx:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>',orders:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',kitchen:'<path d="M6 14a4 4 0 1 1 1.5-7.7 5 5 0 0 1 9 0A4 4 0 1 1 18 14zM6 14v6h12v-6"/>'};
 const ic=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${I[k]}</svg>`;
 const OWNERNAV=[['dashboard','Dashboard'],['floor','Floor plan'],['res','Reservations'],['menu','Menu'],['stock','Stock'],['staff','Staff'],['tx','Payments'],['reports','Reports'],['profit','Costs & profit'],['settings','Settings']];
 const NAV={admin:[['menu','Menu'],['floor','Floor plan'],['staff','Staff'],['settings','Settings']],owner:OWNERNAV,manager:OWNERNAV.filter(x=>x[0]!=='profit'),cashier:[['bills','Bills'],['floor','Floor plan'],['tx','Payments']],
  waiter:[['dashboard','My shift'],['floor','Floor plan'],['orders','Orders'],['res','Reservations']],kitchen:[['kitchen','Kitchen display']]};
-const TITLE={stock:'Stock',profit:'Costs and profit',bills:'Bills',tx:'Payments',dashboard:{owner:'Dashboard',manager:'Dashboard',waiter:'My shift'},floor:'Floor plan',res:'Reservations',menu:'Menu',staff:'Staff',reports:'Reports',settings:'Settings',orders:'Orders',kitchen:'Kitchen display',order:'New order'};
+const TITLE={till:'Till',stock:'Stock',profit:'Costs and profit',bills:'Bills',tx:'Payments',dashboard:{owner:'Dashboard',manager:'Dashboard',waiter:'My shift'},floor:'Floor plan',res:'Reservations',menu:'Menu',staff:'Staff',reports:'Reports',settings:'Settings',orders:'Orders',kitchen:'Kitchen display',order:'New order'};
 const SOON={};
 
 /* ---------- shell ---------- */
@@ -609,7 +614,7 @@ function draw0(){
   if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox]):not([type=file])').forEach(x=>{keep[x.id]=x.value});if(!setApp(GATES[S.page]().replace(/<\/div>(\s*)$/,(S.page==='guest'?adH('guest'):/^admin/.test(S.page)?'':adH('app'))+zpH()+'</div>$1')))return;Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
   if(S.page==='signin'){setApp(signIn().replace(/<\/div>(\s*)$/,adH('app')+zpH()+'</div>$1'));return}
   const u=LIVE&&S.role==='admin'?{name:'Zema Hospitality',role:'Admin'}:staff(S.user);
-  const nav=NAV[S.role],title=S.page==='order'?`Order · ${esc(tb(S.orderFor).name)}`:(typeof TITLE[S.page]==='object'?TITLE[S.page][S.role]:TITLE[S.page]);
+  const nav=navOf(),title=S.page==='order'?`Order · ${esc(tb(S.orderFor).name)}`:(typeof TITLE[S.page]==='object'?TITLE[S.page][S.role]:TITLE[S.page]);
   if(!setApp(`<aside class="rail"><div class="brand"><i>Z</i><div><b>${esc(S.set.name)}</b><small>Zema Hospitality</small></div></div>
 <nav class="nav" aria-label="Sections">${nav.map(([k,l])=>`<button class="${S.page===k||(S.page==='order'&&k==='floor')?'on':''}" data-go="${k}">${ic(k)}<span>${l}</span>${SOON[k]?'<span class="soon">Next</span>':''}</button>`).join('')}</nav>
 <div class="rail-foot"><span style="display:block;margin-bottom:4px">Powered by <b style="color:var(--accent)">Zema Production</b></span>${LIVE?(S.offline?'Offline · changes are waiting':'Live · every device in sync'):'Prototype · sample data<br>Thursday dinner service'}</div></aside>
@@ -630,6 +635,7 @@ function page(){
   if(S.page==='settings')return settingsPage();
   if(S.page==='bills')return billsPage();
   if(S.page==='tx')return txPage();
+  if(S.page==='till')return tillPage();
   if(S.page==='stock')return isMgr()?stockPage():'';
   if(S.page==='profit')return profitPage();
   return S.role==='waiter'?waiterHome():ownerHome();
@@ -818,7 +824,7 @@ document.addEventListener('change',e=>{if(!S.edit)return;const tg=e.target;
 function sheet(){
   if(S.rcpt)return receipt();
   if(S.mod)return modSheet();
-  if(!S.sel||S.edit||S.page==='order'||S.role==='admin')return'';
+  if(!S.sel||S.edit||S.page==='order'||S.role==='admin'||!tb(S.sel))return'';
   const t=tb(S.sel),l=lv(t.id),os=openOrders(t.id),tot=tableTotal(t.id),ready=os.filter(o=>o.status==='ready'),zone=ZONES.find(z=>z.id===t.zone);
   const facts=l.guests?`<div class="facts"><div><span class="eyebrow">Guests</span><b>${l.guests}</b></div><div><span class="eyebrow">Seated</span><b>${hhmm(l.seated)} · ${since(l.seated)}</b></div><div><span class="eyebrow">Waiter</span><b>${esc(staff(l.waiter).name)}</b></div><div><span class="eyebrow">Running total</span><b>${gbp2(tot)}</b></div></div>`:'';
   let foot='';
@@ -934,6 +940,7 @@ function settingsPage(){
   const adm=S.role==='admin';
   const f=(k,l,ph)=>`<div class="fld"><label class="eyebrow" for="set-${k}">${l}</label><input id="set-${k}" value="${esc(S.set[k])}" maxlength="120" placeholder="${ph||''}" ${adm?'':'disabled'}></div>`,own=S.role==='owner';
   return`<div class="grid g2" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><section class="panel"><header><h2>Restaurant</h2></header><div style="display:flex;flex-direction:column;gap:12px">${f('name','Restaurant name')}${f('address','Address')}<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px">${f('phone','Phone')}${f('email','Email')}</div>${f('hours','Opening hours')}
+${adm?`<div class="fld"><label class="eyebrow" for="set-btype">Type of business</label><select id="set-btype" style="min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body)"><option value="restaurant" ${!isCafe()?'selected':''}>Full restaurant · floor plan, waiters and kitchen</option><option value="cafe" ${isCafe()?'selected':''}>Café or bar · simple till and open tabs</option></select></div>`:`<div class="fld"><span class="eyebrow">Type of business</span><span>${isCafe()?'Café or bar':'Full restaurant'}</span></div>`}
 <div class="fld"><label class="eyebrow" for="set-service">Service charge %</label><input id="set-service" type="number" inputmode="decimal" min="0" max="30" step="0.5" value="${S.set.service}" style="max-width:140px" ${adm?'':'disabled'}></div>
 ${adm?'<button class="btn pri" data-a="saveSet" style="align-self:flex-start">Save changes</button>':'<span class="dim" style="font-size:13px">These details are managed by Zema Hospitality. Ask us if something needs changing.</span>'}</div></section>${lookPanel()}</div>
 <div style="display:flex;flex-direction:column;gap:16px;min-width:0"><section class="panel"><header><h2>Payment methods</h2></header>${payMethods(true).map(m=>`<div class="row"><div class="grow"><b>${m}</b></div><button class="chip ${S.set.methods[m]?'on':''}" data-method="${m}" ${adm?'':'disabled'} aria-pressed="${S.set.methods[m]}">${S.set.methods[m]?'Accepted':'Off'}</button></div>`).join('')}</section>
@@ -948,7 +955,7 @@ function billsPage(){
 function txPage(){
   const l=S.tx.filter(x=>!LIVE||x.at>=dayStart()).sort((a,b)=>b.at-a.at),net=l.filter(x=>!x.refunded).reduce((a,x)=>a+x.total,0),canRefund=S.role==='owner'||S.role==='manager',by={};l.filter(x=>!x.refunded).forEach(x=>{by[x.method]=(by[x.method]||0)+x.total});
   return`<div class="panel grid g3" style="padding:0;gap:0"><div class="kpi"><span class="eyebrow">Payments tonight</span><span class="num">${l.length}</span></div><div class="kpi"><span class="eyebrow">Taken</span><span class="num">${gbp2(net)}</span></div><div class="kpi"><span class="eyebrow">By method</span><span style="font-size:14px;line-height:1.6">${Object.entries(by).map(([m,v])=>`${m} <span class="mono">${gbp2(v)}</span>`).join('<br>')||'None yet'}</span></div></div>
-<section class="panel"><header><h2>Transactions</h2>${canRefund?'':'<span class="dim">Refunds need a manager</span>'}</header>${l.map(x=>`<div class="row"><span class="t">${hhmm(x.at)}</span><button class="grow" data-rc="${x.id}" style="text-align:left" aria-label="Receipt for payment ${x.id}"><b>${esc(tb(x.table)?tb(x.table).name:x.table)} · ${x.method}${x.part?' · '+x.part:''}</b><span class="dim" style="font-size:13px;display:block">#${x.id} · ${esc(staff(x.by).name)} · tap for receipt</span></button><span class="mono" style="font-weight:500;${x.refunded?'text-decoration:line-through;color:var(--ink3)':''}">${gbp2(x.total)}</span>${x.refunded?'<span class="pill p-bill">Refunded</span>':canRefund?`<button class="btn quiet" data-refund="${x.id}">Refund</button>`:''}</div>`).join('')}</section>`}
+<section class="panel"><header><h2>Transactions</h2>${canRefund?'':'<span class="dim">Refunds need a manager</span>'}</header>${l.map(x=>`<div class="row"><span class="t">${hhmm(x.at)}</span><button class="grow" data-rc="${x.id}" style="text-align:left" aria-label="Receipt for payment ${x.id}"><b>${esc(tb(x.table)?tb(x.table).name:(x.label||placeName(x.table)))} · ${x.method}${x.part?' · '+x.part:''}</b><span class="dim" style="font-size:13px;display:block">#${x.id} · ${esc(staff(x.by).name)} · tap for receipt</span></button><span class="mono" style="font-weight:500;${x.refunded?'text-decoration:line-through;color:var(--ink3)':''}">${gbp2(x.total)}</span>${x.refunded?'<span class="pill p-bill">Refunded</span>':canRefund?`<button class="btn quiet" data-refund="${x.id}">Refund</button>`:''}</div>`).join('')}</section>`}
 
 /* ---------- actions ---------- */
 function go(page){S.page=page;S.rcpt=null;S.sel=null;S.edit=false;S.mod=null;render();const v=$('#view');if(v)v.scrollTop=0;window.scrollTo(0,0)}
@@ -956,7 +963,7 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin],[data-floor],[data-col],[data-aemail],[data-oopen],[data-adel],[data-apay],[data-abill],[data-u],[data-olink]');if(!el)return;const d=el.dataset;
   if(d.go)return go(d.go);
   if(d.who){S.pick=d.who;S.pin='';return render()}
-  if(d.pin!=null){if(d.pin==='x')S.pin=S.pin.slice(0,-1);else if(S.pin.length<4)S.pin+=d.pin;if(S.pin.length===4){if(LIVE){liveSignin();return draw()}const u=staff(S.pick);S.user=u.id;S.role=ROLEKEY[u.role];if(S.role==='waiter')ME=u.id;S.pick=null;S.pin='';toast('Signed in as '+u.name.replace(/^Chef /,''));return go(NAV[S.role][0][0])}return render()}
+  if(d.pin!=null){if(d.pin==='x')S.pin=S.pin.slice(0,-1);else if(S.pin.length<4)S.pin+=d.pin;if(S.pin.length===4){if(LIVE){liveSignin();return draw()}const u=staff(S.pick);S.user=u.id;S.role=ROLEKEY[u.role];if(S.role==='waiter')ME=u.id;S.pick=null;S.pin='';toast('Signed in as '+u.name.replace(/^Chef /,''));return go(navOf()[0][0])}return render()}
   if(d.rr){S.rr=d.rr;return render()}
   if(d.pm){S.payM=d.pm;return render()}
   if(d.shift){const u=staff(d.shift);if(LIVE)rpc('h_staff_update',{p_token:TOKEN,p_id:u.id,p_patch:{on:!u.on}}).then(setStaff).catch(netFail);u.on=!u.on;toast(u.name+(u.on?' is on shift':' is off shift'));return render()}
@@ -1008,9 +1015,9 @@ document.addEventListener('click',e=>{
   if(a==='staffRm'){const u=staff(S.sEdit);if(LIVE){rpc('h_staff_update',{p_token:TOKEN,p_id:u.id,p_patch:{remove:true}}).then(x=>{setStaff(x);toast(u.name+' removed');draw()}).catch(e=>toast(errMsg(e)))}else{STAFF.splice(STAFF.indexOf(u),1);toast(u.name+' removed')}S.sEdit=null;return render()}
   if(a==='copyLink'){const u=deviceLink();(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Link copied')).catch(()=>toast('Press and hold the link to copy it'));return}
   if(a==='switch'){if(LIVE)return liveOut();S.page='signin';S.pick=null;S.pin='';S.sel=null;S.mod=null;S.edit=false;return render()}
-  if(a==='signBack'){if(S.pick){S.pick=null;S.pin='';S.pinMsg='';return render()}if(LIVE&&!TOKEN)return;return go(NAV[S.role][0][0])}
+  if(a==='signBack'){if(S.pick){S.pick=null;S.pin='';S.pinMsg='';return render()}if(LIVE&&!TOKEN)return;return go(navOf()[0][0])}
   if(a==='addStaff'){const n=$('#sn').value.trim(),r=$('#sr').value;if(!n){$('#sn').focus();return toast('Add their name first')}const pn=($('#sp')||{}).value||'';if(!/^\d{4}$/.test(pn)){$('#sp').focus();return toast('Give them a 4-digit PIN')}if(LIVE){rpc('h_staff_add',{p_token:TOKEN,p_name:n,p_role:r,p_pin:pn}).then(x=>{setStaff(x);toast(n+' added as '+r.toLowerCase());draw()}).catch(e=>toast(errMsg(e)));return}STAFF.push({id:'n'+now(),name:n,role:r,on:false});toast(n+' added as '+r.toLowerCase());return render()}
-  if(a==='saveSet'){if(S.role!=='admin')return;['name','address','phone','email','hours'].forEach(k=>{const v=$('#set-'+k).value.trim();if(v)S.set[k]=v});const sv=parseFloat($('#set-service').value);S.set.service=sv>=0&&sv<=30?sv:0;toast('Settings saved');return render()}
+  if(a==='saveSet'){if(S.role!=='admin')return;['name','address','phone','email','hours'].forEach(k=>{const v=$('#set-'+k).value.trim();if(v)S.set[k]=v});const sv=parseFloat($('#set-service').value);S.set.service=sv>=0&&sv<=30?sv:0;const bt=$('#set-btype');if(bt)S.set.btype=bt.value;toast('Settings saved');return render()}
   if(a==='closeSheet'){if(e.target!==el&&el.classList.contains('scrim'))return;S.sel=null;S.gN=null;S.voidO=S.moveT=S.noteT=S.walkT=S.voidQ=S.cancelQ=S.discOpen=null;return render()}
   if(a==='editOn'){if(S.role!=='admin')return;S.edit=true;S.sel=null;return render()}
   if(a==='saveLayout'){if(!LIVE)try{localStorage.setItem('zh-layout',JSON.stringify(layoutDoc()))}catch(_){}S.edit=false;S.sel=null;S.selZ=null;toast('Layout saved');return render()}
@@ -1076,7 +1083,7 @@ function splitOf(tid){const l=lv(tid),full=billCalc(tid).total,paid=l.paid||0,do
 function receipt(){const r=S.rcpt,x=r.tx!=null&&S.tx.find(q=>q.id==r.tx),tid=x?x.table:r.table,t=tb(tid),lines=x?(x.lines||[]):billLines(tid),bcR=x?null:billCalc(tid),svc=x?(x.svc||0):bcR.rate,sub=lines.reduce((a,q)=>a+q.qty*q.price,0),dsc=r2(sub*(1-(x?(x.dfac!=null?x.dfac:1):bcR.f))),sv=r2((sub-dsc)*svc/100),total=r2(sub-dsc+sv),l=!x&&lv(tid),w=staff(x?x.waiter:l.waiter),at=x?x.at:now();
   const row=(a,b,c)=>`<div class="rc-r ${c||''}"><span>${a}</span><span>${b}</span></div>`;
   return`<div class="rcwrap" data-a="rcClose"><div class="rc" role="dialog" aria-label="${x?'Receipt':'Bill'}"><div class="rc-paper"><h2>${esc(S.set.name)}</h2>${S.set.address?`<p>${esc(S.set.address)}</p>`:''}${S.set.phone?`<p>${esc(S.set.phone)}</p>`:''}
-<div class="rc-hr"></div>${row(x?'Receipt #'+x.id:'Bill',new Date(at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' '+hhmm(at))}${row('Table',esc(t?t.name:tid))}${w.id?row('Served by',esc(w.name.split(' ')[0])):''}
+<div class="rc-hr"></div>${row(x?'Receipt #'+x.id:'Bill',new Date(at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' '+hhmm(at))}${row(t?'Table':'For',esc(t?t.name:(x&&x.label)||placeName(tid)))}${w.id?row('Served by',esc(w.name.split(' ')[0])):''}
 <div class="rc-hr"></div>${lines.length?lines.map(q=>row(q.qty+' × '+esc(q.name),gbp2(q.qty*q.price))).join(''):row('Items','not itemised')}
 <div class="rc-hr"></div>${lines.length?row('Subtotal',gbp2(sub))+(dsc?row('Discount'+(!x&&bcR.d&&bcR.d.k==='pct'?' '+bcR.d.v+'%':''),'−'+gbp2(dsc)):'')+(svc?row('Service '+svc+'%',gbp2(sv)):'')+row('Total',gbp2(total),'big'):''}
 ${x?row((x.refunded?'Refunded · ':'Paid · ')+esc(x.method)+(x.part?' · '+x.part:''),gbp2(x.total),lines.length?'':'big'):(l.paid?row('Paid so far',gbp2(l.paid))+row('Still to pay',gbp2(Math.max(0,total-l.paid)),'big'):'')+((l.split||1)>1?row('Split between '+l.split,gbp2(splitOf(tid).amt)+' each'):'')}
@@ -1084,7 +1091,7 @@ ${x?row((x.refunded?'Refunded · ':'Paid · ')+esc(x.method)+(x.part?' · '+x.pa
 <div class="rc-actions"><button class="btn pri" data-a="rcPrint">Print</button><button class="btn" data-a="rcClose">Close</button></div></div></div>`}
 function startOrder(tid){S.orderFor=tid;S.sel=null;S.draft=[];S.cat='Starters';S.page='order';render();const v=$('#view');if(v)v.scrollTop=0}
 /* a table's state follows its tickets: food on the way is "waiting", everything served is "occupied" */
-function syncTable(tid){const l=lv(tid),os=openOrders(tid);if(!os.length||l.status==='bill')return;l.status=os.some(o=>o.status!=='served')?'waiting':'occupied'}
+function syncTable(tid){if(isTab(tid)||tid==='counter')return;const l=lv(tid),os=openOrders(tid);if(!os.length||l.status==='bill')return;l.status=os.some(o=>o.status!=='served')?'waiting':'occupied'}
 
 /* =====================================================================
    Live mode. With a database configured, the same screens run on real
@@ -1234,7 +1241,7 @@ async function startLive(code){CODE=code;LIVE=true;lsSet('zh-code',code);STAFF.l
     if(st&&st.c===CODE&&st.t){TOKEN=st.t;try{await enter(st.u);return render()}catch(e){TOKEN=null;lsDel('zh-tok')}}
     S.pick=null;S.pin='';S.pinMsg='';S.page='signin';draw()}
   catch(e){if(e.code==='NOCODE'){lsDel('zh-code');CODE=null;LIVE=false;STAFF.push(...DEMO_STAFF.map(x=>({...x})));S.gMsg='That link was not recognised. Check it and try again.';S.page='welcome'}else{S.gMsg='Could not reach the restaurant. Check the internet connection.';S.gRetry=true;S.page='loading'}draw()}}
-async function enter(id){resetData();await pull(true);const u=staff(id);if(!u.id)throw new Error('gone');S.user=u.id;ME=u.id;S.role=ROLEKEY[u.role];S.pick=null;S.pin='';S.sel=null;S.mod=null;S.edit=false;S.page=NAV[S.role][0][0];if(S.goAfter&&NAV[S.role].some(x=>x[0]===S.goAfter))S.page=S.goAfter;S.goAfter=null;
+async function enter(id){resetData();await pull(true);const u=staff(id);if(!u.id)throw new Error('gone');S.user=u.id;ME=u.id;S.role=ROLEKEY[u.role];S.pick=null;S.pin='';S.sel=null;S.mod=null;S.edit=false;S.page=navOf()[0][0];if(S.goAfter&&navOf().some(x=>x[0]===S.goAfter))S.page=S.goAfter;S.goAfter=null;
   if(!SYNCED.has('layout')&&S.role==='owner'&&lsGet('zh-demo')===CODE){MENU.push(...DEMO_MENU.map(m=>({...m,on:true})));lsDel('zh-demo')}}
 async function liveSignin(){const id=S.pick,pin=S.pin;S.pinMsg='Checking…';
   try{const r=await rpc('h_signin',{p_code:CODE,p_staff:id,p_pin:pin});S.pin='';
@@ -1407,9 +1414,9 @@ if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventLis
    in English, Amharic and Tigrinya. Public by the restaurant's menu link.
    ===================================================================== */
 const LANGS=[['en','English'],['am','አማርኛ'],['ti','ትግርኛ']];
-const UI={en:{back:'Back',story:'The story',allergens:'Allergens',fast:'Fasting',veg:'Vegetarian',vegan:'Vegan',gf:'Gluten free',chef:"Chef's special",share:'To share',spice:'Spice',ask:'Ask your server to order',soldout:'Sold out today',empty:'Nothing in this section yet.',paused:'The menu is not available at the moment.',menu:'Menu'},
-  am:{back:'ተመለስ',story:'ታሪኩ',allergens:'አለርጂ',fast:'የጾም',veg:'የአትክልት',vegan:'ቪጋን',gf:'ከግሉተን ነፃ',chef:'የሼፍ ምርጫ',share:'ለመጋራት',spice:'ቅመም',ask:'ለማዘዝ አስተናጋጅዎን ይጠይቁ',soldout:'ዛሬ አልቋል',empty:'እዚህ ክፍል ገና ምንም የለም።',paused:'ምናሌው በአሁኑ ጊዜ አይገኝም።',menu:'ምናሌ'},
-  ti:{back:'ተመለስ',story:'ዛንታ',allergens:'ኣለርጂ',fast:'ጾም',veg:'ኣሕምልቲ',vegan:'ቪጋን',gf:'ብዘይ ግሉተን',chef:'ምርጫ ሸፍ',share:'ንምክፋል',spice:'ቅመም',ask:'ንምእዛዝ ኣሳሳዪኹም ሕተቱ',soldout:'ሎሚ ተወዲኡ',empty:'ኣብዚ ክፍሊ ገና ዋላ ሓንቲ የለን።',paused:'እቲ ዝርዝር መግቢ ሕጂ ኣይርከብን።',menu:'ዝርዝር መግቢ'}};
+const UI={en:{back:'Back',story:'The story',allergens:'Allergens',fast:'Fasting',veg:'Vegetarian',vegan:'Vegan',gf:'Gluten free',chef:"Chef's special",share:'To share',spice:'Spice',ask:'Ask your server to order',askc:'Please order at the counter',soldout:'Sold out today',empty:'Nothing in this section yet.',paused:'The menu is not available at the moment.',menu:'Menu'},
+  am:{back:'ተመለስ',story:'ታሪኩ',allergens:'አለርጂ',fast:'የጾም',veg:'የአትክልት',vegan:'ቪጋን',gf:'ከግሉተን ነፃ',chef:'የሼፍ ምርጫ',share:'ለመጋራት',spice:'ቅመም',ask:'ለማዘዝ አስተናጋጅዎን ይጠይቁ',askc:'እባክዎ በካውንተሩ ይዘዙ',soldout:'ዛሬ አልቋል',empty:'እዚህ ክፍል ገና ምንም የለም።',paused:'ምናሌው በአሁኑ ጊዜ አይገኝም።',menu:'ምናሌ'},
+  ti:{back:'ተመለስ',story:'ዛንታ',allergens:'ኣለርጂ',fast:'ጾም',veg:'ኣሕምልቲ',vegan:'ቪጋን',gf:'ብዘይ ግሉተን',chef:'ምርጫ ሸፍ',share:'ንምክፋል',spice:'ቅመም',ask:'ንምእዛዝ ኣሳሳዪኹም ሕተቱ',askc:'በጃኹም ኣብ ካውንተር ኣዝዙ',soldout:'ሎሚ ተወዲኡ',empty:'ኣብዚ ክፍሊ ገና ዋላ ሓንቲ የለን።',paused:'እቲ ዝርዝር መግቢ ሕጂ ኣይርከብን።',menu:'ዝርዝር መግቢ'}};
 const TAGS=[['fast','🌿'],['veg','🥬'],['vegan','🌱'],['gf','🌾'],['chef','★'],['share','⟡']];
 const DEFAULT_CATS=[{id:'Starters',en:'Starters',am:'መጀመሪያ ምግቦች'},{id:'Mains',en:'Mains',am:'ዋና ምግቦች'},{id:'Sides',en:'Sides',am:'ተጨማሪ ምግቦች'},{id:'Desserts',en:'Desserts',am:'ጣፋጭ ምግቦች'},{id:'Drinks',en:'Drinks',am:'መጠጦች'},{id:'Coffee',en:'Coffee',am:'ቡና'},{id:'Specials',en:'Specials',am:'ልዩ ምግቦች'}];
 const catList=src=>{const c=(src||S.set).cats;return Array.isArray(c)&&c.length?c:DEFAULT_CATS},CID=()=>catList().map(c=>c.id);
@@ -1444,7 +1451,7 @@ GATES.guest=()=>{const d=gmData(),st=d.set||{},ms=st.menuStyle||{},lang=S.lang||
 <div class="gm-mark">✦</div><h1 class="gm-title">${esc(d.name||st.name||'')}</h1>${tag?`<p class="gm-sub">${esc(tag)}</p>`:`<p class="gm-sub">${esc(tl('menu',lang))}</p>`}</div></header>
 ${adH('top')?`<div class="gm-in ad-wrap">${adH('top')}</div>`:''}<nav class="gm-cats" aria-label="Menu sections">${cats.map(c=>`<button class="${c.id===S.gcat?'on':''}" data-gcat="${esc(c.id)}">${esc(c[lang]||c.en||c.id)}</button>`).join('')}</nav>
 <main class="gm-in gm-list"><h2 class="gm-sec">${esc((cats.find(c=>c.id===S.gcat)||{})[lang]||cLabel(S.gcat,'en',st))}</h2>${list.length?list.map((m,i)=>card(m)+(btw&&i===Math.min(2,list.length-1)?btw:'')).join(''):`<p class="gm-sub">${esc(tl('empty',lang))}</p>`}</main>
-<footer class="gm-foot">${TIBEB}<div class="gm-in"><p>${esc(tl('ask',lang))}</p>${st.address?`<p class="gm-small">${esc(st.address)}</p>`:''}${st.hours?`<p class="gm-small">${esc(st.hours)}</p>`:''}${st.service?`<p class="gm-small">${esc(st.service)}% service is added to the bill</p>`:''}</div></footer>
+<footer class="gm-foot">${TIBEB}<div class="gm-in"><p>${esc(tl((gmData().set||{}).btype==='cafe'?'askc':'ask',lang))}</p>${st.address?`<p class="gm-small">${esc(st.address)}</p>`:''}${st.hours?`<p class="gm-small">${esc(st.hours)}</p>`:''}${st.service?`<p class="gm-small">${esc(st.service)}% service is added to the bill</p>`:''}</div></footer>
 ${S.gd?gmDetail(d,lang):''}${adPopup()}</div>`};
 function gmDetail(d,lang){const m=d.items.find(x=>x.id===S.gd);if(!m)return'';const story=tx(m,'story',lang),al=tx(m,'allergens',lang);
   return`<div class="gm-det" role="dialog" aria-label="${esc(tx(m,'name',lang))}"><button class="gm-close" data-a="gmClose" aria-label="${esc(tl('back',lang))}">← ${esc(tl('back',lang))}</button>
@@ -1452,7 +1459,7 @@ function gmDetail(d,lang){const m=d.items.find(x=>x.id===S.gd);if(!m)return'';co
 <h2 class="gm-dname">${esc(tx(m,'name',lang))}</h2>${tx(m,'name',lang)!==m.name?`<p class="gm-alt">${esc(m.name)}</p>`:m.name_am?`<p class="gm-alt ge">${esc(m.name_am)}</p>`:''}
 <p class="gm-dprice">${gbp2(m.price)}${m.on===false?` · ${esc(tl('soldout',lang))}`:''}</p>${gmTags(m,lang)}
 <p class="gm-ddesc">${esc(tx(m,'desc',lang))}</p>${story?`<h3 class="gm-h3">${esc(tl('story',lang))}</h3><p class="gm-story">${esc(story)}</p>`:''}
-${al?`<p class="gm-small"><b>${esc(tl('allergens',lang))}:</b> ${esc(al)}</p>`:''}<p class="gm-ask">${esc(tl('ask',lang))}</p></div></div>`}
+${al?`<p class="gm-small"><b>${esc(tl('allergens',lang))}:</b> ${esc(al)}</p>`:''}<p class="gm-ask">${esc(tl((gmData().set||{}).btype==='cafe'?'askc':'ask',lang))}</p></div></div>`}
 /* large photos arrive one by one after the page shows */
 function gmLoadBig(){const d=gmData();document.querySelectorAll('img[data-big]').forEach(im=>{const id=im.dataset.big;if(!id)return;if(BIG[id]){im.src=BIG[id];im.dataset.big='';return}if(!BIGQ.includes(id))BIGQ.push(id)});gmPump(d.code)}
 function gmPump(code){if(!code||!SB_URL)return;while(BIGRUN<2&&BIGQ.length){const id=BIGQ.shift();if(BIG[id]!==undefined)continue;BIG[id]=null;BIGRUN++;
@@ -1522,7 +1529,7 @@ ${S.moveT===t.id?`<div class="chips" style="margin-top:10px">${free.map(x=>`<but
 ${S.noteT===t.id?`<div class="trow2"><input id="tnote" maxlength="120" value="${esc(l.note||'')}" placeholder="e.g. birthday, allergy at seat 2" aria-label="Table note"><button class="btn" data-a="noteSave">Save</button></div>`:''}
 ${S.walkT===t.id?`<div class="note" style="margin-top:10px;border:1px solid var(--s-bill)"><b>Close ${esc(t.name)} without payment?</b> ${gbp2(tableTotal(t.id))} is recorded as not paid and the owner is told. Nothing goes back into stock.<div class="tbtns" style="margin-top:10px"><button class="btn" data-a="walkGo" style="background:var(--s-bill);border-color:var(--s-bill);color:#fff">Yes, close the table</button><button class="btn quiet" data-a="walkOn">Keep it open</button></div></div>`:''}</div>`}
 /* a table's state after items are removed: nothing left on it means it is back to ordering */
-function fixTable(tid){const l=lv(tid);if(!openOrders(tid).length){if(['waiting','occupied','bill'].includes(l.status))l.status='ordering'}else syncTable(tid)}
+function fixTable(tid){if(isTab(tid)||tid==='counter')return;const l=lv(tid);if(!openOrders(tid).length){if(['waiting','occupied','bill'].includes(l.status))l.status='ordering'}else syncTable(tid)}
 const findO=id=>S.orders.find(x=>String(x.id)===String(id));
 Object.assign(GACT,{
   voidOn(d){S.voidO=d.o;S.voidQ=null;S.cancelQ=null;const o=findO(d.o);S.voidR=o&&o.status!=='new'?'waste':'cancel';render()},voidOff(){S.voidO=null;render()},voidR(d){S.voidR=d.r;render()},
@@ -1814,8 +1821,8 @@ const MORDER=['Cash','Card','Apple Pay','Voucher'];
 function payMethods(all){const ks=Object.keys(S.set.methods||{}),o=MORDER.filter(m=>ks.includes(m)).concat(ks.filter(m=>!MORDER.includes(m)));return all?o:o.filter(m=>S.set.methods[m])}
 function billBox(tid){const l=lv(tid),b=billCalc(tid),lock=!!l.parts,IN='min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 16px var(--mono);width:110px';
   const row=(a,v,c)=>`<div class="brow2 ${c||''}"><span>${a}</span><span class="mono">${v}</span></div>`;
-  return`<div class="billbox">${row('Items',gbp2(b.sub))}${b.disc?row(`Discount${b.d.k==='pct'?' '+b.d.v+'%':''}`,'−'+gbp2(b.disc),'disc'):''}${S.set.service?row(l.nosvc?'Service charge removed':`Service ${b.rate}%`,gbp2(b.svc),l.nosvc?'off':''):''}${row('Total to pay',gbp2(b.total),'tot')}
-${lock?'<span class="dim" style="font-size:12px">Part of this bill is paid, so the discount and service charge are fixed.</span>':`<div class="tbtns"><button class="btn quiet" data-a="discOpen">${b.disc?'Change discount':'Add discount'}</button>${S.set.service?`<button class="btn quiet" data-a="svcTog">${l.nosvc?'Add service charge back':'Remove service charge'}</button>`:''}</div>
+  return`<div class="billbox">${row('Items',gbp2(b.sub))}${b.disc?row(`Discount${b.d.k==='pct'?' '+b.d.v+'%':''}`,'−'+gbp2(b.disc),'disc'):''}${S.set.service&&!isTab(tid)?row(l.nosvc?'Service charge removed':`Service ${b.rate}%`,gbp2(b.svc),l.nosvc?'off':''):''}${row('Total to pay',gbp2(b.total),'tot')}
+${lock?'<span class="dim" style="font-size:12px">Part of this bill is paid, so the discount and service charge are fixed.</span>':`<div class="tbtns"><button class="btn quiet" data-a="discOpen">${b.disc?'Change discount':'Add discount'}</button>${S.set.service&&!isTab(tid)?`<button class="btn quiet" data-a="svcTog">${l.nosvc?'Add service charge back':'Remove service charge'}</button>`:''}</div>
 ${S.discOpen===tid?`<div class="discf"><div class="seg" role="group" aria-label="Discount type"><button class="${(S.discK||'pct')==='pct'?'on':''}" data-a="discK" data-k="pct">%</button><button class="${S.discK==='amt'?'on':''}" data-a="discK" data-k="amt">£</button></div><input id="discv" type="number" inputmode="decimal" min="0" step="0.5" placeholder="${(S.discK||'pct')==='pct'?'e.g. 10':'e.g. 5.00'}" value="${b.d&&b.d.k===(S.discK||'pct')?b.d.v:''}" style="${IN}" aria-label="Discount amount"><button class="btn pri" data-a="discApply">Apply</button>${b.disc?'<button class="btn quiet" data-a="discClear">Remove</button>':''}</div>`:''}`}</div>`}
 function tableBookings(tid){const l=lv(tid);if(l.guests&&l.status!=='reserved')return'';const rs=S.res.filter(r=>r.table===tid);if(!rs.length)return'';
   return`<div class="bookings"><div class="eyebrow" style="margin-bottom:6px">Booked</div>${rs.map(r=>`<div class="bk"><b>${esc(r.t)} · ${esc(r.name)}</b><span class="muted"> · ${r.guests} guests</span>${r.note?`<div class="bk-n">${esc(r.note)}</div>`:''}</div>`).join('')}</div>`}
@@ -1839,6 +1846,73 @@ function usagePanel(){const l=(S.aList||[]).slice();if(!l.length)return'';const 
 <div class="grid g4" style="gap:0"><div class="kpi"><span class="eyebrow">Restaurants</span><span class="num">${l.length}</span></div><div class="kpi"><span class="eyebrow">Live now</span><span class="num" style="color:var(--s-available)">${c(0)}</span></div><div class="kpi"><span class="eyebrow">Used this week</span><span class="num">${week}</span></div><div class="kpi"><span class="eyebrow">Not using it</span><span class="num" ${idle?'style="color:var(--s-bill)"':''}>${idle}</span><small>quiet 7+ days or never</small></div></div>
 <div class="utab" role="table"><div class="urow uh" role="row"><span>Restaurant</span><span>Status</span><span>Last used</span><span>Days used</span><span>Sign-ins</span><span>Orders</span></div>
 ${st.map(([r,s])=>`<div class="urow" role="row"><b class="ell">${esc(r.name)}</b><span><span class="pill ${s[1]}">${s[0]}</span></span><span>${agoTxt(r.last_used)}</span><span>${+r.days30||0} <span class="dim">of 30</span></span><span>${+r.signins30||0}</span><span>${+r.orders30||0}</span></div>`).join('')}</div></section>`}
+
+/* =====================================================================
+   Version 25: Café & bar mode — one till screen, open tabs, no floor plan
+   ===================================================================== */
+const isCafe=()=>S.set&&S.set.btype==='cafe';
+function navOf(role){role=role||S.role;if(!isCafe())return NAV[role];
+  const own=[['dashboard','Dashboard'],['till','Till'],['menu','Menu'],['stock','Stock'],['staff','Staff'],['tx','Payments'],['reports','Reports'],['profit','Costs & profit'],['settings','Settings']];
+  return{owner:own,manager:own.filter(x=>x[0]!=='profit'),waiter:[['till','Till'],['tx','Payments']],cashier:[['till','Till'],['tx','Payments']],kitchen:NAV.kitchen,admin:[['menu','Menu'],['staff','Staff'],['settings','Settings']]}[role]||NAV[role]}
+const isTab=id=>typeof id==='string'&&id.startsWith('tab-');
+const openTabs=()=>Object.entries(S.live).filter(([k,v])=>isTab(k)&&v&&v.status==='tab').map(([k,v])=>({id:k,...v})).sort((a,b)=>(a.opened||0)-(b.opened||0));
+const placeName=id=>id==='counter'?'Counter':isTab(id)?(S.live[id]&&S.live[id].name?'Tab · '+S.live[id].name:'Tab'):(tb(id)?tb(id).name:id);
+async function nextNo(){if(!LIVE)return S.nextOrder++;const n=await rpc('h_next_no',{p_token:TOKEN});netOk();return n}
+const basketTotal=()=>(S.basket||[]).reduce((a,x)=>a+item(x.item).price*x.qty,0);
+function tillPage(){S.basket=S.basket||[];if(!CID().includes(S.tcat))S.tcat=CID()[0];
+  const bq=id=>(S.basket.find(x=>x.item===id)||{}).qty||0,tot=basketTotal(),tabs=openTabs(),to=S.tillFor&&S.live[S.tillFor]&&S.live[S.tillFor].status==='tab'?S.tillFor:null,tab=S.tabSel&&S.live[S.tabSel]&&S.live[S.tabSel].status==='tab'?S.tabSel:null;
+  if(tab)return tabPanel(tab);
+  const cnt=S.basket.reduce((x,q)=>x+q.qty,0);
+  return`<div class="osum"><div class="osum-t"><b>${to?'Adding to '+esc(S.live[to].name):'New sale'}</b><span class="muted">${cnt?cnt+' item'+(cnt>1?'s':''):'Tap items to add them'}</span></div><div class="osum-v"><span class="eyebrow">Total</span><b class="mono">${gbp2(tot)}</b></div><button class="btn pri" data-a="tGo" ${cnt?'':'disabled'}>${to?'Review':'Pay'}</button></div>
+<div class="order till"><div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+${tabs.length?`<div class="tabstrip"><span class="eyebrow">Open tabs</span>${tabs.map(t=>`<button class="tabchip" data-a="tabOpen" data-id="${t.id}"><b>${esc(t.name)}</b><span class="mono">${gbp2(tableTotal(t.id))}</span></button>`).join('')}</div>`:''}
+<div class="cats">${CID().map(c=>`<button class="chip ${S.tcat===c?'on':''}" data-a="tCat" data-c="${esc(c)}"><span aria-hidden="true">${CATI[c]||'🍽️'}</span>${esc(cLabel(c))}</button>`).join('')}</div>
+<div class="menu">${MENU.filter(m=>inCat(m,S.tcat)&&!m.hidden).map(m=>`<button class="dish ${m.on?'':'off'}" data-a="tAdd" data-id="${m.id}" ${m.on?'':'aria-disabled="true"'}>${art(m)}<span class="dt"><b>${esc(m.name)}</b><span style="display:flex;justify-content:space-between;align-items:center;width:100%"><span class="pr">${m.on?gbp2(m.price):'Sold out'}</span>${bq(m.id)?`<span class="cnt">${bq(m.id)}</span>`:''}</span></span></button>`).join('')||'<div class="empty" style="grid-column:1/-1">No items in this category yet.</div>'}</div></div>
+<aside class="ticket"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><h2 style="font-size:20px">${to?'Add to '+esc(S.live[to].name):'New sale'}</h2>${to?'<button class="lnk" data-a="tForNone">Make it a sale instead</button>':''}</div>
+${S.basket.length?S.basket.map((x,i)=>`<div class="line"><div class="step sm"><button data-a="tQty" data-i="${i}" data-n="-1" aria-label="One less">−</button><span>${x.qty}</span><button data-a="tQty" data-i="${i}" data-n="1" aria-label="One more">+</button></div><div>${esc(item(x.item).name)}</div><span class="p">${gbp2(item(x.item).price*x.qty)}</span></div>`).join(''):'<div class="empty">Tap an item to add it.</div>'}
+<div class="total"><span>Total</span><span class="mono">${gbp2(tot)}</span></div>
+${to?`<button class="btn pri big" data-a="tToTab" ${S.basket.length?'':'disabled'}>Add to ${esc(S.live[to].name)}'s tab</button>`:`<div class="chips">${payMethods().map(m=>`<button class="chip ${S.payM===m?'on':''}" data-pm="${m}">${m}</button>`).join('')}</div>
+<button class="btn pri big" data-a="tSell" ${S.basket.length?'':'disabled'}>Take payment · ${gbp2(tot)}</button>
+<div class="tabnew"><input id="tabn" maxlength="40" placeholder="Name for a tab, e.g. Dawit" aria-label="Tab name"><button class="btn" data-a="tNewTab" ${S.basket.length?'':'disabled'}>Start a tab</button></div>
+${tabs.length&&S.basket.length?`<div class="chips"><span class="dim" style="font-size:13px;align-self:center">or add to</span>${tabs.map(t=>`<button class="chip" data-a="tAddTo" data-id="${t.id}">${esc(t.name)}</button>`).join('')}</div>`:''}`}
+${S.basket.length?'<button class="btn quiet" data-a="tClear">Clear</button>':''}</aside></div>`}
+function tabPanel(id){const t=S.live[id],os=openOrders(id),b=billCalc(id);
+  return`<section class="panel"><header><div><div class="eyebrow">Open tab · since ${hhmm(t.opened)}</div><h2 style="font-size:24px">${esc(t.name)}</h2></div><button class="btn quiet" data-a="tabBack">← Till</button></header>
+<div style="display:flex;flex-direction:column;gap:12px">${os.map(orderBlock).join('')||'<div class="empty">Nothing on this tab yet.</div>'}
+${billBox(id)}<div class="chips">${payMethods().map(m=>`<button class="chip ${S.payM===m?'on':''}" data-pm="${m}">${m}</button>`).join('')}</div>
+<div class="tbtns"><button class="btn pri big" data-a="tabPay" ${b.total>0||os.length?'':'disabled'}>${os.length?'Take payment · '+gbp2(b.total):'Close the tab'}</button><button class="btn big" data-a="tabMore">Add items</button></div></div></section>`}
+function tillOrder(place,label,lines){return{id:null,table:place,label,waiter:S.user,status:'served',closed:place==='counter',at:now(),lines:lines.map(x=>({item:x.item,qty:x.qty,note:'',name:item(x.item).name,cat:item(x.item).cat,price:item(x.item).price}))}}
+async function tillPush(place,label){const lines=S.basket.slice();if(!lines.length)return null;const o=tillOrder(place,label,lines);o.id=await nextNo();S.orders.push(o);if(!LIVE)o.lines.forEach(x=>stockLocal(x.item,-x.qty));S.basket=[];return o}
+Object.assign(GACT,{
+  tCat(d){S.tcat=d.c;render()},
+  tAdd(d){const m=item(d.id);if(!m.on)return toast(m.name+' is sold out');S.basket=S.basket||[];const x=S.basket.find(q=>q.item===m.id);if(x)x.qty++;else S.basket.push({item:m.id,qty:1});render()},
+  tQty(d){const x=S.basket[+d.i];if(!x)return;x.qty+=+d.n;if(x.qty<1)S.basket.splice(+d.i,1);render()},
+  tClear(){S.basket=[];render()},tGo(){const t=$('.till .ticket');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},tForNone(){S.tillFor=null;render()},
+  async tSell(){if(S.busy||!S.basket.length)return;S.busy=true;try{const tot=r2(basketTotal()),o=await tillPush('counter','Counter'),txid=await nextNo();
+      S.tx.push({id:txid,net:tot,guests:0,table:'counter',label:'Counter',total:tot,method:S.payM,by:S.user,at:now(),refunded:false,svc:0,dfac:1,disc:0,part:'',lines:billLinesOf([o]),waiter:S.user});
+      if(!LIVE)BASE.rev+=tot;repStale();S.rcpt={tx:txid};toast(`${gbp2(tot)} taken by ${S.payM.toLowerCase()}`)}catch(e){netFail(e);toast('No connection. Nothing was charged, try again.')}finally{S.busy=false}render()},
+  async tNewTab(){const nm=($('#tabn').value||'').trim();if(nm.length<1){$('#tabn').focus();return toast('Give the tab a name')}if(S.busy)return;S.busy=true;
+    try{const id='tab-'+now().toString(36);S.live[id]={status:'tab',name:nm.slice(0,40),opened:now(),waiter:S.user,guests:0,nosvc:true,note:''};await tillPush(id,nm);toast('Tab started for '+nm)}catch(e){netFail(e)}finally{S.busy=false}render()},
+  async tAddTo(d){if(S.busy)return;S.busy=true;try{await tillPush(d.id,S.live[d.id].name);toast('Added to '+S.live[d.id].name+"'s tab")}catch(e){netFail(e)}finally{S.busy=false}render()},
+  async tToTab(){const id=S.tillFor;if(!id||S.busy)return;S.busy=true;try{await tillPush(id,S.live[id].name);S.tillFor=null;S.tabSel=id;toast('Added to '+S.live[id].name+"'s tab")}catch(e){netFail(e)}finally{S.busy=false}render()},
+  tabOpen(d){S.tabSel=d.id;S.sel=d.id;render();const v=$('#view');if(v)v.scrollTop=0},
+  tabBack(){S.tabSel=null;S.sel=null;render()},
+  tabMore(){S.tillFor=S.tabSel;S.tabSel=null;S.sel=null;render()},
+  async tabPay(){const id=S.tabSel;if(!id||S.busy)return;const os=openOrders(id),t=S.live[id];
+    if(!os.length){t.status='closed';S.tabSel=null;S.sel=null;toast('Tab closed');return render()}
+    S.busy=true;try{const b=billCalc(id),txid=await nextNo();
+      S.tx.push({id:txid,net:b.after,guests:0,table:id,label:'Tab · '+t.name,total:b.total,method:S.payM,by:S.user,at:now(),refunded:false,svc:b.rate,dfac:b.f,disc:b.disc,part:'',lines:billLines(id),waiter:t.waiter});
+      os.forEach(o=>{o.closed=true});t.status='closed';if(!LIVE)BASE.rev+=b.after;repStale();S.tabSel=null;S.sel=null;S.rcpt={tx:txid};toast(`${gbp2(b.total)} taken · ${t.name}'s tab closed`)}catch(e){netFail(e);toast('No connection. Nothing was charged, try again.')}finally{S.busy=false}render()}});
+function billLinesOf(os){const m=new Map();os.forEach(o=>o.lines.forEach(x=>{if(x.void)return;const k=x.name+'|'+x.price,c=m.get(k)||{name:x.name,qty:0,price:x.price};c.qty+=x.qty;m.set(k,c)}));return[...m.values()]}
+/* the owner's dashboard in café & bar mode: open tabs instead of the floor plan */
+const ownerHome0=ownerHome;
+ownerHome=function(){let h=ownerHome0();if(!isCafe())return h;const tabs=openTabs(),a=h.indexOf('<section class="panel"><header><h2>Tables</h2>');
+  if(a>=0){const b=h.indexOf('</section>',h.indexOf('Kitchen right now',a));const rep=`<section class="panel"><header><h2>Open tabs</h2><button class="btn quiet" data-go="till">Till</button></header>${tabs.map(t=>`<div class="row"><div class="grow"><b class="ell">${esc(t.name)}</b><span class="dim" style="font-size:13px">open since ${hhmm(t.opened)}</span></div><span class="mono">${gbp2(tableTotal(t.id))}</span></div>`).join('')||'<div class="empty">No open tabs.</div>'}</section>`;if(b>a)h=h.slice(0,a)+rep+h.slice(b+10)}
+  const ot=tabs.reduce((x,t)=>x+tableTotal(t.id),0);
+  h=h.replace('Flying out of the kitchen','Selling well today').replace(/sold tonight/g,'sold today')
+   .replace(/<div class="kpi"><span class="eyebrow">Covers<\/span>[\s\S]*?<\/small><\/div>/,`<div class="kpi"><span class="eyebrow">Open tabs</span><span class="num">${tabs.length}</span><small>${gbp2(ot)} still to pay</small></div>`)
+   .replace(/<section class="panel"><header><h2>Arriving tonight<\/h2>[\s\S]*?<\/section>/,'');
+  return h.replace(/\d+ tables seated, \d+ tickets in the kitchen[^.]*/,`${tabs.length} open tab${tabs.length===1?'':'s'}`)};
 
 boot();
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())softRender()},30000);

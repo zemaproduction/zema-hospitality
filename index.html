@@ -445,6 +445,15 @@ button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select
 .throw{display:flex;gap:8px;align-items:center}.thimg{width:42%;aspect-ratio:4/3;border-radius:calc(var(--gm-r) / 2);background:var(--gm-card);border:1px solid color-mix(in srgb,var(--gold) 30%,transparent)}.thlines{flex:1;display:flex;flex-direction:column;gap:5px}.thlines i{height:6px;border-radius:3px;background:var(--gm-ink);opacity:.8}.thlines i+i{width:60%;background:var(--gold)}
 .thname{font-size:13px;font-weight:600;padding:2px 4px}
 .adform{border-top:1px solid var(--line2);margin-top:14px;padding-top:14px}
+
+.billbox{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:12px;background:var(--sunk)}.brow2{display:flex;justify-content:space-between;gap:12px;font-size:15px;color:var(--ink2)}.brow2.disc{color:var(--s-available)}.brow2.off span:first-child{text-decoration:line-through}.brow2.tot{color:var(--ink);font-weight:600;font-size:17px;border-top:1px solid var(--line2);padding-top:8px;margin-top:2px}
+.billbox .tbtns{margin-top:6px}.billbox .tbtns .btn{flex:1 1 140px;width:auto;min-height:40px;font-size:14px}.discf{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.confirm{display:flex;flex-direction:column;gap:8px;margin:6px 0 8px;padding:12px;border-radius:10px;border:1px solid var(--s-bill);background:color-mix(in srgb,var(--s-bill) 10%,transparent);font-size:14px}
+.ohead .lnk+.lnk{padding-left:12px}
+.bookings{padding:12px 14px;border-radius:12px;background:var(--accent-soft)}.bk+.bk{margin-top:8px}.bk-n{font-size:14px;margin-top:2px}
+.osum{position:sticky;top:-1px;z-index:6;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;margin:-6px 0 0;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface,#1B1816) 92%,transparent);backdrop-filter:blur(10px)}
+.osum-t{display:flex;flex-direction:column;min-width:0;margin-right:auto}.osum-t b{font-size:17px}.osum-t .muted{font-size:13px}.osum-v{display:flex;flex-direction:column;align-items:flex-end}.osum-v b{font-size:22px;line-height:1.1}
+@media (max-width:520px){.osum .btn{padding:0 12px}.osum-v b{font-size:19px}}
 </style>
 </head>
 <body>
@@ -513,7 +522,7 @@ const DEFAULT_TABLES=[T(1,180,100,'round',2,'window'),T(2,270,100,'round',2,'win
  T(15,130,518,'round',2,'terrace'),T(16,240,518,'round',4,'terrace'),T(17,360,518,'round',4,'terrace'),T(18,480,518,'round',2,'terrace'),
  T(19,680,518,'rect',8,'private'),T(20,860,518,'rect',8,'private')];
 
-const S={user:'o1',pick:null,pin:'',rr:'day',payM:'Card',tx:[],set:{name:'Zema Kitchen',address:'14 Camden Passage, London N1 8EA',phone:'020 7946 0182',email:'hello@zemakitchen.example',hours:'Tue to Sun · 12:00 to 23:00',service:12.5,methods:{Card:true,Cash:true,'Apple Pay':true,Voucher:false}},
+const S={user:'o1',pick:null,pin:'',rr:'day',payM:'Cash',tx:[],set:{name:'Zema Kitchen',address:'14 Camden Passage, London N1 8EA',phone:'020 7946 0182',email:'hello@zemakitchen.example',hours:'Tue to Sun · 12:00 to 23:00',service:12.5,methods:{Card:true,Cash:true,'Apple Pay':true,Voucher:false}},
  costs:{},exp:[],stock:{},look:{},role:'owner',page:'dashboard',sel:null,edit:false,range:'today',cat:'Starters',orderFor:null,draft:[],mod:null,toast:null,
  tables:[],fix:[],floors:[{id:'g',name:'Ground floor'}],floor:'g',shapes:[],selZ:null,live:{},orders:[],paid:[],nextOrder:105,
  res:[{t:'19:00',name:'John & Sarah Whitmore',guests:4,table:'T12',note:'Anniversary'},{t:'19:30',name:'Michael Asante',guests:2,table:'T4',note:''},{t:'19:45',name:'Bethlehem Family',guests:8,table:'T19',note:'Birthday cake at 21:00'},{t:'20:15',name:'Dr. Patel',guests:6,table:'T13',note:'One vegetarian, one nut allergy'},{t:'20:30',name:'Leor Films',guests:4,table:'T9',note:''}]};
@@ -556,6 +565,10 @@ const tb=id=>S.tables.find(t=>t.id===id), lv=id=>S.live[id]||(S.live[id]={status
 const openOrders=id=>S.orders.filter(o=>o.table===id&&!o.closed);
 const lineTotal=l=>l.void?0:(l.price!=null?l.price:item(l.item).price)*l.qty, orderTotal=o=>o.lines.reduce((a,l)=>a+lineTotal(l),0), tableTotal=id=>openOrders(id).reduce((a,o)=>a+orderTotal(o),0);
 const due=t=>Math.round(t*(1+(S.set.service||0)/100)*100)/100;
+const r2=n=>Math.round(n*100)/100;
+/* the bill for a table: items, discount, service charge (can be removed), total */
+function billCalc(tid){const l=lv(tid),sub=r2(tableTotal(tid)),d=l.disc||null,disc=!d?0:d.k==='pct'?r2(sub*Math.min(100,+d.v||0)/100):Math.min(sub,r2(+d.v||0)),after=r2(sub-disc),rate=l.nosvc?0:(S.set.service||0),svc=r2(after*rate/100);
+  return{sub,disc,after,rate,svc,total:r2(after+svc),f:sub?after/sub:1,d}}
 function toast(m){S.toast=m;clearTimeout(toast.t);toast.t=setTimeout(()=>{S.toast=null;const e=$('.toast');if(e)e.remove()},2600);const e=$('.toast');if(e)e.textContent=m;else document.body.insertAdjacentHTML('beforeend',`<div class="toast" role="status">${esc(m)}</div>`)}
 
 /* ---------- icons ---------- */
@@ -572,24 +585,30 @@ const SOON={};
 
 /* ---------- shell ---------- */
 function render(){DIRTY=0;draw();queueSync()}
-function afterDraw(){try{appMeta();installHint();if(S.page==='guest')gmLoadBig();keepAwake();drawQRs();appTint();if(SB_URL&&(S.page==='guest'||LIVE||GATES[S.page]))loadAds(adCode());adPopupArm();if(LIVE&&TOKEN&&!PCHK&&pushCan()){PCHK=1;pushCheck()}}catch(_){}}
+function afterDraw(){try{const ck=$('#clock');if(ck)ck.textContent=hhmm(now());appMeta();installHint();if(S.page==='guest')gmLoadBig();keepAwake();drawQRs();appTint();if(SB_URL&&(S.page==='guest'||LIVE||GATES[S.page]))loadAds(adCode());adPopupArm();if(LIVE&&TOKEN&&!PCHK&&pushCan()){PCHK=1;pushCheck()}}catch(_){}}
 /* a Show / Hide button inside every password box */
 function addEyes(){document.querySelectorAll('#app input[type=password]').forEach(x=>{if(x.parentNode.classList.contains('pw'))return;const w=document.createElement('span');w.className='pw';x.parentNode.insertBefore(w,x);w.appendChild(x);
   const b=document.createElement('button');b.type='button';b.className='eye';b.textContent='Show';b.setAttribute('aria-label','Show password');b.setAttribute('aria-pressed','false');w.appendChild(b)})}
 document.addEventListener('click',e=>{const b=e.target.closest('.eye');if(!b)return;e.stopPropagation();const x=b.parentNode.querySelector('input'),show=x.type==='password';x.type=show?'text':'password';b.textContent=show?'Hide':'Show';b.setAttribute('aria-label',show?'Hide password':'Show password');b.setAttribute('aria-pressed',String(show));x.focus()},true);
+/* redraws keep every scroll position, and a background refresh that changes nothing touches nothing */
+const SCROLLERS=['#view','.sheet .body','.gm','.gm-det','.signin','.ticket','.menu','.nav','.kds'];
+function setApp(html){const app=$('#app');if(QUIET&&app._h===html)return false;
+  const keep=SCROLLERS.map(q=>[...document.querySelectorAll(q)].map(e=>[e.scrollTop,e.scrollLeft])),wy=window.scrollY;
+  app.innerHTML=html;app._h=html;
+  SCROLLERS.forEach((q,i)=>[...document.querySelectorAll(q)].forEach((e,j)=>{const v=keep[i][j];if(v){e.scrollTop=v[0];e.scrollLeft=v[1]}}));if(wy&&window.scrollY!==wy)window.scrollTo(0,wy);return true}
 function draw(){draw0();afterDraw()}
 function draw0(){
   document.documentElement.dataset.skin='service';
-  if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox]):not([type=file])').forEach(x=>{keep[x.id]=x.value});$('#app').innerHTML=GATES[S.page]().replace(/<\/div>(\s*)$/,(S.page==='guest'?adH('guest'):/^admin/.test(S.page)?'':adH('app'))+zpH()+'</div>$1');Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
-  if(S.page==='signin'){$('#app').innerHTML=signIn().replace(/<\/div>(\s*)$/,adH('app')+zpH()+'</div>$1');return}
+  if(GATES[S.page]){const keep={};document.querySelectorAll('#app .si-card input[id]:not([type=checkbox]):not([type=file])').forEach(x=>{keep[x.id]=x.value});if(!setApp(GATES[S.page]().replace(/<\/div>(\s*)$/,(S.page==='guest'?adH('guest'):/^admin/.test(S.page)?'':adH('app'))+zpH()+'</div>$1')))return;Object.keys(keep).forEach(k=>{const x=document.getElementById(k);if(x&&!x.value)x.value=keep[k]});addEyes();return}
+  if(S.page==='signin'){setApp(signIn().replace(/<\/div>(\s*)$/,adH('app')+zpH()+'</div>$1'));return}
   const u=LIVE&&S.role==='admin'?{name:'Zema Hospitality',role:'Admin'}:staff(S.user);
   const nav=NAV[S.role],title=S.page==='order'?`Order · ${esc(tb(S.orderFor).name)}`:(typeof TITLE[S.page]==='object'?TITLE[S.page][S.role]:TITLE[S.page]);
-  $('#app').innerHTML=`<aside class="rail"><div class="brand"><i>Z</i><div><b>${esc(S.set.name)}</b><small>Zema Hospitality</small></div></div>
+  if(!setApp(`<aside class="rail"><div class="brand"><i>Z</i><div><b>${esc(S.set.name)}</b><small>Zema Hospitality</small></div></div>
 <nav class="nav" aria-label="Sections">${nav.map(([k,l])=>`<button class="${S.page===k||(S.page==='order'&&k==='floor')?'on':''}" data-go="${k}">${ic(k)}<span>${l}</span>${SOON[k]?'<span class="soon">Next</span>':''}</button>`).join('')}</nav>
 <div class="rail-foot"><span style="display:block;margin-bottom:4px">Powered by <b style="color:var(--accent)">Zema Production</b></span>${LIVE?(S.offline?'Offline · changes are waiting':'Live · every device in sync'):'Prototype · sample data<br>Thursday dinner service'}</div></aside>
-<div class="main"><div class="top"><h1>${title}</h1>${LIVE?`<span class="pill ${S.offline?'p-bill':'p-available'}">${S.offline?'Offline':'Live'}</span>`:''}<span class="clock" id="clock">${hhmm(now())}</span>
+<div class="main"><div class="top"><h1>${title}</h1>${LIVE?`<span class="pill ${S.offline?'p-bill':'p-available'}">${S.offline?'Offline':'Live'}</span>`:''}<span class="clock" id="clock"></span>
 <button class="userchip" data-a="switch" aria-label="Switch user"><span class="ava">${ini(u.name)}</span><span><b>${esc(u.name.replace(/^Chef /,''))}</b><small>${LIVE&&S.role==='admin'?'Admin · all restaurants':u.role+' · switch'}</small></span></button></div>
-<div class="view" id="view"><div class="wrap">${billBanner()}${page()}${S.role==='admin'?'':adH('app')}${zpH()}</div></div></div>${sheet()}`;
+<div class="view" id="view"><div class="wrap">${billBanner()}${page()}${S.role==='admin'?'':adH('app')}${zpH()}</div></div></div>${sheet()}`))return;
   if(S.page==='floor'||(S.role==='waiter'&&S.page==='dashboard'))bindFloor();
 }
 function page(){
@@ -798,19 +817,19 @@ function sheet(){
   let foot='';
   if(l.status==='available'||l.status==='reserved')foot=`<div style="display:flex;align-items:center;gap:14px;justify-content:space-between"><span class="muted">Guests</span><div class="step"><button data-a="gMinus" aria-label="Fewer guests">−</button><span id="gN">${S.gN||Math.min(t.seats,2)}</span><button data-a="gPlus" aria-label="More guests">+</button></div></div><button class="btn pri big" data-a="seat">Seat guests and start order</button>${l.status==='reserved'&&S.role!=='kitchen'?'<button class="btn" data-a="freeT">Release the reservation</button>':''}`;
   else if(l.status==='cleaning')foot=`<button class="btn pri big" data-a="cleaned">Table is clean and ready</button>`;
-  else if(l.status==='bill'){const sp=payPlan(t.id),md=spModeOf(t.id),lock=!!l.parts;foot=`<div class="chips">${Object.keys(S.set.methods).filter(m=>S.set.methods[m]).map(m=>`<button class="chip ${S.payM===m?'on':''}" data-pm="${m}">${m}</button>`).join('')}</div>
+  else if(l.status==='bill'){const sp=payPlan(t.id),md=spModeOf(t.id),lock=!!l.parts;foot=`<div class="chips">${payMethods().map(m=>`<button class="chip ${S.payM===m?'on':''}" data-pm="${m}">${m}</button>`).join('')}</div>
 <div class="seg" role="group" aria-label="How to split"><button class="${md!=='item'?'on':''}" data-a="smEq" ${lock&&md==='item'?'disabled':''}>Equal split</button><button class="${md==='item'?'on':''}" data-a="smItem" ${lock&&md!=='item'?'disabled':''}>By item</button></div>
 ${md==='item'?`<div class="units">${unitsOf(t.id).map(u=>{const pd=sp.pk[u.k],on=!pd&&(S.selU||[]).includes(u.k);return`<button class="unit ${on?'on':''} ${pd?'paid':''}" data-u="${esc(u.k)}" ${pd?'disabled':''} aria-pressed="${on}"><span class="tick" aria-hidden="true">${pd?'✓':on?'●':''}</span><span class="grow">${esc(u.name)}</span><span class="mono">${pd?'paid':gbp2(u.price)}</span></button>`}).join('')}</div>
 <div style="display:flex;gap:10px"><button class="btn quiet" data-a="selAll" style="flex:1">Select all remaining</button><button class="btn quiet" data-a="selNone" style="flex:1">Clear</button></div>`
 :`<div style="display:flex;align-items:center;gap:14px;justify-content:space-between"><span class="muted">Split between</span><div class="step"><button data-a="spMinus" aria-label="Fewer people">−</button><span>${sp.n}</span><button data-a="spPlus" aria-label="More people">+</button></div></div>`}
-${S.set.service?`<div class="muted" style="display:flex;justify-content:space-between"><span>Service ${S.set.service}%</span><span class="mono">${gbp2(tot*S.set.service/100)}</span></div>`:''}
+
 ${sp.paid?`<div style="display:flex;justify-content:space-between;color:var(--s-available)"><span>Paid so far${md==='item'?'':` · ${sp.done} of ${sp.n}`}</span><span class="mono">${gbp2(sp.paid)} · ${gbp2(sp.rem)} left</span></div>`:''}
 <button class="btn pri big" data-a="pay" ${md==='item'&&!sp.keys.length?'disabled':''}>${md==='item'?(sp.keys.length?`Take ${gbp2(sp.amt)} · ${sp.keys.length} item${sp.keys.length>1?'s':''}`:'Select what this guest is paying for'):sp.n>1?`Take ${gbp2(sp.amt)} · ${sp.done+1} of ${sp.n}`:`Take payment · ${gbp2(sp.amt)}`}</button><div style="display:flex;gap:10px"><button class="btn" data-a="showBill" style="flex:1">Show bill</button><button class="btn" data-a="startOrder" style="flex:1">Add items</button></div><button class="btn quiet" data-a="unbill">Back to ordering</button>`}
   else foot=`${ready.length?`<button class="btn pri big" data-a="served">Mark ${ready.length>1?ready.length+' orders':'order #'+ready[0].id} served</button>`:''}<button class="btn ${ready.length?'':'pri'} big" data-a="startOrder">${os.length?'Add more items':'Start order'}</button>${os.length?`<button class="btn" data-a="bill">Request bill</button>`:l.guests?`<button class="btn" data-a="freeT">Guests left · free the table</button>`:''}`;
   return`<div class="scrim" data-a="closeSheet"><aside class="sheet" role="dialog" aria-label="${esc(t.name)}"><header><div><div class="eyebrow">${zone?esc(zone.name)+' · ':''}${t.seats} seats</div><h2>${esc(t.name)}</h2><span class="pill p-${l.status}" style="margin-top:8px">${STATUS[l.status]}</span></div><button class="x" data-a="closeSheet" aria-label="Close">×</button></header>
-<div class="body">${facts}${l.note?`<div class="note"><b>Note</b> · ${esc(l.note)}</div>`:''}
+<div class="body">${facts}${l.note?`<div class="note"><b>Note</b> · ${esc(l.note)}</div>`:''}${tableBookings(t.id)}
 ${os.length?`<div><div class="eyebrow" style="margin-bottom:8px">Order</div>${os.map(orderBlock).join('')}<div class="total"><span>Total</span><span class="mono">${gbp2(tot)}</span></div></div>`:l.guests?'<div class="empty">Nothing ordered yet.</div>':`<div class="empty">${l.status==='reserved'?'Held for a reservation.':l.status==='cleaning'?'Being cleared and reset.':'Free to seat.'}</div>`}
-${tableTools(t,l,os)}${S.role==='owner'||S.role==='manager'?`<div><div class="eyebrow" style="margin-bottom:8px">Set status</div><div class="chips">${Object.keys(STATUS).map(s=>`<button class="chip ${l.status===s?'on':''}" data-a="setStatus" data-s="${s}">${STATUS[s]}</button>`).join('')}</div></div>`:''}</div>
+${l.status==='bill'?billBox(t.id):''}${tableTools(t,l,os)}${S.role==='owner'||S.role==='manager'?`<div><div class="eyebrow" style="margin-bottom:8px">Set status</div><div class="chips">${Object.keys(STATUS).map(s=>`<button class="chip ${l.status===s?'on':''}" data-a="setStatus" data-s="${s}">${STATUS[s]}</button>`).join('')}</div></div>`:''}</div>
 <footer>${foot}</footer></aside></div>`}
 
 /* ---------- waiter ---------- */
@@ -832,7 +851,7 @@ function ordersPage(){const l=S.orders.filter(o=>o.waiter===ME&&!o.closed).sort(
 function orderPage(){
   if(!CID().includes(S.cat))S.cat=CID()[0];
   const t=tb(S.orderFor),dq=id=>S.draft.filter(l=>l.item===id).reduce((a,l)=>a+l.qty,0),tot=S.draft.reduce((a,l)=>a+lineTotal(l),0);
-  return`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><button class="btn" data-a="backFloor">← Back to floor</button><span class="muted">${lv(t.id).guests} guests · ${esc(staff(lv(t.id).waiter).name)}</span></div>
+  const had=tableTotal(t.id);return`<div class="osum"><button class="btn" data-a="backFloor">← Back</button><div class="osum-t"><b>${esc(t.name)}</b><span class="muted">${lv(t.id).guests} guests${had?' · ordered '+gbp2(had):''}</span></div><div class="osum-v"><span class="eyebrow">${S.draft.length?'Total with this round':'Total so far'}</span><b class="mono">${gbp2(had+tot)}</b></div><button class="btn pri" data-a="send" ${S.draft.length?'':'disabled'}>Send${S.draft.length?' '+S.draft.reduce((a,l)=>a+l.qty,0):''}</button></div>
 <div class="order"><div style="display:flex;flex-direction:column;gap:14px;min-width:0"><div class="cats">${CID().map(c=>`<button class="chip ${S.cat===c?'on':''}" data-cat="${esc(c)}"><span aria-hidden="true">${CATI[c]||'🍽️'}</span>${esc(cLabel(c))}</button>`).join('')}</div>
 <div class="menu">${MENU.filter(m=>inCat(m,S.cat)&&!m.hidden).map(m=>`<button class="dish ${m.on?'':'off'}" data-dish="${m.id}" ${m.on?'':'aria-disabled="true"'}>${art(m)}<span class="dt"><b>${esc(m.name)}</b>${m.name_am?`<span class="ge dish-am">${esc(m.name_am)}</span>`:''}<small>${esc(m.desc)}</small><span style="display:flex;justify-content:space-between;align-items:center;width:100%"><span class="pr">${m.on?gbp2(m.price):'Sold out'}</span>${dq(m.id)?`<span class="cnt">${dq(m.id)}</span>`:''}</span></span></button>`).join('')||'<div class="empty" style="grid-column:1/-1">No dishes in this category yet.</div>'}</div></div>
 <aside class="ticket"><div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="font-size:20px">${esc(t.name)}</h2><span class="mono dim">New round</span></div>
@@ -907,10 +926,10 @@ function reportsPage(){
 function settingsPage(){
   const adm=S.role==='admin';
   const f=(k,l,ph)=>`<div class="fld"><label class="eyebrow" for="set-${k}">${l}</label><input id="set-${k}" value="${esc(S.set[k])}" maxlength="120" placeholder="${ph||''}" ${adm?'':'disabled'}></div>`,own=S.role==='owner';
-  return`<div class="grid g2" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><section class="panel"><header><h2>Restaurant</h2></header><div style="display:flex;flex-direction:column;gap:12px">${f('name','Restaurant name')}${f('address','Address')}<div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">${f('phone','Phone')}${f('email','Email')}</div>${f('hours','Opening hours')}
+  return`<div class="grid g2" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><section class="panel"><header><h2>Restaurant</h2></header><div style="display:flex;flex-direction:column;gap:12px">${f('name','Restaurant name')}${f('address','Address')}<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px">${f('phone','Phone')}${f('email','Email')}</div>${f('hours','Opening hours')}
 <div class="fld"><label class="eyebrow" for="set-service">Service charge %</label><input id="set-service" type="number" inputmode="decimal" min="0" max="30" step="0.5" value="${S.set.service}" style="max-width:140px" ${adm?'':'disabled'}></div>
 ${adm?'<button class="btn pri" data-a="saveSet" style="align-self:flex-start">Save changes</button>':'<span class="dim" style="font-size:13px">These details are managed by Zema Hospitality. Ask us if something needs changing.</span>'}</div></section>${lookPanel()}</div>
-<div style="display:flex;flex-direction:column;gap:16px;min-width:0"><section class="panel"><header><h2>Payment methods</h2></header>${Object.keys(S.set.methods).map(m=>`<div class="row"><div class="grow"><b>${m}</b></div><button class="chip ${S.set.methods[m]?'on':''}" data-method="${m}" ${adm?'':'disabled'} aria-pressed="${S.set.methods[m]}">${S.set.methods[m]?'Accepted':'Off'}</button></div>`).join('')}</section>
+<div style="display:flex;flex-direction:column;gap:16px;min-width:0"><section class="panel"><header><h2>Payment methods</h2></header>${payMethods(true).map(m=>`<div class="row"><div class="grow"><b>${m}</b></div><button class="chip ${S.set.methods[m]?'on':''}" data-method="${m}" ${adm?'':'disabled'} aria-pressed="${S.set.methods[m]}">${S.set.methods[m]?'Accepted':'Off'}</button></div>`).join('')}</section>
 <section class="panel"><header><h2>Sections and tables</h2><button class="btn quiet" data-go="floor">Open floor plan</button></header>${ZONES.map(z=>{const l=S.tables.filter(t=>t.zone===z.id);return`<div class="row"><div class="grow"><b>${esc(z.name)}</b>${S.floors.length>1?`<span class="dim" style="display:block;font-size:13px">${esc((S.floors.find(f=>f.id===fl(z))||{}).name||'')}</span>`:''}</div><span class="mono muted">${l.length} tables · ${l.reduce((a,t)=>a+t.seats,0)} seats</span></div>`}).join('')}</section>
 ${LIVE?notifyPanel()+linkPanel()+guestPanel():''}<section class="panel"><header><h2>Account</h2>${own?'':'<span class="pill">Owner only</span>'}</header>${own?`<div class="row"><div class="grow"><b>Plan</b><span class="dim" style="display:block;font-size:13px">${LIVE&&S.bill&&S.bill.status!=='free'?`${esc(S.bill.plan)} · ${money(S.bill.price)} a month · paid until ${dLong(S.bill.paid_until)}`:`One restaurant · ${STAFF.length} staff`}</span></div><span class="pill ${LIVE&&S.bill?(BST[S.bill.status]||BST.free)[1]:'p-available'}">${LIVE&&S.bill?(BST[S.bill.status]||BST.free)[0]:'Active'}</span></div><div class="row"><div class="grow"><b>Locations</b><span class="dim" style="display:block;font-size:13px">${esc(S.set.name)}</span></div><button class="btn quiet" disabled>Add a restaurant</button></div><div class="row"><div class="grow"><b>Ownership</b><span class="dim" style="display:block;font-size:13px">${esc((STAFF.find(x=>x.role==='Owner')||{name:''}).name)}</span></div><button class="btn quiet" disabled>Transfer</button></div>`:'<p class="muted" style="margin:0">Billing, extra locations and ownership can only be changed by the owner.</p>'}</section></div></div>`}
 
@@ -918,14 +937,14 @@ ${LIVE?notifyPanel()+linkPanel()+guestPanel():''}<section class="panel"><header>
 function billsPage(){
   const open=S.tables.filter(t=>openOrders(t.id).length).sort((a,b)=>(lv(b.id).status==='bill')-(lv(a.id).status==='bill')||lv(a.id).seated-lv(b.id).seated),ask=open.filter(t=>lv(t.id).status==='bill'),took=S.tx.filter(x=>x.by===S.user&&!x.refunded&&(!LIVE||x.at>=dayStart())).reduce((a,x)=>a+x.total,0);
   return`<div class="panel grid g3" style="padding:0;gap:0"><div class="kpi"><span class="eyebrow">Waiting to pay</span><span class="num" ${ask.length?'style="color:var(--s-bill)"':''}>${ask.length}</span></div><div class="kpi"><span class="eyebrow">Open tables</span><span class="num">${open.length}</span></div><div class="kpi"><span class="eyebrow">Taken by me today</span><span class="num">${gbp2(took)}</span></div></div>
-<section class="panel"><header><h2>Open bills</h2><span class="dim">${gbp2(open.reduce((a,t)=>a+tableTotal(t.id),0))} on the floor</span></header>${open.map(t=>{const l=lv(t.id);return`<div class="row brow"><span class="pill p-${l.status}">${esc(t.name)}</span><div class="grow"><b>${l.guests} guests · ${esc(staff(l.waiter).name)}</b><span class="dim" style="font-size:13px;display:block">Seated ${since(l.seated)} · ${STATUS[l.status]}</span></div><span class="mono" style="font-weight:500">${gbp2(due(tableTotal(t.id)))}</span><button class="btn ${l.status==='bill'?'pri':'quiet'}" data-open="${t.id}">${l.status==='bill'?'Take payment':'Open'}</button></div>`}).join('')||'<div class="empty">No open bills.</div>'}</section>`+notifyPanel()}
+<section class="panel"><header><h2>Open bills</h2><span class="dim">${gbp2(open.reduce((a,t)=>a+tableTotal(t.id),0))} on the floor</span></header>${open.map(t=>{const l=lv(t.id);return`<div class="row brow"><span class="pill p-${l.status}">${esc(t.name)}</span><div class="grow"><b>${l.guests} guests · ${esc(staff(l.waiter).name)}</b><span class="dim" style="font-size:13px;display:block">Seated ${since(l.seated)} · ${STATUS[l.status]}</span></div><span class="mono" style="font-weight:500">${gbp2(billCalc(t.id).total)}</span><button class="btn ${l.status==='bill'?'pri':'quiet'}" data-open="${t.id}">${l.status==='bill'?'Take payment':'Open'}</button></div>`}).join('')||'<div class="empty">No open bills.</div>'}</section>`+notifyPanel()}
 function txPage(){
   const l=S.tx.filter(x=>!LIVE||x.at>=dayStart()).sort((a,b)=>b.at-a.at),net=l.filter(x=>!x.refunded).reduce((a,x)=>a+x.total,0),canRefund=S.role==='owner'||S.role==='manager',by={};l.filter(x=>!x.refunded).forEach(x=>{by[x.method]=(by[x.method]||0)+x.total});
   return`<div class="panel grid g3" style="padding:0;gap:0"><div class="kpi"><span class="eyebrow">Payments tonight</span><span class="num">${l.length}</span></div><div class="kpi"><span class="eyebrow">Taken</span><span class="num">${gbp2(net)}</span></div><div class="kpi"><span class="eyebrow">By method</span><span style="font-size:14px;line-height:1.6">${Object.entries(by).map(([m,v])=>`${m} <span class="mono">${gbp2(v)}</span>`).join('<br>')||'None yet'}</span></div></div>
 <section class="panel"><header><h2>Transactions</h2>${canRefund?'':'<span class="dim">Refunds need a manager</span>'}</header>${l.map(x=>`<div class="row"><span class="t">${hhmm(x.at)}</span><button class="grow" data-rc="${x.id}" style="text-align:left" aria-label="Receipt for payment ${x.id}"><b>${esc(tb(x.table)?tb(x.table).name:x.table)} · ${x.method}${x.part?' · '+x.part:''}</b><span class="dim" style="font-size:13px;display:block">#${x.id} · ${esc(staff(x.by).name)} · tap for receipt</span></button><span class="mono" style="font-weight:500;${x.refunded?'text-decoration:line-through;color:var(--ink3)':''}">${gbp2(x.total)}</span>${x.refunded?'<span class="pill p-bill">Refunded</span>':canRefund?`<button class="btn quiet" data-refund="${x.id}">Refund</button>`:''}</div>`).join('')}</section>`}
 
 /* ---------- actions ---------- */
-function go(page){S.page=page;S.rcpt=null;S.sel=null;S.edit=false;S.mod=null;render();const v=$('#view');if(v)v.scrollTop=0}
+function go(page){S.page=page;S.rcpt=null;S.sel=null;S.edit=false;S.mod=null;render();const v=$('#view');if(v)v.scrollTop=0;window.scrollTo(0,0)}
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-go],[data-who],[data-pin],[data-range],[data-rr],[data-pm],[data-shift],[data-refund],[data-method],[data-a],[data-open],[data-cat],[data-dish],[data-bump],[data-avail],[data-hold],[data-sedit],[data-dedit],[data-resrm],[data-rc],[data-aopen],[data-alink],[data-apin],[data-floor],[data-col],[data-aemail],[data-oopen],[data-adel],[data-apay],[data-abill],[data-u],[data-olink]');if(!el)return;const d=el.dataset;
   if(d.go)return go(d.go);
@@ -935,7 +954,7 @@ document.addEventListener('click',e=>{
   if(d.pm){S.payM=d.pm;return render()}
   if(d.shift){const u=staff(d.shift);if(LIVE)rpc('h_staff_update',{p_token:TOKEN,p_id:u.id,p_patch:{on:!u.on}}).then(setStaff).catch(netFail);u.on=!u.on;toast(u.name+(u.on?' is on shift':' is off shift'));return render()}
   if(d.refund){const x=S.tx.find(q=>q.id==d.refund);x.refunded=true;if(!LIVE)BASE.rev-=x.total;repStale();toast(gbp2(x.total)+' refunded to '+x.method.toLowerCase());return render()}
-  if(d.method){if(S.role!=='admin')return;S.set.methods[d.method]=!S.set.methods[d.method];if(!S.set.methods[S.payM])S.payM=Object.keys(S.set.methods).find(m=>S.set.methods[m])||'Card';return render()}
+  if(d.method){if(S.role!=='admin')return;S.set.methods[d.method]=!S.set.methods[d.method];if(!S.set.methods[S.payM])S.payM=payMethods()[0]||'Cash';return render()}
   if(d.range){S.range=d.range;return render()}
   if(d.floor){S.floor=d.floor;S.sel=null;S.selZ=null;return render()}
   if(d.open){S.selU=[];S.spMode='eq';const ot=tb(d.open);if(ot)S.floor=fl(ot);if(S.page!=='floor'&&!(S.role==='waiter'&&S.page==='dashboard'))S.page='floor';S.sel=d.open;S.edit=false;return render()}
@@ -943,7 +962,7 @@ document.addEventListener('click',e=>{
   if(d.dish){const m=item(d.dish);if(!m.on)return toast(m.name+' is sold out tonight');S.mod={item:m.id,qty:1,mods:[],note:''};return render()}
   if(d.bump){const o=S.orders.find(x=>x.id==d.bump);o.status=d.next;syncTable(o.table);toast(d.next==='ready'?`${tb(o.table).name} is ready · ${staff(o.waiter).name.split(' ')[0]} notified`:`#${o.id} ${OSTATE[d.next].toLowerCase()}`);return render()}
   if(d.avail){const m=item(d.avail);if(m.hidden){m.hidden=false;m.on=true}else if(m.on)m.on=false;else m.hidden=true;toast(m.name+(m.hidden?' is hidden from the order screen':m.on?' is available':' marked sold out'));return render()}
-  if(d.hold!=null){const r=S.res[+d.hold];Object.assign(lv(r.table),{status:'reserved',note:r.t+' · '+r.name});toast(`${r.table} held for ${r.name}`);return render()}
+  if(d.hold!=null){const r=S.res[+d.hold];Object.assign(lv(r.table),{status:'reserved',note:[r.t,r.name,r.guests+' guests',r.note].filter(Boolean).join(' · ')});toast(`${r.table} held for ${r.name}`);return render()}
   if(d.aopen)return adminOpen(d.aopen);
   if(d.oopen)return ownerOpen(d.oopen);
   if(d.apay){S.aPay=S.aPay===d.apay?null:d.apay;S.aBill=null;return draw()}
@@ -985,7 +1004,7 @@ document.addEventListener('click',e=>{
   if(a==='signBack'){if(S.pick){S.pick=null;S.pin='';S.pinMsg='';return render()}if(LIVE&&!TOKEN)return;return go(NAV[S.role][0][0])}
   if(a==='addStaff'){const n=$('#sn').value.trim(),r=$('#sr').value;if(!n){$('#sn').focus();return toast('Add their name first')}const pn=($('#sp')||{}).value||'';if(!/^\d{4}$/.test(pn)){$('#sp').focus();return toast('Give them a 4-digit PIN')}if(LIVE){rpc('h_staff_add',{p_token:TOKEN,p_name:n,p_role:r,p_pin:pn}).then(x=>{setStaff(x);toast(n+' added as '+r.toLowerCase());draw()}).catch(e=>toast(errMsg(e)));return}STAFF.push({id:'n'+now(),name:n,role:r,on:false});toast(n+' added as '+r.toLowerCase());return render()}
   if(a==='saveSet'){if(S.role!=='admin')return;['name','address','phone','email','hours'].forEach(k=>{const v=$('#set-'+k).value.trim();if(v)S.set[k]=v});const sv=parseFloat($('#set-service').value);S.set.service=sv>=0&&sv<=30?sv:0;toast('Settings saved');return render()}
-  if(a==='closeSheet'){if(e.target!==el&&el.classList.contains('scrim'))return;S.sel=null;S.gN=null;S.voidO=S.moveT=S.noteT=S.walkT=null;return render()}
+  if(a==='closeSheet'){if(e.target!==el&&el.classList.contains('scrim'))return;S.sel=null;S.gN=null;S.voidO=S.moveT=S.noteT=S.walkT=S.voidQ=S.cancelQ=S.discOpen=null;return render()}
   if(a==='editOn'){if(S.role!=='admin')return;S.edit=true;S.sel=null;return render()}
   if(a==='saveLayout'){if(!LIVE)try{localStorage.setItem('zh-layout',JSON.stringify(layoutDoc()))}catch(_){}S.edit=false;S.sel=null;S.selZ=null;toast('Layout saved');return render()}
   if(a==='resetLayout'){if(!S.edit||!window.confirm('Replace the whole floor plan with the sample layout? Your current tables, sections and floors will be removed.'))return;if(!LIVE)try{localStorage.removeItem('zh-layout')}catch(_){}S.tables=JSON.parse(JSON.stringify(DEFAULT_TABLES));S.fix=JSON.parse(JSON.stringify(DEFAULT_FIX));setZones();S.sel=null;S.selZ=null;toast('Sample layout loaded. Press Save layout to keep it.');return render()}
@@ -1010,17 +1029,17 @@ document.addEventListener('click',e=>{
   if(a==='addTable'){let n=S.tables.length+1;while(tb('T'+n))n++;const nt={id:'T'+n,name:'T'+n,x:500,y:310,shape:'square',seats:4,zone:'',floor:S.floor};S.tables.push(nt);lv(nt.id);S.sel=nt.id;S.selZ=null;toast(nt.name+' added. Drag it into place.');return render()}
   if(a==='delTable'&&t){S.tables=S.tables.filter(x=>x.id!==t.id);S.sel=null;toast(t.name+' removed');return render()}
   if(a==='gPlus'||a==='gMinus'){S.gN=Math.max(1,Math.min(12,(S.gN||Math.min(t.seats,2))+(a==='gPlus'?1:-1)));$('#gN').textContent=S.gN;return}
-  if(a==='seat'){Object.assign(l,{paid:0,parts:0,split:1,smode:'',itemsPaid:{},status:'ordering',guests:S.gN||Math.min(t.seats,2),waiter:S.role==='waiter'?ME:(l.waiter||ME),seated:now(),note:''});S.gN=null;return startOrder(t.id)}
+  if(a==='seat'){Object.assign(l,{paid:0,parts:0,split:1,smode:'',itemsPaid:{},status:'ordering',guests:S.gN||Math.min(t.seats,2),waiter:S.role==='waiter'?ME:(l.waiter||ME),seated:now(),note:l.status==='reserved'?(l.note||''):'',disc:null,nosvc:false});S.gN=null;return startOrder(t.id)}
   if(a==='startOrder')return startOrder(t.id);
   if(a==='backFloor'){S.page=S.role==='waiter'?'dashboard':'floor';S.sel=S.orderFor;S.draft=[];return render()}
   if(a==='served'){openOrders(t.id).filter(o=>o.status==='ready').forEach(o=>o.status='served');syncTable(t.id);toast('Served at '+t.name);return render()}
   if(a==='bill'){l.status='bill';toast('Bill requested for '+t.name);return render()}
   if(a==='pay'){if(LIVE&&S.no==null){const keep=t.id;withNo(n=>{S.no=n;S.sel=keep;act('pay')});return}const txid=LIVE?S.no:S.nextOrder+200+S.tx.length;S.no=null;
-    const tot=tableTotal(t.id),sp=payPlan(t.id),f=sp.full?sp.amt/sp.full:1;if(sp.item&&!sp.keys.length)return toast('Select the items this guest is paying for');S.paid.push({total:0,guests:0});
-    S.tx.push({id:txid,net:Math.round(tot*f*100)/100,guests:sp.last?l.guests:0,table:t.id,total:sp.amt,method:S.payM,by:S.user,at:now(),refunded:false,svc:S.set.service||0,part:sp.part,lines:sp.lines,waiter:l.waiter});
+    const bc=billCalc(t.id),tot=bc.after,sp=payPlan(t.id),f=sp.full?sp.amt/sp.full:1;if(sp.item&&!sp.keys.length)return toast('Select the items this guest is paying for');S.paid.push({total:0,guests:0});
+    S.tx.push({id:txid,net:Math.round(tot*f*100)/100,guests:sp.last?l.guests:0,table:t.id,total:sp.amt,method:S.payM,by:S.user,at:now(),refunded:false,svc:bc.rate,dfac:bc.f,disc:r2(bc.disc*f),part:sp.part,lines:sp.lines,waiter:l.waiter});
     if(!LIVE){BASE.rev+=tot*f;if(sp.last)BASE.covers+=l.guests}repStale();
     if(!sp.last){l.paid=Math.round((sp.paid+sp.amt)*100)/100;l.parts=sp.done+1;l.smode=sp.item?'item':'eq';if(sp.item){l.itemsPaid={...sp.pk};sp.keys.forEach(k=>{l.itemsPaid[k]=true})}S.selU=[];toast(`${gbp2(sp.amt)} taken by ${S.payM.toLowerCase()} · `+(sp.item?`${gbp2(Math.max(0,sp.rem-sp.amt))} still to pay`:`${sp.n-sp.done-1} more to pay`));return render()}
-    openOrders(t.id).forEach(o=>{o.closed=true;o.status='served'});Object.assign(l,{status:'cleaning',guests:0,waiter:null,seated:null,note:'',paid:0,parts:0,split:1,smode:'',itemsPaid:{}});S.selU=[];S.spMode='eq';S.rcpt={tx:txid};toast(`${gbp2(sp.amt)} taken by ${S.payM.toLowerCase()} · ${t.name} closed`);return render()}
+    openOrders(t.id).forEach(o=>{o.closed=true;o.status='served'});Object.assign(l,{status:'cleaning',guests:0,waiter:null,seated:null,note:'',paid:0,parts:0,split:1,smode:'',itemsPaid:{},disc:null,nosvc:false});S.selU=[];S.spMode='eq';S.discOpen=false;S.rcpt={tx:txid};toast(`${gbp2(sp.amt)} taken by ${S.payM.toLowerCase()} · ${t.name} closed`);return render()}
   if(a==='cleaned'){l.status='available';toast(t.name+' is available');return render()}
   if(a==='setStatus'){if((d.s==='available'||d.s==='cleaning'||d.s==='reserved')&&openOrders(t.id).length)return toast('This table still has an open bill. Take payment, or use Left without paying.');l.status=d.s;if(d.s==='available'||d.s==='cleaning')Object.assign(l,{...EMPTYLIVE,itemsPaid:{}});return render()}
   if(a==='rmLine'){S.draft.splice(+d.i,1);return render()}
@@ -1043,16 +1062,16 @@ function billLines(tid){const m=new Map();openOrders(tid).forEach(o=>o.lines.for
 function unitsOf(tid){const u=[];billLines(tid).forEach(q=>{for(let i=0;i<q.qty;i++)u.push({k:q.name+'|'+q.price+'|'+i,name:q.name,price:q.price})});return u}
 const spModeOf=tid=>{const l=lv(tid);return l.parts?(l.smode||'eq'):(S.spMode||'eq')};
 function payPlan(tid){const l=lv(tid),sp=splitOf(tid);if(spModeOf(tid)!=='item')return{...sp,lines:billLines(tid),part:sp.n>1?(sp.done+1)+' of '+sp.n:'',keys:[]};
-  const pk=l.itemsPaid||{},open=unitsOf(tid).filter(u=>!pk[u.k]),sel=open.filter(u=>(S.selU||[]).includes(u.k)),sub=sel.reduce((a,u)=>a+u.price,0),last=sel.length>0&&sel.length===open.length,amt=last?sp.rem:Math.round(sub*(1+(S.set.service||0)/100)*100)/100,m=new Map();
+  const pk=l.itemsPaid||{},open=unitsOf(tid).filter(u=>!pk[u.k]),sel=open.filter(u=>(S.selU||[]).includes(u.k)),sub=sel.reduce((a,u)=>a+u.price,0),last=sel.length>0&&sel.length===open.length,bc=billCalc(tid),amt=last?sp.rem:r2(sub*bc.f*(1+bc.rate/100)),m=new Map();
   sel.forEach(u=>{const k=u.name+'|'+u.price,c=m.get(k)||{name:u.name,qty:0,price:u.price};c.qty++;m.set(k,c)});
   return{...sp,last,amt,lines:[...m.values()],part:'by item',keys:sel.map(u=>u.k),open,sel,item:true,pk}}
-function splitOf(tid){const l=lv(tid),full=due(tableTotal(tid)),paid=l.paid||0,done=l.parts||0,n=Math.max(done+1,l.split||1),rem=Math.max(0,Math.round((full-paid)*100)/100),last=n-done<=1,amt=last?rem:Math.round(rem/(n-done)*100)/100;return{full,paid,done,n,rem,last,amt}}
-function receipt(){const r=S.rcpt,x=r.tx!=null&&S.tx.find(q=>q.id==r.tx),tid=x?x.table:r.table,t=tb(tid),lines=x?(x.lines||[]):billLines(tid),svc=x?(x.svc||0):(S.set.service||0),sub=lines.reduce((a,q)=>a+q.qty*q.price,0),sv=Math.round(sub*svc)/100,total=Math.round((sub+sv)*100)/100,l=!x&&lv(tid),w=staff(x?x.waiter:l.waiter),at=x?x.at:now();
+function splitOf(tid){const l=lv(tid),full=billCalc(tid).total,paid=l.paid||0,done=l.parts||0,n=Math.max(done+1,l.split||1),rem=Math.max(0,Math.round((full-paid)*100)/100),last=n-done<=1,amt=last?rem:Math.round(rem/(n-done)*100)/100;return{full,paid,done,n,rem,last,amt}}
+function receipt(){const r=S.rcpt,x=r.tx!=null&&S.tx.find(q=>q.id==r.tx),tid=x?x.table:r.table,t=tb(tid),lines=x?(x.lines||[]):billLines(tid),bcR=x?null:billCalc(tid),svc=x?(x.svc||0):bcR.rate,sub=lines.reduce((a,q)=>a+q.qty*q.price,0),dsc=r2(sub*(1-(x?(x.dfac!=null?x.dfac:1):bcR.f))),sv=r2((sub-dsc)*svc/100),total=r2(sub-dsc+sv),l=!x&&lv(tid),w=staff(x?x.waiter:l.waiter),at=x?x.at:now();
   const row=(a,b,c)=>`<div class="rc-r ${c||''}"><span>${a}</span><span>${b}</span></div>`;
   return`<div class="rcwrap" data-a="rcClose"><div class="rc" role="dialog" aria-label="${x?'Receipt':'Bill'}"><div class="rc-paper"><h2>${esc(S.set.name)}</h2>${S.set.address?`<p>${esc(S.set.address)}</p>`:''}${S.set.phone?`<p>${esc(S.set.phone)}</p>`:''}
 <div class="rc-hr"></div>${row(x?'Receipt #'+x.id:'Bill',new Date(at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' '+hhmm(at))}${row('Table',esc(t?t.name:tid))}${w.id?row('Served by',esc(w.name.split(' ')[0])):''}
 <div class="rc-hr"></div>${lines.length?lines.map(q=>row(q.qty+' × '+esc(q.name),gbp2(q.qty*q.price))).join(''):row('Items','not itemised')}
-<div class="rc-hr"></div>${lines.length?row('Subtotal',gbp2(sub))+(svc?row('Service '+svc+'%',gbp2(sv)):'')+row('Total',gbp2(total),'big'):''}
+<div class="rc-hr"></div>${lines.length?row('Subtotal',gbp2(sub))+(dsc?row('Discount'+(!x&&bcR.d&&bcR.d.k==='pct'?' '+bcR.d.v+'%':''),'−'+gbp2(dsc)):'')+(svc?row('Service '+svc+'%',gbp2(sv)):'')+row('Total',gbp2(total),'big'):''}
 ${x?row((x.refunded?'Refunded · ':'Paid · ')+esc(x.method)+(x.part?' · '+x.part:''),gbp2(x.total),lines.length?'':'big'):(l.paid?row('Paid so far',gbp2(l.paid))+row('Still to pay',gbp2(Math.max(0,total-l.paid)),'big'):'')+((l.split||1)>1?row('Split between '+l.split,gbp2(splitOf(tid).amt)+' each'):'')}
 <div class="rc-hr"></div><p>${x?'Thank you for dining with us':'Service is '+(svc?'included as shown':'not included')}</p><p style="font-size:11px;opacity:.7">Powered by Zema Production</p></div>
 <div class="rc-actions"><button class="btn pri" data-a="rcPrint">Print</button><button class="btn" data-a="rcClose">Close</button></div></div></div>`}
@@ -1078,7 +1097,7 @@ async function rpc(fn,args){const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{metho
 const errMsg=e=>(e&&/schema cache|Could not find the function|does not exist/i.test(String(e.code||e.message)))?'The database needs updating. Run the latest database script from the setup page.':({IMAGE:'That picture is too large. Try a smaller one.',EMAIL:'That email does not look right',DENIED:'You are not allowed to do that',PIN:'PINs are 4 digits',NAME:'Add a name first',BUSY:'Too many at once. Try again later.'}[e&&e.code]||'No connection. Try again.');
 let DIRTY=0;document.addEventListener('input',()=>{DIRTY=Date.now()});
 const safe=()=>{const a=document.activeElement;return!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))&&!S.edit&&Date.now()-DIRTY>120000&&!GATES[S.page]};
-function softRender(){if(safe())draw()}
+let QUIET=0;function softRender(){if(safe()){QUIET=1;try{draw()}finally{QUIET=0}}}
 function act(a){const b=document.createElement('button');b.dataset.a=a;b.hidden=true;document.body.appendChild(b);b.click();b.remove()}
 function withNo(fn){if(S.busy)return;S.busy=true;rpc('h_next_no',{p_token:TOKEN}).then(n=>{S.busy=false;netOk();fn(n)}).catch(e=>{S.busy=false;netFail(e);toast('No connection. Nothing was sent, try again.')})}
 function netOk(){if(S.offline){S.offline=false;softRender()}}
@@ -1478,13 +1497,14 @@ function dishExtraRead(){const g=id=>{const el=$('#'+id);return el?el.value.trim
    costs and profit, alerts and phone notifications
    ===================================================================== */
 const isMgr=()=>S.role==='owner'||S.role==='manager';
-const VOIDR=[['cancel','Not made · cancel'],['comp','On the house']],VOIDL={cancel:'Cancelled',comp:'On the house',walkout:'Not paid · guests left'};
+const VOIDR=[['cancel','Not made yet'],['waste','Already made'],['comp','On the house']],VOIDL={cancel:'Cancelled',waste:'Removed after cooking',comp:'On the house',walkout:'Not paid · guests left'};
 const EMPTYLIVE={guests:0,waiter:null,seated:null,note:'',paid:0,parts:0,split:1,smode:'',itemsPaid:{}};
 const fullPrice=x=>(x.price!=null?x.price:item(x.item).price)*x.qty;
-function orderBlock(o){const vm=String(S.voidO)===String(o.id),canC=S.role==='waiter'&&o.status==='new';
-  return`<div class="oblk"><div class="ohead"><span class="mono dim">#${o.id} · ${hhmm(o.at)}</span><span class="pill p-${o.status}">${OSTATE[o.status]}</span>${vm?'':isMgr()?`<button class="lnk" data-a="voidOn" data-o="${o.id}">Remove items</button>`:canC?`<button class="lnk" data-a="cancelO" data-o="${o.id}">Cancel order</button>`:''}</div>
-${vm?`<div class="vbar"><div class="chips">${VOIDR.map(([k,lb])=>`<button class="chip ${(S.voidR||'cancel')===k?'on':''}" data-a="voidR" data-r="${k}">${lb}</button>`).join('')}</div><small class="dim">Choose the reason, then tap × next to the item. Cancelled items go back into stock.</small></div>`:''}
-${o.lines.map((x,i)=>`<div class="line ${x.void?'void':''}"><span class="q">${x.qty}×</span><div>${esc(ln(x))}${x.note?`<small>${esc(x.note)}</small>`:''}${x.void?`<small class="vtag">${VOIDL[x.void]||'Removed'}</small>`:''}</div><span class="p">${gbp2(fullPrice(x))}</span>${vm&&!x.void?`<button class="x sm" data-a="voidLine" data-o="${o.id}" data-i="${i}" aria-label="Remove ${esc(ln(x))}">×</button>`:''}</div>`).join('')}
+function orderBlock(o){const vm=String(S.voidO)===String(o.id),can=S.role!=='kitchen'&&S.role!=='admin',cq=String(S.cancelQ)===String(o.id),vq=S.voidQ&&String(S.voidQ.o)===String(o.id)?S.voidQ.i:-1,started=o.status!=='new';
+  return`<div class="oblk"><div class="ohead"><span class="mono dim">#${o.id} · ${hhmm(o.at)}</span><span class="pill p-${o.status}">${OSTATE[o.status]}</span>${vm||cq||!can?'':`<button class="lnk" data-a="voidOn" data-o="${o.id}">Remove items</button><button class="lnk" data-a="cancelAsk" data-o="${o.id}">Cancel order</button>`}</div>
+${cq?`<div class="confirm"><b>Cancel the whole order #${o.id}?</b> <span class="muted">${started?'The kitchen has already started it.':'Nothing has been made yet, so it all goes back into stock.'}</span><div class="tbtns"><button class="btn" data-a="cancelO" data-o="${o.id}" style="background:var(--s-bill);border-color:var(--s-bill);color:#fff">Yes, cancel the order</button><button class="btn quiet" data-a="cancelNo">Keep it</button></div></div>`:''}
+${vm?`<div class="vbar"><span class="eyebrow">Why is it being removed?</span><div class="chips">${VOIDR.map(([k,lb])=>`<button class="chip ${(S.voidR||'cancel')===k?'on':''}" data-a="voidR" data-r="${k}">${lb}</button>`).join('')}</div><small class="dim">Then tap × next to the item. Items not made yet go back into stock.</small></div>`:''}
+${o.lines.map((x,i)=>`<div class="line ${x.void?'void':''}"><span class="q">${x.qty}×</span><div>${esc(ln(x))}${x.note?`<small>${esc(x.note)}</small>`:''}${x.void?`<small class="vtag">${VOIDL[x.void]||'Removed'}</small>`:''}</div><span class="p">${gbp2(fullPrice(x))}</span>${vm&&!x.void&&vq!==i?`<button class="x sm" data-a="voidAsk" data-o="${o.id}" data-i="${i}" aria-label="Remove ${esc(ln(x))}">×</button>`:''}</div>${vq===i?`<div class="confirm"><b>Remove ${x.qty}× ${esc(ln(x))}?</b> <span class="muted">${(VOIDR.find(v=>v[0]===(S.voidR||'cancel'))||[])[1]||''}</span><div class="tbtns"><button class="btn" data-a="voidLine" data-o="${o.id}" data-i="${i}" style="background:var(--s-bill);border-color:var(--s-bill);color:#fff">Remove</button><button class="btn quiet" data-a="voidNo">Keep</button></div></div>`:''}`).join('')}
 ${vm?`<button class="btn quiet" data-a="voidOff" style="margin-top:8px">Done</button>`:''}</div>`}
 function tableTools(t,l,os){if(!l.guests||!(isMgr()||S.role==='waiter'))return'';
   const free=S.tables.filter(x=>x.id!==t.id&&lv(x.id).status==='available');
@@ -1498,11 +1518,11 @@ ${S.walkT===t.id?`<div class="note" style="margin-top:10px;border:1px solid var(
 function fixTable(tid){const l=lv(tid);if(!openOrders(tid).length){if(['waiting','occupied','bill'].includes(l.status))l.status='ordering'}else syncTable(tid)}
 const findO=id=>S.orders.find(x=>String(x.id)===String(id));
 Object.assign(GACT,{
-  voidOn(d){S.voidO=d.o;S.voidR='cancel';render()},voidOff(){S.voidO=null;render()},voidR(d){S.voidR=d.r;render()},
-  voidLine(d){const o=findO(d.o);if(!o||!isMgr())return;const x=o.lines[+d.i];if(!x||x.void)return;Object.assign(x,{void:S.voidR||'cancel',vby:S.user,vat:now()});
+  voidOn(d){S.voidO=d.o;S.voidQ=null;S.cancelQ=null;const o=findO(d.o);S.voidR=o&&o.status!=='new'?'waste':'cancel';render()},voidOff(){S.voidO=null;render()},voidR(d){S.voidR=d.r;render()},
+  voidLine(d){S.voidQ=null;const o=findO(d.o);if(!o||S.role==='kitchen')return;const x=o.lines[+d.i];if(!x||x.void)return;Object.assign(x,{void:S.voidR||'cancel',vby:S.user,vat:now()});
     if(!LIVE&&x.void==='cancel')stockLocal(x.item,x.qty);if(o.lines.every(q=>q.void)){o.closed=true;S.voidO=null}fixTable(o.table);repStale();toast(ln(x)+(x.void==='comp'?' is on the house':' removed'));render()},
-  cancelO(d){const o=findO(d.o);if(!o)return;if(o.status!=='new'&&!isMgr())return toast('The kitchen has started it. Ask a manager to remove it.');
-    o.lines.forEach(x=>{if(!x.void){Object.assign(x,{void:'cancel',vby:S.user,vat:now()});if(!LIVE)stockLocal(x.item,x.qty)}});o.closed=true;fixTable(o.table);repStale();toast('Order #'+o.id+' cancelled');render()},
+  cancelO(d){S.cancelQ=null;const o=findO(d.o);if(!o||S.role==='kitchen')return;const why=o.status==='new'?'cancel':'waste';
+    o.lines.forEach(x=>{if(!x.void){Object.assign(x,{void:why,vby:S.user,vat:now()});if(!LIVE&&why==='cancel')stockLocal(x.item,x.qty)}});o.closed=true;fixTable(o.table);repStale();toast('Order #'+o.id+' cancelled');render()},
   gAdj(d){const l=lv(S.sel);l.guests=Math.max(1,Math.min(40,(l.guests||1)+(+d.n)));render()},
   moveOn(){S.moveT=S.moveT===S.sel?null:S.sel;S.noteT=S.walkT=null;render()},
   moveTo(d){const from=S.sel,to=d.t,a=lv(from),b=lv(to);if(!tb(to)||b.status!=='available')return toast('That table is no longer free');
@@ -1767,8 +1787,31 @@ document.addEventListener('change',e=>{if(e.target.id==='adall'&&e.target.checke
     S.adDraft=adFormRead();S.adImg=out;draw()};
   img.onerror=()=>{URL.revokeObjectURL(u);toast('That file is not a picture this device can read')};img.src=u});
 
+/* =====================================================================
+   Version 22: discounts, service charge on/off, removing items at any
+   stage with a confirmation, booking notes on the table
+   ===================================================================== */
+const MORDER=['Cash','Card','Apple Pay','Voucher'];
+function payMethods(all){const ks=Object.keys(S.set.methods||{}),o=MORDER.filter(m=>ks.includes(m)).concat(ks.filter(m=>!MORDER.includes(m)));return all?o:o.filter(m=>S.set.methods[m])}
+function billBox(tid){const l=lv(tid),b=billCalc(tid),lock=!!l.parts,IN='min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 16px var(--mono);width:110px';
+  const row=(a,v,c)=>`<div class="brow2 ${c||''}"><span>${a}</span><span class="mono">${v}</span></div>`;
+  return`<div class="billbox">${row('Items',gbp2(b.sub))}${b.disc?row(`Discount${b.d.k==='pct'?' '+b.d.v+'%':''}`,'−'+gbp2(b.disc),'disc'):''}${S.set.service?row(l.nosvc?'Service charge removed':`Service ${b.rate}%`,gbp2(b.svc),l.nosvc?'off':''):''}${row('Total to pay',gbp2(b.total),'tot')}
+${lock?'<span class="dim" style="font-size:12px">Part of this bill is paid, so the discount and service charge are fixed.</span>':`<div class="tbtns"><button class="btn quiet" data-a="discOpen">${b.disc?'Change discount':'Add discount'}</button>${S.set.service?`<button class="btn quiet" data-a="svcTog">${l.nosvc?'Add service charge back':'Remove service charge'}</button>`:''}</div>
+${S.discOpen===tid?`<div class="discf"><div class="seg" role="group" aria-label="Discount type"><button class="${(S.discK||'pct')==='pct'?'on':''}" data-a="discK" data-k="pct">%</button><button class="${S.discK==='amt'?'on':''}" data-a="discK" data-k="amt">£</button></div><input id="discv" type="number" inputmode="decimal" min="0" step="0.5" placeholder="${(S.discK||'pct')==='pct'?'e.g. 10':'e.g. 5.00'}" value="${b.d&&b.d.k===(S.discK||'pct')?b.d.v:''}" style="${IN}" aria-label="Discount amount"><button class="btn pri" data-a="discApply">Apply</button>${b.disc?'<button class="btn quiet" data-a="discClear">Remove</button>':''}</div>`:''}`}</div>`}
+function tableBookings(tid){const l=lv(tid);if(l.guests&&l.status!=='reserved')return'';const rs=S.res.filter(r=>r.table===tid);if(!rs.length)return'';
+  return`<div class="bookings"><div class="eyebrow" style="margin-bottom:6px">Booked</div>${rs.map(r=>`<div class="bk"><b>${esc(r.t)} · ${esc(r.name)}</b><span class="muted"> · ${r.guests} guests</span>${r.note?`<div class="bk-n">${esc(r.note)}</div>`:''}</div>`).join('')}</div>`}
+Object.assign(GACT,{
+  discOpen(){S.discOpen=S.discOpen===S.sel?null:S.sel;if(!S.discK)S.discK='pct';render()},
+  discK(d){S.discK=d.k;render()},
+  discApply(){const l=lv(S.sel),v=parseFloat($('#discv').value);if(l.parts)return;if(!(v>0))return toast('Enter the discount');const k=S.discK||'pct';if(k==='pct'&&v>100)return toast('A discount cannot be more than 100%');
+    l.disc={k,v:Math.round(v*100)/100,by:S.user};S.discOpen=null;toast(`Discount ${k==='pct'?v+'%':gbp2(v)} added`);render()},
+  discClear(){const l=lv(S.sel);if(l.parts)return;l.disc=null;S.discOpen=null;toast('Discount removed');render()},
+  svcTog(){const l=lv(S.sel);if(l.parts)return;l.nosvc=!l.nosvc;toast(l.nosvc?'Service charge removed':'Service charge added back');render()},
+  voidAsk(d){S.voidQ={o:d.o,i:+d.i};render()},voidNo(){S.voidQ=null;render()},
+  cancelAsk(d){S.cancelQ=d.o;render()},cancelNo(){S.cancelQ=null;render()}});
+
 boot();
-setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())render()},30000);
+setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())softRender()},30000);
 </script>
 
 </body>

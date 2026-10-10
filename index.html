@@ -480,6 +480,12 @@ button,.chip,.btn{touch-action:manipulation;-webkit-user-select:none;user-select
 .greqb{display:block;width:100%;padding:12px 16px;border-radius:12px;background:var(--s-ordering);color:#1A1308;font-weight:700;text-align:left}
 .greq{padding:12px 0;border-top:1px solid var(--line2)}.greq:first-of-type{border-top:0}.greq-h{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-bottom:4px}.greq-l{font-size:14px;color:var(--ink2);padding:2px 0}
 .greqp{border-color:var(--s-ordering)}.ritems{display:flex;flex-direction:column;gap:4px;max-height:260px;overflow:auto;margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:10px}
+
+.gm-land{display:flex;flex-direction:column;gap:16px;padding-top:26px;padding-bottom:40px}
+.gm-tile{position:relative;overflow:hidden;display:flex;align-items:center;gap:16px;min-height:120px;padding:22px 24px;border-radius:calc(var(--gm-r) + 8px);border:1px solid color-mix(in srgb,var(--gold) 45%,transparent);background:var(--gm-card);color:var(--gm-ink);text-align:left;box-shadow:0 14px 30px var(--gm-shadow)}
+.gm-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}.gm-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,color-mix(in srgb,var(--gm-base) 80%,transparent),transparent)}
+.gm-tile-i,.gm-tile-t{position:relative;z-index:1}.gm-tile-i{font-size:38px}.gm-tile-t{font:600 clamp(26px,7vw,36px)/1.1 var(--gm-serif);color:var(--gold);letter-spacing:.04em;text-transform:uppercase}
+.gm-secb{white-space:nowrap;padding:9px 14px;border-radius:99px;color:var(--gm-on);background:color-mix(in srgb,var(--gold) 80%,transparent);font:700 14px var(--body)}
 </style>
 </head>
 <body>
@@ -1462,7 +1468,8 @@ function gmData(){if(S.gm&&S.gm.pub)return S.gm;return{name:S.set.name,set:S.set
 function gmPhoto(m,cls){const big=BIG[m.id],p=big||phOf(m);return p?`<img class="${cls}" src="${p}" alt="" data-big="${m.big&&!big?m.id:''}">`:`<span class="${cls} gm-ph f-${esc(m.cat)}">${FOOD[m.name]||CATI[m.cat]||'🍽️'}</span>`}
 function gmTags(m,lang){const t=(m.tags||[]).filter(k=>TAGS.some(x=>x[0]===k));return(t.length||m.spice)?`<div class="gm-tags">${t.map(k=>`<span>${TAGS.find(x=>x[0]===k)[1]} ${esc(tl(k,lang))}</span>`).join('')}${m.spice?`<span title="${esc(tl('spice',lang))}">${'🌶'.repeat(Math.min(3,m.spice))}</span>`:''}</div>`:''}
 const TIBEB='<svg class="tibeb" viewBox="0 0 120 16" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="tb" width="24" height="16" patternUnits="userSpaceOnUse"><path d="M0 8 L6 2 L12 8 L6 14Z M12 8 L18 2 L24 8 L18 14Z" fill="none" stroke="currentColor" stroke-width="1"/><path d="M6 6v4M4 8h4M18 6v4M16 8h4" stroke="currentColor" stroke-width="1"/></pattern></defs><rect width="120" height="16" fill="url(#tb)"/></svg>';
-GATES.guest=()=>{const d=gmData(),st=d.set||{},ms=st.menuStyle||{},gl=gmLangs(d),lang=gl.includes(S.lang)?S.lang:gl[0],cats=catList(st).filter(c=>d.items.some(m=>inCat(m,c.id)));
+GATES.guest=()=>{const d=gmData(),st=d.set||{},ms=st.menuStyle||{},gl=gmLangs(d),lang=gl.includes(S.lang)?S.lang:gl[0],cats0=catList(st).filter(c=>d.items.some(m=>inCat(m,c.id)));
+  const SECS=gmSecs(cats0,ms);let land=false,cats=cats0;if(SECS){if(!S.gsec||!SECS.some(x=>x.k===S.gsec))land=true;else cats=cats0.filter(c=>secOf(c)===S.gsec)}
   if(d.paused)return`<div class="gm"><div class="gm-in"><h1 class="gm-title">${esc(d.name)}</h1><p class="gm-sub">${esc(tl('paused',lang))}</p></div></div>`;
   if(!cats.some(c=>c.id===S.gcat))S.gcat=cats[0]&&cats[0].id;
   const list=d.items.filter(m=>inCat(m,S.gcat)),tag=tx(ms,'tagline',lang);
@@ -1471,8 +1478,8 @@ GATES.guest=()=>{const d=gmData(),st=d.set||{},ms=st.menuStyle||{},gl=gmLangs(d)
   return`<div class="gm lay-${esc(L.layout)} ${pat?'':'nopat'}" style="${themeVars(L.theme)}" lang="${lang}">${S.gm&&S.gm.pub?'':'<button class="gm-exit" data-a="gmExit">← Back to the app</button>'}
 <header class="gm-head">${TIBEB}<div class="gm-in">${gl.length>1?`<div class="gm-lang" role="group" aria-label="Language">${LANGS.filter(x=>gl.includes(x[0])).map(([k,l])=>`<button class="${lang===k?'on':''}" data-lang="${k}" lang="${k}">${l}</button>`).join('')}</div>`:'<div style="height:14px"></div>'}
 <div class="gm-mark">✦</div><h1 class="gm-title">${esc(d.name||st.name||'')}</h1>${tag?`<p class="gm-sub">${esc(tag)}</p>`:`<p class="gm-sub">${esc(tl('menu',lang))}</p>`}</div></header>
-${adH('top')?`<div class="gm-in ad-wrap">${adH('top')}</div>`:''}<nav class="gm-cats" aria-label="Menu sections">${cats.map(c=>`<button class="${c.id===S.gcat?'on':''}" data-gcat="${esc(c.id)}">${esc(c[lang]||c.en||c.id)}</button>`).join('')}</nav>
-<main class="gm-in gm-list"><h2 class="gm-sec">${esc((cats.find(c=>c.id===S.gcat)||{})[lang]||cLabel(S.gcat,'en',st))}</h2>${list.length?list.map((m,i)=>card(m)+(btw&&i===Math.min(2,list.length-1)?btw:'')).join(''):`<p class="gm-sub">${esc(tl('empty',lang))}</p>`}</main>
+${adH('top')?`<div class="gm-in ad-wrap">${adH('top')}</div>`:''}${land?gmLanding(SECS,d,lang):`<nav class="gm-cats" aria-label="Menu sections">${SECS?`<button class="gm-secb" data-a="gSecBack" aria-label="All sections">‹ ${esc(secName(S.gsec,lang))}</button>`:''}${cats.map(c=>`<button class="${c.id===S.gcat?'on':''}" data-gcat="${esc(c.id)}">${esc(c[lang]||c.en||c.id)}</button>`).join('')}</nav>
+<main class="gm-in gm-list"><h2 class="gm-sec">${esc((cats.find(c=>c.id===S.gcat)||{})[lang]||cLabel(S.gcat,'en',st))}</h2>${list.length?list.map((m,i)=>card(m)+(btw&&i===Math.min(2,list.length-1)?btw:'')).join(''):`<p class="gm-sub">${esc(tl('empty',lang))}</p>`}</main>`}
 <footer class="gm-foot">${TIBEB}<div class="gm-in"><p>${esc(tl((gmData().set||{}).btype==='cafe'?'askc':'ask',lang))}</p>${st.address?`<p class="gm-small">${esc(st.address)}</p>`:''}${hoursText(st.open)||st.hours?`<p class="gm-small">${esc(hoursText(st.open)||st.hours)}</p>`:''}${st.service?`<p class="gm-small">${esc(st.service)}% service is added to the bill</p>`:''}</div></footer>
 ${gBar(d,lang)}${S.gd?gmDetail(d,lang):''}${gSheet(d,lang)}${adPopup()}</div>`};
 function gmDetail(d,lang){const m=d.items.find(x=>x.id===S.gd);if(!m)return'';const story=tx(m,'story',lang),al=tx(m,'allergens',lang);
@@ -1503,7 +1510,7 @@ async function pushBig(id,src){BIG[id]=src||undefined;if(!LIVE||!TOKEN)return;tr
 function catsPanel(){const c=catList(),IN='min-height:40px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 10px;font:500 15px var(--body);width:100%;min-width:0';
   return`<section class="panel"><header><h2>Menu categories</h2><button class="btn quiet" data-a="catAdd">+ Add category</button></header><div class="cattab">${c.map((x,i)=>`<div class="catrow"><div class="catmv"><button class="chip" data-catmv="${i}" data-d="-1" aria-label="Move up" ${i?'':'disabled'}>▲</button><button class="chip" data-catmv="${i}" data-d="1" aria-label="Move down" ${i<c.length-1?'':'disabled'}>▼</button></div>
 <input data-catf="en" data-cid="${esc(x.id)}" value="${esc(x.en||x.id)}" aria-label="Name in English" placeholder="English" style="${IN}"><input class="ge" data-catf="am" data-cid="${esc(x.id)}" value="${esc(x.am||'')}" aria-label="Name in Amharic" placeholder="አማርኛ" style="${IN}"><input class="ge" data-catf="ti" data-cid="${esc(x.id)}" value="${esc(x.ti||'')}" aria-label="Name in Tigrinya" placeholder="ትግርኛ" style="${IN}">
-<button class="x" data-catdel="${esc(x.id)}" aria-label="Delete ${esc(x.en||x.id)}">×</button></div>`).join('')}</div><p class="dim" style="font-size:13px;margin:10px 0 0">Changes save straight away. A category can only be deleted once it has no dishes.</p></section>`}
+<select data-catf="sec" data-cid="${esc(x.id)}" aria-label="Section for ${esc(x.en||x.id)}" style="${IN};width:auto">${SECDEF.map(z=>`<option value="${z.k}" ${secOf(x)===z.k?'selected':''}>${z.en}</option>`).join('')}</select><button class="x" data-catdel="${esc(x.id)}" aria-label="Delete ${esc(x.en||x.id)}">×</button></div>`).join('')}</div><p class="dim" style="font-size:13px;margin:10px 0 0">Changes save straight away. A category can only be deleted once it has no dishes.</p></section>`}
 const setCats=c=>{S.set.cats=c.map(x=>({...x}))};
 document.addEventListener('change',e=>{const t=e.target;if(!t.dataset||!t.dataset.catf||S.role!=='admin')return;const c=catList().map(x=>({...x})),x=c.find(y=>y.id===t.dataset.cid);if(!x)return;const v=t.value.trim();if(t.dataset.catf==='en'&&!v)return render();x[t.dataset.catf]=v;setCats(c);render()});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-catmv],[data-catdel]');if(!b||S.role!=='admin')return;e.stopPropagation();const c=catList().map(x=>({...x}));
@@ -1513,12 +1520,13 @@ GACT.catAdd=()=>{const c=catList().map(x=>({...x}));c.push({id:'c'+now().toStrin
 function guestPanel(){const u=appUrl()+'?m='+CODE,adm=S.role==='admin',ms=S.set.menuStyle||{},IN='min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);padding:0 12px;font:500 15px var(--body);width:100%';
   return`<section class="panel"><header><h2>Guest menu</h2><button class="btn quiet" data-a="gmOpen">Preview</button></header><p class="muted" style="margin:0 0 10px;font-size:14px">Guests open this on their own phone, for example from a QR code on each table. No sign-in needed.</p><p class="mono" style="margin:0;word-break:break-all;font-size:13px;user-select:all">${esc(u)}</p>
 <div class="qrline"><div class="qrbox" data-qr="${esc(u)}" aria-label="QR code for the guest menu"></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-a="gmCopy">Copy link</button><button class="btn" data-a="gmQR">Print QR code</button></div></div>
-${adm?`<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;border-top:1px solid var(--line2);padding-top:14px"><span class="eyebrow">Tagline under the restaurant name</span><input id="mt-en" value="${esc(ms.tagline||'')}" placeholder="e.g. Authentic Ethiopian kitchen" style="${IN}"><input class="ge" id="mt-am" value="${esc(ms.tagline_am||'')}" placeholder="አማርኛ" style="${IN}"><input class="ge" id="mt-ti" value="${esc(ms.tagline_ti||'')}" placeholder="ትግርኛ" style="${IN}"><label class="gchk"><input type="checkbox" id="mt-pat" ${ms.pattern===false?'':'checked'}> Show the traditional tibeb border</label><button class="btn pri" data-a="gmStyleSave" style="align-self:flex-start">Save menu style</button></div>`:''}</section>`}
+${adm?`<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;border-top:1px solid var(--line2);padding-top:14px"><span class="eyebrow">Tagline under the restaurant name</span><input id="mt-en" value="${esc(ms.tagline||'')}" placeholder="e.g. Authentic Ethiopian kitchen" style="${IN}"><input class="ge" id="mt-am" value="${esc(ms.tagline_am||'')}" placeholder="አማርኛ" style="${IN}"><input class="ge" id="mt-ti" value="${esc(ms.tagline_ti||'')}" placeholder="ትግርኛ" style="${IN}"><label class="gchk"><input type="checkbox" id="mt-pat" ${ms.pattern===false?'':'checked'}> Show the traditional tibeb border</label>
+<span class="eyebrow" style="margin-top:6px">When guests open the menu</span><label class="gchk"><input type="radio" name="mt-start" value="menu" ${ms.start==='sections'?'':'checked'}> Show the whole menu straight away</label><label class="gchk"><input type="radio" name="mt-start" value="sections" ${ms.start==='sections'?'checked':''}> Show Food, Drinks and Shisha buttons first</label><span class="dim" style="font-size:13px">Choose which button each category belongs to in Menu categories. Buttons with nothing in them are hidden.</span><button class="btn pri" data-a="gmStyleSave" style="align-self:flex-start">Save menu style</button></div>`:''}</section>`}
 function loadQR(){return window.QRCode?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
 Object.assign(GACT,{
   gmCopy(){const u=appUrl()+'?m='+CODE;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Menu link copied')).catch(()=>window.prompt('Copy this menu link',u))},
   gmQR(){qrPrint(appUrl()+'?m='+CODE,S.set.name)},
-  gmStyleSave(){S.set.menuStyle={...(S.set.menuStyle||{}),tagline:$('#mt-en').value.trim(),tagline_am:$('#mt-am').value.trim(),tagline_ti:$('#mt-ti').value.trim(),pattern:$('#mt-pat').checked};toast('Menu style saved');render()}});
+  gmStyleSave(){S.set.menuStyle={...(S.set.menuStyle||{}),tagline:$('#mt-en').value.trim(),tagline_am:$('#mt-am').value.trim(),tagline_ti:$('#mt-ti').value.trim(),pattern:$('#mt-pat').checked,start:((document.querySelector('[name="mt-start"]:checked')||{}).value)||'menu'};toast('Menu style saved');render()}});
 
 const inCat=(m,c)=>m.cat===c||(Array.isArray(m.cats)&&m.cats.includes(c));
 function dishExtra(e,IN){const v=(k)=>e?esc(e[k]||''):'',TA=IN.replace('min-height:42px','min-height:90px').replace('padding:0 12px','padding:10px 12px'),tg=(e&&e.tags)||[];
@@ -1748,7 +1756,7 @@ const THEMES={
   clean:{name:'Clean White',app:'#E9E4DA',v:{gold:'#1C1A17','gm-bg':'#FFFFFF','gm-base':'#FFFFFF','gm-ink':'#171513','gm-ink2':'#4A4640','gm-mute':'#77716A','gm-on':'#FFFFFF','gm-bar':'rgba(255,255,255,.95)','gm-card':'#F1EFEC','gm-tibeb':'#C9C2B7','gm-serif':SANS,'gm-shadow':'rgba(0,0,0,.08)','gm-r':'6px'}}};
 const LAYOUTS=[['side','Photo beside the dish'],['stack','Big photo on top'],['grid','Two per row'],['text','Text only, no photos']];
 const lookOf=d=>({theme:'habesha',layout:'side',...((d&&d.look)||{})});
-const themeVars=t=>Object.entries((THEMES[t]||THEMES.habesha).v).map(([k,v])=>`--${k}:${v}`).join(';');
+const themeVars=t=>Object.entries((THEMES[t]||THEMES.habesha).v).map(([k,v])=>`--${k}:${v}`).join(';').replace(/"/g,'&quot;');
 /* the restaurant's colour also tints its staff and owner app */
 function appTint(){const el=$('#app');if(!el)return;const t=LIVE&&S.look&&S.look.theme&&THEMES[S.look.theme];
   if(t&&!GATES[S.page]&&S.page!=='signin'){el.style.setProperty('--accent',t.app);el.style.setProperty('--accent-soft',`color-mix(in srgb,${t.app} 16%,#141210)`)}else{el.style.removeProperty('--accent');el.style.removeProperty('--accent-soft')}}
@@ -2055,6 +2063,15 @@ Object.assign(GACT,{cafeCats(){if(!confirm('Use the café categories Food, Drink
 
 const priceTag=m=>{const p=priceOf(m);return p!==(+m.price||0)?`<s class="was">${gbp2(m.price)}</s> ${gbp2(p)}`:gbp2(p)};
 const gPrice=(m,rules)=>{const p=priceOf(m,rules);return p!==(+m.price||0)?`<s class="was">${gbp2(m.price)}</s> ${gbp2(p)}`:gbp2(p)};
+/* ---------- guest menu: open on Food / Drinks / Shisha buttons (admin setting) ---------- */
+const SECDEF=[{k:'food',i:'🍽️',en:'Food',am:'ምግብ',ti:'መግቢ'},{k:'drinks',i:'🥤',en:'Drinks',am:'መጠጦች',ti:'መስተ'},{k:'shisha',i:'💨',en:'Shisha',am:'ሺሻ',ti:'ሺሻ'}];
+const secOf=c=>c&&c.sec?c.sec:/shisha|hookah|ሺሻ/i.test((c.id||'')+' '+(c.en||''))?'shisha':/drink|coffee|tea|juice|beer|wine|cocktail|bar|መጠጥ|ቡና/i.test((c.id||'')+' '+(c.en||''))?'drinks':'food';
+const secName=(k,lang)=>{const x=SECDEF.find(s=>s.k===k)||SECDEF[0];return x[lang]||x.en};
+function gmSecs(cats,ms){if(!ms||ms.start!=='sections')return null;const l=SECDEF.filter(s=>cats.some(c=>secOf(c)===s.k));return l.length>1?l:null}
+function gmLanding(secs,d,lang){const pic=k=>{const m=d.items.find(m=>catList(d.set).some(c=>secOf(c)===k&&inCat(m,c.id))&&(BIG[m.id]||phOf(m)));return m?(BIG[m.id]||phOf(m)):''};
+  return`<main class="gm-in gm-land">${secs.map(x=>{const p=pic(x.k);return`<button class="gm-tile" data-a="gSec" data-k="${x.k}">${p?`<img src="${p}" alt="">`:''}<span class="gm-tile-i" aria-hidden="true">${x.i}</span><span class="gm-tile-t">${esc(x[lang]||x.en)}</span></button>`}).join('')}</main>`}
+Object.assign(GACT,{gSec(d){S.gsec=d.k;S.gcat=null;draw();const g=$('.gm');if(g)g.scrollTop=0},gSecBack(){S.gsec=null;draw();const g=$('.gm');if(g)g.scrollTop=0}});
+
 boot();
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hhmm(now());if(!S.sel&&!S.mod&&!S.edit&&S.page!=='order'&&safe())softRender()},30000);
 </script>
